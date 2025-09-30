@@ -84,7 +84,9 @@ avaScen_LWD-*.geojson  (final scenario outputs, WebGIS-ready)
    - This keeps the map lightweight while enabling rich raster detail when needed.  
 
 ![zoomConcept1](zoomConcept1.png)
+
 ![zoomConcept2](zoomConcept2.png)
+
 ![zoomConcept3](zoomConcept3.png)
 
 ---
