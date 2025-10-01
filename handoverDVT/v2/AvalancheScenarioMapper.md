@@ -1,8 +1,8 @@
-
 # Avalanche Simulation Data – Handover Notes
 
 This document describes the avalanche simulation data prepared for the **pilot Brenner dataset**,  
-focusing on the `/11_avaDirectory` directory and the scenario-specific exports in `/12_avaScenMaps`.
+focusing on the `/11_avaDirectory` directory, the scenario-specific exports in `/12_avaScenMaps`,  
+and the lightweight preview outputs in `/13_avaScenPreview`.
 
 ---
 
@@ -42,6 +42,38 @@ This folder contains **scenario-specific exports**, generated after applying fil
 - **avaScenMaster.\***  
   - Optional combined export of **all filtered scenarios** in one file.  
   - Written if `makeMaster=True` during filtering.  
+
+---
+
+## `/13_avaScenPreview/`
+
+This folder contains **preview-ready data in WGS84** (EPSG:4326) for fast use in **WebGIS and Leaflet**.  
+The files here are derived from the UTM-based outputs in `/12_avaScenMaps` and `/00_input`.
+
+### Transformations Applied
+- **CRS Conversion**  
+  All data converted from UTM (EPSG:25832) → WGS84 (EPSG:4326).  
+
+- **Raster reprojection**  
+  Hillshade (`10HS_pilotBrenner_MC_mask.tif`) reprojected with nearest-neighbor resampling.  
+
+- **Vector reprojection**  
+  Avalanche results (`avaScenMaster.parquet`) and microregion boundaries  
+  (`avaScenMaster_avaReportMicroRegionsPilotBrenner.geojson`) reprojected to WGS84.  
+
+- **Path field shortening**  
+  Raster path fields (`path_*`) shortened to last 10 characters for readability.  
+
+### Purpose
+- **This folder** → lightweight preview, fast to load in WebGIS.  
+- **For complete data** → refer to `/12_avaScenMaps/avaScenMaster.*`  
+  (keeps full raster paths + attributes, UTM-based).  
+
+### Contents
+- `avaScenMaster_wgs84.geojson` → avalanche polygons + attributes (paths shortened)  
+- `10HS_pilotBrenner_wgs84.tif` → hillshade raster in WGS84  
+- `avaRepMicroRegionsPilotBrenner_wgs84.geojson` → microregion boundaries in WGS84  
+- `avaScenPreviewHTML.html` / `avaScenPreviewHTML.zip` → exported interactive preview map 
 
 ---
 
