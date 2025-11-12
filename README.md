@@ -282,9 +282,8 @@ baseDir = /media/christoph/Daten/Cairos/ModelChainProcess/cairosTutti/pilotSella
 #
 # --- Avalanche potential & size ---
 # Define the avalanche magnitude class to include in the scenario:
-#   avaPotential : Avalanche hazard potential level
-#                  (very high, high, moderat, low)
-#   avaSize      : Target avalanche size (PEM header value)
+#   avaPotential : Avalanche potential derived from EAWS-Matrix (e.g. low, medium, high, very high)
+#   avaSize      : Target potential event mobility size 
 #   applySingleRsizeRule : If True, deduplicates PRAs by keeping only
 #                          the largest rSize variant per unique PRA.
 #
@@ -358,19 +357,18 @@ applySingleRsizeRule = True
 |-------|------|-------------|
 | **praID** | *int* | Unique Potential Release Area (PRA) identifier |
 | **modType** | *str* | `"res"` = avalanche outline / `"rel"` = release area |
-| **LKGebiet** | *str* | Administrative district name |
+| **LKGebiet** | *str* | Avalanche commission region  |
 | **LWDGebietID** | *str* | Avalanche warning region ID |
-| **LKRegion** | *str* | Administrative region / province name |
 | **subC** | *int* | Subcatchment ID |
 | **sector** | *str* | Aspect sector (e.g. N, NE, E, SE, S, SW, W, NW) |
 | **elevMin** | *float* | Minimum elevation (m a.s.l.) |
 | **elevMax** | *float* | Maximum elevation (m a.s.l.) |
 | **flow** | *str* | Flow regime: `"dry"` or `"wet"` |
-| **PPM** | *int* | Potential Parameter Mass (model input) |
-| **PEM** | *int* | Potential Energy Mass (model input) |
+| **PPM** | *int* | Potential Path Mobility |
+| **PEM** | *int* | Potential Event Mobility |
 | **rSize** | *int* | Avalanche relative size class |
-| **avaPotential** | *str* | Avalanche potential level (e.g. low, medium, high, very high) |
-| **praAreaM** | *float* | PRA polygon area in m² |
+| **avaPotential** | *str* | Avalanche potential derived from EAWS-Matrix (e.g. low, medium, high, very high) |
+| **praAreaM** | *float* | PRA area in m² |
 | **praAreaSized** | *int* | PRA area size class |
 | **praAreaVol** | *float* | Estimated release volume (m³) |
 | **praElevBand** | *str* | Elevation band label (e.g. `"1800–2000"`) |
