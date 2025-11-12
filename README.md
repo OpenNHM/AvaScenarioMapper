@@ -28,14 +28,11 @@
 ## Cairos/cairosMapper/ Repository layout
 
 ```text
-../Cairos/cairosMapper/
+../cairosMapper/
 ├── avaScenMapperCfg.ini            ← Main configuration (global + scenarios)
 ├── local_avaScenMapperCfg.ini      ← Local override for development/testing
 ├── runAvaScenMapper.py             ← Main execution script (Step 16)
 ├── README.md                       ← This documentation
-│
-├── docs/
-│   └── avaPotMatrix.csv            ← Legend table for avalanche potential × size × modType
 │
 ├── in1Utils/
 │   ├── cfgUtils.py                 ← Logging, INI handling, relative-path helper
@@ -128,6 +125,22 @@ Or explicitly select the environment and script:
 ```bash
 pixi shell -e dev
 pixi run -e dev python runAvaScenMapper.py
+```
+
+```bash
+# ───────────────────────────────────────────────────────────────────────────────────────────────
+#    ███████  A V A L A N C H E · S C E N E N A R I O · M A P P E R   ██████████████████
+# ───────────────────────────────────────────────────────────────────────────────────────────────
+#
+#    ██████╗  ██╗  ██╗ ██████╗     ████████╗  ██████╗ ███████╗ ███╗   ██╗
+#    ██╔══██╗ ██╗  ██║ ██╔══██╗    ╚██╔════╝ ██╔════╝ ██╔════╝ ████╗  ██║
+#    ███████║ ██║ ██╔╝ ███████║     ███████╗ ██║      █████╗   ██╔██╗ ██║           
+#    ██╔══██║ ██║██╔╝  ██╔══██║     ╚════██║ ██║      ██╔══╝   ██║╚██╗██║
+#    ██║  ██║ ╚███╔╝   ██║  ███╗██╗████████║ ╚██████╗ ███████╗ ██║ ╚████║ █████╗ ███╗██╗
+#    ╚═╝  ╚═╝  ╚══╝    ╚═╝  ╚══╝╚═╝╚═══════╝  ╚═════╝ ╚══════╝ ╚═╝  ╚═══╝ ╚════╝ ╚══╝╚═╝
+# ───────────────────────────────────────────────────────────────────────────────────────────────
+#    ███████  runAvaScenMapper.py   ·  runAvaScenMapper.py  ·  runAvaScenMapper  ███████
+# ───────────────────────────────────────────────────────────────────────────────────────────────
 ```
 
 ---
@@ -225,8 +238,8 @@ mapperPathMode = cairosPaths
 
 # Enable external CAAML JSON feed (not yet implemented)
 mapperUseCaaml = False
-#mapperCaamlURL  = https://example.org/eaws/forecast/caamlv6.json
-#mapperCaamlFile = ./demo_caaml_v6.json
+#mapperCaamlURL  = 
+#mapperCaamlFile = 
 
 
 # ------------------ Path definitions ------------------ #
