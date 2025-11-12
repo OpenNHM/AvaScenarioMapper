@@ -1,5 +1,5 @@
-#
-# 🏔️ CAIROS Avalanche Scenario Mapper (2025-11 Update)
+
+## 🏔️ Avalanche Scenario Mapper (2025-11 Update)
 
 <p align="center">
   <img src="https://media.giphy.com/media/3Xzlefv57zcrVIPPRN/giphy.gif"
@@ -23,8 +23,7 @@
   - Outputs to: `13_avaScenMaps/`
 
 ---
-#
-#
+
 ## Cairos/cairosMapper/ Repository layout
 
 ```text
@@ -47,8 +46,7 @@
 ```
 
 ---
-#
-#
+
 ## Purpose
 
 - The Avalanche Scenario Mapper consumes the **AvaDirectoryResults** dataset from Step 15 of the Model Chain and generates **scenario-specific subsets** for visualization, web mapping, or export.
@@ -80,8 +78,7 @@ Optionally, a combined master file can be created:
 - Linked uniquely by **(praID, resultID)**.
 
 ---
-#
-#
+
 ## Execution
 
 - Run from within the Pixi environment:
@@ -102,8 +99,7 @@ python runAvaScenMapper.py --cfg avaScenMapperCfg.ini
 ```
 13_avaScenMaps/runAvaScenMapper_<timestamp>.log
 ```
-#
-#
+---
 ##  CAIROS Mapper — Quick Start Guide
 
 - The **CAIROS Avalanche Scenario Mapper** can be run **inside the Pixi environment** or **stand-alone**.
@@ -143,8 +139,6 @@ pixi run -e dev python runAvaScenMapper.py
 # ───────────────────────────────────────────────────────────────────────────────────────────────
 ```
 
----
-
 ### Run standalone (without Pixi)
 
 - If you already have the required Python dependencies installed:
@@ -181,8 +175,6 @@ python runAvaScenMapper.py --cfg /path/to/local_avaScenMapperCfg.ini
 ```
 
 ---
-#
-#
 ## Configuration overview (`avaScenMapperCfg.ini`)
 
 ```ini
@@ -355,8 +347,7 @@ applySingleRsizeRule = True
 ```
 
 ---
-#
-#
+
 ## Data Model — AvaDirectoryResults
 
 - The AvaDirectoryResults dataset (Step 15) is a structured summary of all avalanche simulation outputs.  
@@ -432,8 +423,7 @@ applySingleRsizeRule = True
 ```
 
 ---
-#
-#
+
 ## Relation between Release (rel) and Avalanche (res)
 
 - Each PRA (Potential Release Area) has **paired geometries**:
@@ -451,8 +441,7 @@ applySingleRsizeRule = True
     - Each `resultID` groups exactly two entries → one release and one outline.
 
 ---
-#
-#
+
 ## Typical workflow
 
 1. Run the full **CAIROS Model Chain** (Steps 00–15) to generate AvaDirectoryResults.  
@@ -465,8 +454,7 @@ applySingleRsizeRule = True
     - Diagnostic mode (`checkAvaDirResult = True`) lists all available attributes and exits before filtering.
 
 ---
-#
-#
+
 ## Module Responsibilities
 
 | Module | Responsibility |
@@ -478,8 +466,7 @@ applySingleRsizeRule = True
 | `runAvaScenMapper` | Main Step 16 orchestrator |
 
 ---
-#
-#
+
 ## Output summary
 
 ```text
@@ -491,8 +478,7 @@ applySingleRsizeRule = True
 └── runAvaScenMapper_<timestamp>.log   ← log file
 ```
 ---
-#
-#
+
 ## Summary
 
 - Step 16 of the CAIROS Avalanche Model Chain.  
