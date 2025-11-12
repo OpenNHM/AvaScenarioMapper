@@ -1,0 +1,43 @@
+[project]
+name = "cairos-mapper"
+description = "CAIROS Avalanche Scenario Mapper (Step 17: Scenario Filtering)"
+requires-python = ">=3.9,<3.12"
+
+# Pure Python deps (keep minimal)
+dependencies = [
+    "pandas",
+    "geopandas",
+    "pyarrow",
+    "shapely",
+    "requests",  # only needed if you use CAAML v6 online; remove if not used
+]
+
+# ----------------------------------------------------------------------
+# Pixi configuration (minimal mapper env)
+# ----------------------------------------------------------------------
+
+[tool.pixi.workspace]
+channels = ["https://prefix.dev/conda-forge"]
+platforms = ["linux-64", "win-64", "osx-64"]
+
+[tool.pixi.dependencies]
+python   = "3.11.*"
+proj     = "9.5.*"
+gdal     = "3.10.*"
+fiona    = "1.10.*"
+rasterio = "1.4.*"
+pyproj   = "3.7.*"
+pyarrow  = "*"
+
+[tool.pixi.tasks]
+# Run CAIROS Mapper standalone
+mapper = { cmd = "python runMapper.py", cwd = "." }
+
+[tool.pixi.environments]
+dev = {}
+
+[tool.pixi.activation.env]
+NUMBA_CAPTURED_ERRORS        = "new_style"
+CPL_LOG                      = "/dev/null"
+GDAL_PAM_ENABLED             = "NO"
+GDAL_DISABLE_READDIR_ON_OPEN = "EMPTY_DIR"

@@ -1,0 +1,68 @@
+# ----------------------------------------------------------------------
+# CAIROS Avalanche Scenario Mapper (.gitignore)
+# Public repository version
+# ----------------------------------------------------------------------
+
+# --- Python artifacts ---
+__pycache__/
+*.py[cod]
+*.pyo
+
+# --- Pixi / environment files ---
+.pixi/
+pixi.lock
+
+# Keep pixi.lock for reproducibility
+# (comment out next line if you prefer not to include it)
+# pixi.lock
+
+# --- Local configuration (user-specific) ---
+local_*.ini
+
+# --- Logs, temp, cache ---
+*.log
+*.tmp
+
+# --- IDE / Editor files ---
+.vscode/
+.idea/
+*.swp
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+
+# --- Example data, notebooks, archives ---
+notebooks/
+testData/
+_archiv/
+handoverDVT/
+data/
+examples/
+
+# --- Generated documentation & assets ---
+*.pdf
+*.png
+*.zip
+
+# --- Large media (exclude video/demo artifacts) ---
+*.mp4
+*.tiff
+*.avi
+*.flv
+*.mov
+*.wmv
+
+# --- Git / packaging ---
+.git/
+*.egg-info/
+dist/
+build/
+
+# ----------------------------------------------------------------------
+# Notes:
+# • Keep pyproject.toml  → required by Pixi
+# • Keep avaScenMapperCfg.ini → public config template
+# • Exclude local_avaScenMapperCfg.ini → user-specific paths
+# • Keep pixi.lock if you want others to reproduce the exact environment
+# ----------------------------------------------------------------------
