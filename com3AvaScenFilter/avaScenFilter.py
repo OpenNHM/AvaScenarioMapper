@@ -1,38 +1,47 @@
-# ------------------ com3AvaScenFilter/avaScenFilter.py ------------------ #
-# Step 17 Core Logic: Avalanche Scenario Filtering
+# --------------------------- com3AvaScenFilter/avaScenFilter.py --------------------------- #
 #
-# Purpose
-# --------
-# Apply multi-criteria filtering to the AvaDirectory results dataset
-# (avaDirectoryResults.parquet) to extract scenario-specific subsets
-# for visualization and mapping.
+# Purpose :
+#   Apply multi-criteria filtering to the AvaDirectory results dataset
+#   (avaDirectoryResults.parquet) to extract scenario-specific subsets
+#   for visualization and mapping.
 #
-# The filtering criteria correspond to physical, geographical, and
-# avalanche-dynamics attributes defined in avaScenMapperCfg.ini.
+#   The filtering criteria correspond to physical, geographical, and
+#   avalanche-dynamics attributes defined in avaScenMapperCfg.ini.
 #
-# Each scenario is defined by a set of filters:
-#   - Region filters: select PRA results by administrative or forecast region
-#                     (LKGebietID or LWDGebietID)
-#   - Scenario filters: select by subcatchment (subC), flow type (dry/wet),
-#                       aspect/sector, and elevation range.
-#   - Legend filters: apply avalanche potential (AvaPotential) and
-#                     avalanche size (PEM_header) combinations using
-#                     the matrix defined in in2Matrix/avaPotMatrix.py.
-#   - Deduplication: enforce a single PRA per scenario, keeping the
-#                    result with the largest relative size (rSize).
+#   Each scenario is defined by a set of filters :
+#       - Region filters : select PRA results by administrative or forecast region
+#                          (LKGebietID or LWDGebietID)
+#       - Scenario filters : select by subcatchment (subC), flow type (dry/wet),
+#                            aspect/sector, and elevation range
+#       - Legend filters : apply avalanche distribution and size potentials
+#                          (AvaDistributionPotential × AvaSizePotential)
+#                          using the matrix defined in in2Matrix/avaPotMatrix.py
+#       - Deduplication : enforce a single PRA per scenario, keeping the
+#                         result with the largest relative size (rSize)
 #
-# The output is a filtered GeoDataFrame ready for export as
-# avaScen_<ScenarioName>.parquet / .geojson by runAvaScenMapper.py.
+# Output :
+#   A filtered GeoDataFrame ready for export as
+#   avaScen_<ScenarioName>.parquet / .geojson by runAvaScenMapper.py.
 #
-# Author:  CAIROS Project Team
-# Version: 2025-11
-# -------------------------------------------------------------------------
+# Author :
+#   Christoph Hesselbach
+#
+# Institution :
+#   Austrian Research Centre for Forests (BFW)
+#   Department of Natural Hazards | Snow and Avalanche Unit
+#
+# Version :
+#   2025-11
+#
+# ------------------------------------------------------------------------------------------- #
+
 
 import logging
 import pandas as pd
 import geopandas as gpd
 from typing import Dict, List
-from in2Matrix.avaPotMatrix import makeAvaLegend
+
+from in2Matrix.avaPotMatrix import avaPotMatrix
 from in1Utils.mapperUtils import normalizeAvaCols, logScenarioSummary
 
 log = logging.getLogger(__name__)
@@ -47,21 +56,23 @@ def filterScenarioResults(
     legend: pd.DataFrame = None
 ) -> gpd.GeoDataFrame:
     """
-    Filter avaDirectoryResults using region, flow, elevation and avalanche
-    potential/size rules. Returns filtered GeoDataFrame.
+    Filter avaDirectoryResults using region, flow, elevation, and
+    avalanche potential–size rules.
 
     Parameters
     ----------
     gdf : GeoDataFrame
         Input dataset (avaDirectoryResults.parquet content).
+
     criteria : dict
         Scenario definition (parsed from avaScenMapperCfg.ini).
         Keys include:
           LKRegionID, LwdRegionID, regionMode,
           subCs, sectors, flows, elevMin, elevMax,
-          avaPotential, avaSize, applySingleRsizeRule
+          AvaDistributionPotential, AvaSizePotential, applySingleRsizeRule
+
     legend : DataFrame, optional
-        Avalanche potential–size–modType matrix from makeAvaLegend().
+        Avalanche potential–size–modType matrix from avaPotMatrix().
     """
     gdf = normalizeAvaCols(gdf)
 
@@ -103,23 +114,24 @@ def filterScenarioResults(
     if elevMax is not None:
         gdf = gdf[gdf["elevMax"] <= elevMax]
 
-    # --- 3. Avalanche Legend filters (AvaPotential + AvaSize) ---
-    avaPotential = criteria.get("avaPotential")
-    avaSize = criteria.get("avaSize")
-    if avaPotential and avaSize is not None:
-        legend = legend if legend is not None else makeAvaLegend()
+    # --- 3. Avalanche Legend filters (AvaDistributionPotential + AvaSizePotential) ---
+    avaDistPot = criteria.get("AvaDistributionPotential")
+    avaSizePot = criteria.get("AvaSizePotential")
+    if avaDistPot and avaSizePot is not None:
+        legend = legend if legend is not None else avaPotMatrix()
 
-        pots = [avaPotential] if isinstance(avaPotential, str) else list(avaPotential)
+        pots = [avaDistPot] if isinstance(avaDistPot, str) else list(avaDistPot)
         pots = [p.lower() for p in pots]
-        pemHeader = int(avaSize)
+        sizeRef = int(avaSizePot)
 
         leg = legend.copy()
-        leg["AvaPotential"] = leg["AvaPotential"].str.lower()
+        leg["AvaDistributionPotential"] = leg["AvaDistributionPotential"].str.lower()
         leg["modType"] = leg["modType"].str.lower().str.strip()
-        leg = leg[(leg["AvaPotential"].isin(pots)) & (leg["PEM_header"] == pemHeader)]
+        leg = leg[(leg["AvaDistributionPotential"].isin(pots)) &
+                  (leg["AvaSizePotential"] == sizeRef)]
 
         if leg.empty:
-            log.warning("Legend selection empty for potentials=%s, PEM=%s", pots, pemHeader)
+            log.warning("Legend selection empty for potentials=%s, AvaSize=%s", pots, sizeRef)
         else:
             for c in ("PPM", "PEM", "rSize"):
                 if c in gdf.columns:
@@ -133,10 +145,10 @@ def filterScenarioResults(
 
             before = len(gdf)
             gdf = gdf.merge(allowedTriples, on=["PPM", "PEM", "rSize"], how="inner")
-            log.info("Applied legend filter: potentials=%s, PEM=%s → kept %d/%d rows",
-                     pots, pemHeader, len(gdf), before)
+            log.info("Applied legend filter: potentials=%s, AvaSize=%s → kept %d/%d rows",
+                     pots, sizeRef, len(gdf), before)
 
-            gdf["avaPotential"] = ",".join(sorted(set(pots)))
+            gdf["AvaDistributionPotential"] = ",".join(sorted(set(pots)))
 
     # --- 4. Deduplication: keep largest rSize per PRA ---
     applySingle = criteria.get("applySingleRsizeRule", True)
@@ -172,10 +184,12 @@ def runScenarioFilters(
     ----------
     gdf : GeoDataFrame
         Source data (avaDirectoryResults.parquet)
+
     criteriaList : list of dict
         Scenario definitions parsed from configuration
+
     legend : DataFrame
-        Avalanche potential–size matrix
+        Avalanche Distribution–Size matrix
 
     Returns
     -------

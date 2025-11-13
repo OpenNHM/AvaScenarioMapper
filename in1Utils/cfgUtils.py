@@ -1,24 +1,33 @@
-# ------------------ in1Utils/cfgUtils.py ------------------ #
-# Unified configuration and logging utilities for CAIROS Mapper
+# --------------------------- in1Utils/cfgUtils.py --------------------------- #
 #
-# Purpose
-# --------
-# Provides configuration loading (with local overrides),
-# unified logging setup, relative path formatting for log output,
-# and a timing decorator for performance diagnostics.
+# Purpose :
+#   Unified configuration and logging utilities for the Avalanche Scenario Mapper.
 #
-# Consistent with cairosModelChain style:
+#   Provides configuration loading with local overrides, unified logging setup,
+#   relative path formatting for compact log output, and a timing decorator for
+#   performance diagnostics.
+#
+# Consistent with Avalanche Scenario Model Chain style :
 #   - Logging format and levels
 #   - local_<config>.ini override behavior
 #   - relPath() for short log references
 #
-# Used by:
+# Used by :
 #   - runAvaScenMapper.py
 #   - in1Utils/mapperUtils.py
 #
-# Author : CAIROS Project Team
-# Version: 2025-11
-# -------------------------------------------------------------------------
+# Author :
+#   Christoph Hesselbach
+#
+# Institution :
+#   Austrian Research Centre for Forests (BFW)
+#   Department of Natural Hazards | Snow and Avalanche Unit
+#
+# Version :
+#   2025-11
+#
+# ------------------------------------------------------------------------------ #
+
 
 import os
 import time
@@ -32,7 +41,7 @@ from functools import wraps
 
 def setupLogging(cfg: configparser.ConfigParser) -> None:
     """
-    Initialize unified CAIROS logging based on configuration settings.
+    Initialize unified Avalanche Scenario Mapper logging based on configuration settings.
 
     Reads the log level from:
         [WORKFLOW] logLevel = INFO | DEBUG | WARNING | ERROR
