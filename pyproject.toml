@@ -1,23 +1,24 @@
 [project]
-name = "cairos-mapper"
-description = "CAIROS Avalanche Scenario Mapper (Step 17: Scenario Filtering)"
+name = "avalanche-scenario-mapper"
+description = "Avalanche Scenario Mapper (Step 16: Scenario Filtering and Visualization)"
 requires-python = ">=3.9,<3.12"
 
-# Pure Python deps (keep minimal)
+# ----------------------------------------------------------------------
+# Core Python dependencies (keep minimal for portability)
+# ----------------------------------------------------------------------
 dependencies = [
     "pandas",
     "geopandas",
     "pyarrow",
     "shapely",
-    "requests",  # only needed if you use CAAML v6 online; remove if not used
+    "requests",  # only required if CAAML v6 online integration is used
 ]
 
 # ----------------------------------------------------------------------
-# Pixi configuration (minimal mapper env)
+# Pixi configuration (project-level)
 # ----------------------------------------------------------------------
-
-[tool.pixi.workspace]
-channels = ["https://prefix.dev/conda-forge"]
+[tool.pixi]
+channels  = ["https://prefix.dev/conda-forge"]
 platforms = ["linux-64", "win-64", "osx-64"]
 
 [tool.pixi.dependencies]
@@ -29,13 +30,23 @@ rasterio = "1.4.*"
 pyproj   = "3.7.*"
 pyarrow  = "*"
 
+# ----------------------------------------------------------------------
+# Pixi tasks
+# ----------------------------------------------------------------------
 [tool.pixi.tasks]
-# Run CAIROS Mapper standalone
-mapper = { cmd = "python runMapper.py", cwd = "." }
+# Run the Avalanche Scenario Mapper standalone
+mapper = "python runAvaScenMapper.py"
 
+# ----------------------------------------------------------------------
+# Pixi environments
+# ----------------------------------------------------------------------
 [tool.pixi.environments]
-dev = {}
+# Define the dev environment (explicitly add features to avoid schema errors)
+dev = { features = [] }
 
+# ----------------------------------------------------------------------
+# Environment activation variables
+# ----------------------------------------------------------------------
 [tool.pixi.activation.env]
 NUMBA_CAPTURED_ERRORS        = "new_style"
 CPL_LOG                      = "/dev/null"

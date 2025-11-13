@@ -13,52 +13,37 @@
 # ───────────────────────────────────────────────────────────────────────────────────────────────
 #    ███████  runAvaScenMapper.py   ·  runAvaScenMapper.py  ·  runAvaScenMapper  ███████
 # ───────────────────────────────────────────────────────────────────────────────────────────────
-
-
-
+#
 # Purpose :
-#   Step 17 of the CAIROS Model Chain.
+#   Step 17 of the Avalanche Scenario Model Chain.
 #   Filters avaDirectoryResults.parquet into scenario-specific subsets
-#   for visualization, mapping, and web publication.
+#   for visualization, mapping, and publication.
 #
-# Inputs  : 12_avaDirectory/avaDirectoryResults.parquet
-# Outputs : 13_avaScenMaps/avaScen_<Scenario>.parquet / .geojson
-#
-# Config  : avaScenMapperCfg.ini + local_avaScenMapperCfg.ini
-#            [WORKFLOW], [PATHS], [FILTER], [FILTER.*]
-#
-# Execution:
-#     pixi run -e dev python runAvaScenMapper.py
-#     or  python runAvaScenMapper.py --cfg avaScenMapperCfg.ini
-#
-# Author  : CAIROS Project Team
-# Version : 2025-11
-# ───────────────────────────────────────────────────────────────────────────────────────────────
-
-
-# ------------------ runAvaScenMapper.py ------------------ #
-# Step 17: Avalanche Scenario Mapper
-#
-# Purpose
-# --------
-# Orchestrates the filtering and export of scenario-specific avalanche
-# results from avaDirectoryResults.parquet into separate GeoDataFrames.
-#
-# Each scenario is defined in avaScenMapperCfg.ini under [FILTER.*] sections
-# or can be generated from CAAML (future integration).
-#
-# Inputs :
+# Inputs  :
 #   12_avaDirectory/avaDirectoryResults.parquet
-# Outputs:
+# Outputs :
 #   13_avaScenMaps/avaScen_<Scenario>.parquet / .geojson
 #
-# Config :
+# Config  :
 #   avaScenMapperCfg.ini + local_avaScenMapperCfg.ini
 #   [WORKFLOW], [PATHS], [FILTER], [FILTER.*]
 #
-# Author : CAIROS Project Team
-# Version: 2025-11
-# -------------------------------------------------------------------------
+# Execution :
+#   pixi run -e dev python runAvaScenMapper.py
+#   or  python runAvaScenMapper.py --cfg avaScenMapperCfg.ini
+#
+# Author :
+#   Christoph Hesselbach
+#
+# Institution :
+#   Austrian Research Centre for Forests (BFW)
+#   Department of Natural Hazards | Snow and Avalanche Unit
+#
+# Version :
+#   2025-11
+#
+# ---------------------------------------------------------------------------------- #
+
 
 # ------------------ System imports ------------------ #
 import sys
@@ -71,7 +56,7 @@ from typing import List, Dict, Optional
 import pandas as pd
 import geopandas as gpd
 
-# ------------------ Core CAIROS utilities ------------------ #
+# ------------------ Core utilities ------------------ #
 import in1Utils.cfgUtils as cfgUtils
 import in1Utils.mapperUtils as mapperUtils
 from in1Utils.cfgUtils import relPath
@@ -79,15 +64,13 @@ from in1Utils.cfgUtils import relPath
 # ------------------ Components ------------------ #
 import com3AvaScenFilter.avaScenFilter as avaScenFilter
 import in2Matrix.avaPotMatrix as avaPotMatrix
-import in1Utils.caamlUtils as caamlUtils  # placeholder
+import in1Utils.caamlUtils as caamlUtils  # placeholder for future CAAML v6 integration
 
 # ------------------ Logger ------------------ #
 log = logging.getLogger(__name__)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# MAIN FUNCTION
-# ─────────────────────────────────────────────────────────────────────────────
+# --------------------------- MAIN FUNCTION --------------------------- #
 def runAvaScenMapper(
     cfg: configparser.ConfigParser,
     paths: Optional[dict] = None,
@@ -102,9 +85,7 @@ def runAvaScenMapper(
         "       ============================================================================\n"
     )
 
-    # -------------------------------------------------------------------------
-    # Resolve paths
-    # -------------------------------------------------------------------------
+    # ------------------ Resolve paths ------------------ #
     if paths is None:
         paths = mapperUtils.resolvePaths(cfg)
 
@@ -115,9 +96,7 @@ def runAvaScenMapper(
     log.info("Input AvaDirectoryResults : %s", relPath(avaResultsPath, baseDir))
     log.info("Output AvaScenMaps folder : %s", relPath(scenMapsDir, baseDir))
 
-    # -------------------------------------------------------------------------
-    # Load and validate input data
-    # -------------------------------------------------------------------------
+    # ------------------ Load and validate input data ------------------ #
     gdf = mapperUtils.readGdf(avaResultsPath)
     gdf = mapperUtils.normalizeAvaCols(gdf)
 
@@ -129,15 +108,11 @@ def runAvaScenMapper(
     if not mapperUtils.handleAvaDirCheckMode(cfg, avaResultsPath):
         return
 
-    # -------------------------------------------------------------------------
-    # Load avalanche potential matrix
-    # -------------------------------------------------------------------------
-    avaLegend = avaPotMatrix.makeAvaLegend()
-    log.info("Step 17: Avalanche legend loaded (%d entries)", len(avaLegend))
+    # ------------------ Load Avalanche Distribution–Size matrix ------------------ #
+    avaLegend = avaPotMatrix.avaPotMatrix()
+    log.info("Step 17: Avalanche Distribution–Size matrix loaded (%d entries)", len(avaLegend))
 
-    # -------------------------------------------------------------------------
-    # Parse scenario definitions
-    # -------------------------------------------------------------------------
+    # ------------------ Parse scenario definitions ------------------ #
     if areaCriteriaList is None:
         useCaaml = cfg.getboolean("WORKFLOW", "mapperUseCaaml", fallback=False)
         if useCaaml:
@@ -150,9 +125,7 @@ def runAvaScenMapper(
         log.warning("Step 17: No scenarios configured → exiting Mapper.")
         return
 
-    # -------------------------------------------------------------------------
-    # Run scenario filtering
-    # -------------------------------------------------------------------------
+    # ------------------ Run scenario filtering ------------------ #
     log.info("Step 17: Running %d scenario(s) -------------------------------------------------", len(areaCriteriaList))
     results = avaScenFilter.runScenarioFilters(gdf, areaCriteriaList, avaLegend)
 
@@ -160,9 +133,7 @@ def runAvaScenMapper(
         log.warning("Step 17: No scenario produced output; nothing to export.")
         return
 
-    # -------------------------------------------------------------------------
-    # Write per-scenario outputs
-    # -------------------------------------------------------------------------
+    # ------------------ Write per-scenario outputs ------------------ #
     for df, crit in zip(results, areaCriteriaList):
         scenName = crit.get("name", "unnamed")
         scenNameClean = "".join(ch for ch in scenName if ch.isalnum() or ch in "-_").strip()
@@ -172,9 +143,7 @@ def runAvaScenMapper(
         log.info("Step 17: Writing scenario '%s' → %s", scenName, relPath(outParquet, baseDir))
         mapperUtils.writeScenarioOutputs(df, outParquet, outGeoJson)
 
-    # -------------------------------------------------------------------------
-    # Combine master file (optional)
-    # -------------------------------------------------------------------------
+    # ------------------ Combine master file (optional) ------------------ #
     makeMaster = cfg.getboolean("WORKFLOW", "mapperMakeMaster", fallback=False)
     if makeMaster:
         log.info("Step 17: Combining all scenarios into avaScen_Master --------------------------------")
@@ -183,10 +152,9 @@ def runAvaScenMapper(
         outGeoJson = scenMapsDir / "avaScen_Master.geojson"
         mapperUtils.writeScenarioOutputs(master, outParquet, outGeoJson)
         mapperUtils.logScenarioSummary(master, "avaScen_Master")
+        log.info("Master file CRS inherited from first scenario for consistency.")
 
-    # -------------------------------------------------------------------------
-    # Completion
-    # -------------------------------------------------------------------------
+    # ------------------ Completion ------------------ #
     dt = time.perf_counter() - t0
     log.info(
         "\n       ============================================================================\n"
@@ -195,9 +163,7 @@ def runAvaScenMapper(
     )
 
 
-# -------------------------------------------------------------------------
-# MAIN ENTRYPOINT
-# -------------------------------------------------------------------------
+# --------------------------- MAIN ENTRYPOINT --------------------------- #
 def main(argv: Optional[list] = None) -> int:
     """Command-line entry point for standalone execution."""
     if argv is None:
@@ -217,17 +183,14 @@ def main(argv: Optional[list] = None) -> int:
     try:
         runAvaScenMapper(cfg)
     except Exception:
-        log.exception("Step 17: AvaScenario Mapper failed.")
+        log.exception("Step 17: Avalanche Scenario Mapper failed.")
         return 1
 
-    # relative log output path
     baseDir = Path(cfg.get("PATHS", "baseDir", fallback=Path.cwd()))
-    log.info("AvaScenario Mapper log saved at: %s", relPath(log_path, baseDir))
+    log.info("Avalanche Scenario Mapper log saved at: %s", relPath(log_path, baseDir))
     return 0
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# MAIN RUNNER
-# ─────────────────────────────────────────────────────────────────────────────
+# --------------------------- MAIN RUNNER --------------------------- #
 if __name__ == "__main__":
     raise SystemExit(main())
