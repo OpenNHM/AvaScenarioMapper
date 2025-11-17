@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------
-# CAIROS Avalanche Scenario Mapper (.gitignore)
+# CAIROS Avalanche Model Chain (.gitignore)
 # Public repository version
 # ----------------------------------------------------------------------
 
@@ -32,20 +32,22 @@ local_*.ini
 .DS_Store
 Thumbs.db
 
-# --- Example data, notebooks, archives ---
-notebooks/
-testData/
+# --- Internal or heavy data ---
 _archiv/
-handoverDVT/
-data/
-examples/
 
-# --- Generated documentation & assets ---
+
+# --- Generated outputs (optional to exclude) ---
+*_output/
+*_results/
+*_plots/
+*_cache/
+
+# --- Documentation / assets ---
 *.pdf
 *.png
 *.zip
 
-# --- Large media (exclude video/demo artifacts) ---
+# --- Large media (avoid committing videos) ---
 *.mp4
 *.tiff
 *.avi
@@ -61,8 +63,8 @@ build/
 
 # ----------------------------------------------------------------------
 # Notes:
-# • Keep pyproject.toml  → required by Pixi
-# • Keep avaScenMapperCfg.ini → public config template
-# • Exclude local_avaScenMapperCfg.ini → user-specific paths
-# • Keep pixi.lock if you want others to reproduce the exact environment
+# • Keep pyproject.toml and pixi.lock → required for Pixi reproducibility
+# • Keep cairosCfg.ini → public template
+# • Exclude local_cairosCfg.ini → user-specific paths
+# • Exclude generated model outputs and flowPy results
 # ----------------------------------------------------------------------
