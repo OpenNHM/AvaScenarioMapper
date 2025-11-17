@@ -1,5 +1,5 @@
 
-# Avalanche Scenario Mapper (2025-11 Update)
+## Avalanche Scenario Mapper (2025-11 Update)
 
 <p align="center">
   <img src="https://media.giphy.com/media/3Xzlefv57zcrVIPPRN/giphy.gif"
@@ -11,7 +11,7 @@
 
 ---
 
-## Overview
+### Overview
 
 - The Avalanche Scenario Mapper was developed within the **EUREGIO Project CAIROS**.  
 - It represents **Step 16** of the **Avalanche Scenario Model Chain**.  
