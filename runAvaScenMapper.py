@@ -157,11 +157,10 @@ def runAvaScenMapper(
     # ------------------ Completion ------------------ #
     dt = time.perf_counter() - t0
     log.info(
-        "\n       ============================================================================\n"
+        "\n\n       ============================================================================\n"
         f"          ... Step 17: Avalanche Scenario Mapper finished successfully in {dt:.2f}s ...\n"
         "       ============================================================================\n"
     )
-
 
 # --------------------------- MAIN ENTRYPOINT --------------------------- #
 def main(argv: Optional[list] = None) -> int:
@@ -187,7 +186,7 @@ def main(argv: Optional[list] = None) -> int:
         return 1
 
     baseDir = Path(cfg.get("PATHS", "baseDir", fallback=Path.cwd()))
-    log.info("Avalanche Scenario Mapper log saved at: %s", relPath(log_path, baseDir))
+    log.info("Avalanche Scenario Mapper log saved at: %s\n", relPath(log_path, baseDir))
     return 0
 
 

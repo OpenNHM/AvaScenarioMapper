@@ -4,23 +4,26 @@ description = "Avalanche Scenario Mapper (Step 16: Scenario Filtering and Visual
 requires-python = ">=3.9,<3.12"
 
 # ----------------------------------------------------------------------
-# Core Python dependencies (keep minimal for portability)
+# Core Python dependencies (minimal, portable)
 # ----------------------------------------------------------------------
 dependencies = [
     "pandas",
     "geopandas",
     "pyarrow",
     "shapely",
-    "requests",  # only required if CAAML v6 online integration is used
+    "requests",   # only needed for CAAML v6 online integration
 ]
 
 # ----------------------------------------------------------------------
-# Pixi configuration (project-level)
+# Pixi PROJECT configuration
 # ----------------------------------------------------------------------
 [tool.pixi]
 channels  = ["https://prefix.dev/conda-forge"]
 platforms = ["linux-64", "win-64", "osx-64"]
 
+# ----------------------------------------------------------------------
+# Conda-level dependencies (GDAL/Fiona/PROJ stack)
+# ----------------------------------------------------------------------
 [tool.pixi.dependencies]
 python   = "3.11.*"
 proj     = "9.5.*"
@@ -31,21 +34,19 @@ pyproj   = "3.7.*"
 pyarrow  = "*"
 
 # ----------------------------------------------------------------------
-# Pixi tasks
+# Tasks
 # ----------------------------------------------------------------------
 [tool.pixi.tasks]
-# Run the Avalanche Scenario Mapper standalone
-mapper = "python runAvaScenMapper.py"
+mapper = { cmd = "python runAvaScenMapper.py", cwd = "." }
 
 # ----------------------------------------------------------------------
-# Pixi environments
+# Environments
 # ----------------------------------------------------------------------
 [tool.pixi.environments]
-# Define the dev environment (explicitly add features to avoid schema errors)
 dev = { features = [] }
 
 # ----------------------------------------------------------------------
-# Environment activation variables
+# Runtime environment variables
 # ----------------------------------------------------------------------
 [tool.pixi.activation.env]
 NUMBA_CAPTURED_ERRORS        = "new_style"

@@ -1,5 +1,5 @@
 
-# 🏔️ Avalanche Scenario Mapper (2025-11 Update)
+# Avalanche Scenario Mapper (2025-11 Update)
 
 <p align="center">
   <img src="https://media.giphy.com/media/3Xzlefv57zcrVIPPRN/giphy.gif"
@@ -7,7 +7,7 @@
        width="300"/>
 </p>
 
-<h3 align="center">⚠️ Handle with care — work in progress</h3>
+<h4 align="center">⚠️ Handle with care — work in progress</h4>
 
 ---
 
@@ -34,7 +34,7 @@
 ../AvalancheScenarioMapper/
 ├── avaScenMapperCfg.ini            ← Main configuration (global + scenarios)
 ├── local_avaScenMapperCfg.ini      ← Local override for testing
-├── runAvaScenMapper.py             ← Main execution script (Step 17)
+├── runAvaScenMapper.py             ← Main execution script (Step 16)
 ├── README.md                       ← This documentation
 │
 ├── in1Utils/
@@ -43,7 +43,7 @@
 │   └── caamlUtils.py               ← Placeholder for future CAAML v6 integration
 │
 ├── in2Matrix/
-│   └── avaPotMatrix.py             ← Avalanche Distribution × Size × modType legend
+│   └── avaPotMatrix.py             ← Avalanche potential matrix (derived from EAWS-Matrix)
 │
 └── com3AvaScenFilter/
     └── avaScenFilter.py            ← Core filtering logic (region / flow / elevation / legend)
@@ -58,7 +58,7 @@
     - **Geographic filters** → LKGebietID / LWDGebietID / Region  
     - **Physical filters** → subcatchment (subC), sector, elevation range  
     - **Flow type filters** → dry / wet  
-    - **Avalanche legend** → AvaPotential × avalanche size (PEM_header)  
+    - **Avalanche Size** → Avalanche potential martix × potential event mobility (PPM)
     - **Deduplication rule** → keep only largest relative size (rSize)
 
 ### Results
@@ -84,51 +84,7 @@ Optionally, a combined master file can be created:
 
 ## Execution
 
-- Run from within the Pixi environment:
-
 ```bash
-pixi shell -e dev
-pixi run -e dev python runAvaScenMapper.py
-```
-
-- or standalone:
-
-```bash
-python runAvaScenMapper.py --cfg avaScenMapperCfg.ini
-```
-
-- Logs are written automatically to:
-
-```
-13_avaScenMaps/runAvaScenMapper_<timestamp>.log
-```
----
-##  CAIROS Mapper — Quick Start Guide
-
-- The **CAIROS Avalanche Scenario Mapper** can be run **inside the Pixi environment** or **stand-alone**.
-
-### Run inside Pixi
-
-- From within the `cairosMapper/` directory:
-
-```bash
-# Activate Pixi environment
-pixi shell
-
-# Run the mapper (task defined in pyproject.toml)
-pixi run mapper
-```
-
-Or explicitly select the environment and script:
-
-```bash
-pixi shell -e dev
-pixi run -e dev python runAvaScenMapper.py
-```
-
-```bash
-# ───────────────────────────────────────────────────────────────────────────────────────────────
-#    ███████  A V A L A N C H E · S C E N E N A R I O · M A P P E R   ██████████████████
 # ───────────────────────────────────────────────────────────────────────────────────────────────
 #
 #    ██████╗  ██╗  ██╗ ██████╗     ████████╗  ██████╗ ███████╗ ███╗   ██╗
@@ -138,47 +94,30 @@ pixi run -e dev python runAvaScenMapper.py
 #    ██║  ██║ ╚███╔╝   ██║  ███╗██╗████████║ ╚██████╗ ███████╗ ██║ ╚████║ █████╗ ███╗██╗
 #    ╚═╝  ╚═╝  ╚══╝    ╚═╝  ╚══╝╚═╝╚═══════╝  ╚═════╝ ╚══════╝ ╚═╝  ╚═══╝ ╚════╝ ╚══╝╚═╝
 # ───────────────────────────────────────────────────────────────────────────────────────────────
-#    ███████  runAvaScenMapper.py   ·  runAvaScenMapper.py  ·  runAvaScenMapper  ███████
+#    ███████████  A V A L A N C H E · S C E N A R I O · M A P P E R   ██████████████████
 # ───────────────────────────────────────────────────────────────────────────────────────────────
 ```
 
-### Run standalone (without Pixi)
-
-- If you already have the required Python dependencies installed:
+- Run from within the Pixi environment:
 
 ```bash
-python runAvaScenMapper.py --cfg avaScenMapperCfg.ini
+pixi install
+pixi run mapper
 ```
 
-- You can also provide an absolute path to a custom configuration:
+- or standalone:
 
 ```bash
 python runAvaScenMapper.py --cfg /path/to/local_avaScenMapperCfg.ini
 ```
 
-### Log output
-
-- All run-time information and scenario summaries are written automatically to:
-
-```
-13_avaScenMaps/runAvaScenMapper_<timestamp>.log
-```
-
-- Each log contains:
-    - input / output directory paths  
-    - active filters or CAAML scenarios  
-    - summary statistics per scenario  
-    - total runtime
-
-- Outputs will appear under:
-
-```
-13_avaScenMaps/<caseFolder>/avaScen_<scenario>.parquet
-13_avaScenMaps/<caseFolder>/avaScen_<scenario>.geojson
-```
+- Logs are written automatically to:
+  - `13_avaScenMaps/runAvaScenMapper_<timestamp>.log`
 
 ---
-## Configuration overview (`avaScenMapperCfg.ini`)
+
+## Configuration overview
+- `avaScenMapperCfg.ini` or `local_avaScenMapperCfg.ini`
 
 ```ini
 # --------------------------- Avalanche Scenario Mapper --------------------------- #
@@ -189,7 +128,7 @@ python runAvaScenMapper.py --cfg /path/to/local_avaScenMapperCfg.ini
 #
 # Usage :
 #   - Standalone :  python runAvaScenMapper.py --cfg avaScenMapperCfg.ini
-#   - Integrated :  Executed as Step 17 of the Avalanche Scenario Model Chain.
+#   - Integrated :  Executed as Step 16 of the Avalanche Scenario Model Chain.
 #
 # Pixi environment :
 #   pixi shell -e dev
@@ -353,8 +292,6 @@ elevMax     = 2200
 AvaDistributionPotential = very high
 AvaSizePotential         = 3
 applySingleRsizeRule     = True
-
-
 ```
 
 ---
