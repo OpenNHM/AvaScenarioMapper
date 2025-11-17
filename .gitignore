@@ -60,11 +60,3 @@ _archiv/
 *.egg-info/
 dist/
 build/
-
-# ----------------------------------------------------------------------
-# Notes:
-# • Keep pyproject.toml and pixi.lock → required for Pixi reproducibility
-# • Keep cairosCfg.ini → public template
-# • Exclude local_cairosCfg.ini → user-specific paths
-# • Exclude generated model outputs and flowPy results
-# ----------------------------------------------------------------------
