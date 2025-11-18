@@ -31,7 +31,7 @@
 ## Repository layout
 
 ```text
-../AvalancheScenarioMapper/
+../AvaScenarioMapper/
 ├── avaScenMapperCfg.ini            ← Main configuration (global + scenarios)
 ├── local_avaScenMapperCfg.ini      ← Local override for testing
 ├── runAvaScenMapper.py             ← Main execution script (Step 16)
@@ -99,6 +99,9 @@ Optionally, a combined master file can be created:
 ```
 
 - Run from within the Pixi environment:
+  - **Note:** This repository contains its own Pixi environment, independent from the Model Chain, but:
+  - **Required input:** This step requires `avaDirectoryResults.parquet` from Model Chain Step 15.
+
 
 ```bash
 pixi install
