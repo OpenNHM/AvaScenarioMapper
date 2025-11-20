@@ -44,7 +44,7 @@ _archiv/
 
 # --- Documentation / assets ---
 *.pdf
-*.png
+#*.png
 *.zip
 
 # --- Large media (avoid committing videos) ---
