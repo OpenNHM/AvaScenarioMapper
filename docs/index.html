@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_e371c5d133bee88e415e46b1847b254a {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+<!-- self cache-bust so the same QR/URL always fetches the latest build -->
+<script>
+(function () {
+  if (!/([?&])v=/.test(location.search)) {
+    var sep = location.search ? '&' : '?';
+    var bust = 'v=' + Date.now();
+    location.replace(location.pathname + location.search + sep + bust + location.hash);
+  }
+})();
+</script>
+
+<style>
+  /* -------- LOADER (fake) -------- */
+  #ava-loader{
+    position:fixed; inset:0; z-index:20000;
+    background:rgba(255,255,255,0.6);
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .35s ease;
+  }
+  #ava-loader.hide{opacity:0}
+  .loader-box{
+    text-align:center; pointer-events:none;
+  }
+  .loader-box img{width:200px; height:auto; display:block; margin:0 auto 6px}
+  .loader-title{font:700 18px/1.2 Arial, sans-serif; color:#ff00ff; margin:0 0 4px}
+  .loader-sub{font:12px Arial, sans-serif; color:#333}
+
+  /* Top banner (...% width, centered) */
+  #ava-banner{position:fixed;top:0;left:0;width:100%;z-index:10000;pointer-events:none;display:flex;justify-content:center}
+  #ava-banner img{width:100%;height:auto;opacity:0.9;display:block}
+
+  /* Settings panel (bottom-left, collapsible) */
+  .ava-style{background:rgba(255,255,255,.9);padding:6px 8px;border:1px solid #ccc;border-radius:4px;
+    font-family:Arial,sans-serif;font-size:12px;line-height:1.25em;box-shadow:0 1px 3px rgba(0,0,0,.15);
+    min-width:220px;max-width:240px}
+  .ava-style .hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    font-weight:700;margin:0 0 4px;cursor:pointer;user-select:none}
+  /* make only the "SETTINGS" text bold */
+  .ava-style .hdr span:first-child{
+    font-weight: 800;
+  }
+  .ava-style .hdr .caret{font-weight:500;font-size:16px;line-height:1;transform:translateY(-1px)}
+  .ava-style .body{transition:max-height .2s ease, opacity .2s ease}
+  .ava-style.collapsed .body{max-height:0;opacity:.0;overflow:hidden}
+  .ava-style .row{margin:3px 0}
+  .ava-style .cb{display:flex;align-items:center;gap:6px}
+  .ava-style .radio-row label{display:block;margin:2px 0}
+  .swatch{display:inline-block;width:40px;height:10px;border-radius:2px;vertical-align:middle}
+  
+  /* Transparency buttons (apply to all layers) — thinner */
+  .alpha-row{display:flex;gap:6px;margin:4px 0 6px}
+  .alpha-btn{flex:1;border:1px solid #bbb;border-radius:6px;padding:2px 4px;line-height:1.1;background:#fff;
+    cursor:pointer;text-align:center;font-size:11px;user-select:none}
+  .alpha-btn.active{border-color:#666;font-weight:700}
+
+  /* Size legend (continuous bar + 3 labels) — NO border */
+  .legend-size{margin-top:6px}
+  .size-grad{width:100%;height:12px;border-radius:3px}
+  /* Size legend labels alignment */
+  .size-labels{
+    display:flex;
+    gap:0;
+    font-size:11px;
+    margin-top:2px;
+  }
+  .size-labels span{
+    flex:1 1 33%;
+  }
+  .size-labels span:first-child{ text-align:left; }
+  .size-labels span:nth-child(2){ text-align:center; transform:none; } /* remove prior translate */
+  .size-labels span:last-child{ text-align:right; }
+
+
+  /* Hide default Leaflet layer control (we recreated it inside Settings) */
+  .leaflet-control-layers{display:none !important;}
+
+  .leaflet-bottom.leaflet-left .leaflet-control{margin-left:10px;margin-bottom:10px}
+  /* Hide Leaflet +/- (Python also sets zoom_control=False) */
+  .leaflet-control-zoom{display:none !important;}
+
+  /* Popup: 80% opaque background, crisp text */
+  .ava-popup .leaflet-popup-content-wrapper{
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    border-radius: 8px;
+  }
+  .ava-popup .leaflet-popup-tip{
+    background: rgba(255,255,255,0.8);
+  }
+
+
+  @media (max-width:480px){
+    .ava-style{min-width:200px}
+  }
+</style>
+
+<!-- Fake loader -->
+<div id="ava-loader">
+  <div class="loader-box">
+    <img src="https://media.giphy.com/media/3Xzlefv57zcrVIPPRN/giphy.gif" alt="">
+    <div class="loader-title">Avalanche Scenario Mapper</div>
+    <div class="loader-sub">Please wait …</div>
+  </div>
+</div>
+
+<!-- Banner -->
+<div id="ava-banner"><img id="ava-banner-img" src="" alt=""></div>
+
+
+<script>
+(function(){
+  /* ============== IMPORTANT STYLE VARS ============== */
+  let FILL_OPACITY = 0.30;        // transparency for all visible features
+  const CONFIG = {
+    STROKE_WEIGHT: 0,
+    REL_COLOR: "#ff00ff",
+    RES_COLOR: "#1e00ff",
+    SIZE_CLASSES: [
+      { color:"#09a2ff", label:"Size 1<br>1 LKW" },
+      { color:"#66ff31", label:""                  },
+      { color:"#fff300", label:"Size 3<br>100 LKW"},
+      { color:"#ff0000", label:""                  },
+      { color:"#5b0069", label:"Size 5<br>10.000 LKW"},
+    ],
+    HIGHLIGHT_BORDER: "red",
+    HIGHLIGHT_WEIGHT: 3.5,
+    HIGHLIGHT_STROKE_OPACITY: 0.5,
+    HIGHLIGHT_EXTRA_FILL: 0.15,
+    HIGHLIGHT_MAX_FILL: 0.55
+  };
+  const LOADER_MS = 4000;  //  fake loader
+
+  const winterUrl = "data/avaScen_Winter_mobile_hex.geojson";
+  const springUrl = "data/avaScen_Spring_mobile_hex.geojson";
+  const microUrl  = "data/avaScenMaster_avaReportMicroRegionsPilotBrenner_wgs84.geojson";
+  const bannerWinter = "data/avaScenWinter.png";
+  const bannerSpring = "data/avaScenSpring.png";
+  
+  // Reuse page's ?v=... to bust image cache (falls back to now)
+  const BUST  = new URLSearchParams(location.search).get('v') || Date.now();
+  const CACHE = '?v=' + BUST;
+  
+  const START_ZOOM = 14, MIN_ZOOM = 12, MAX_ZOOM = 14;
+  const FIT_TO_DATA = false;
+  const TITLE_OFF = 4500;
+  const STYLE_POS = "bottomleft";
+  const ATTRS = ['LWDGebietID', 'LKGebiet', 'LKRegion', 'praID', 'resultID', 'modType', 'sector', 'flow', 'praAreaM', 'rSize', 'PPM', 'PEM', 'avaPotential'];
+
+  /* --- Hillshade base (PNG + bounds) --- */
+  const HILL_PNG = "data/HS10m_pilotBrenner_wgs84.png";
+  let base_hill = null;
+  try {
+    const info = JSON.parse('{"bounds": [[46.91571776781058, 11.239491625878523], [47.080879561592, 11.593290591056762]]}');   // expects {"bounds":[[S,W],[N,E]]}
+    if (HILL_PNG && info && Array.isArray(info.bounds)) {
+      const hillBounds = L.latLngBounds(info.bounds);
+      base_hill = L.imageOverlay(HILL_PNG + CACHE, hillBounds, {
+        opacity: 0.30,                  // 30% transparency
+        interactive: false
+      });
+    }
+  } catch (e) {
+    console.error("Hillshade bounds JSON parse failed:", e);
+  }
+
+
+  function waitForVars(maxTries){
+    let tries=0, iv=setInterval(()=>{
+      const mapObj=window["map_e371c5d133bee88e415e46b1847b254a"],
+            G_W=window["feature_group_f606cb3d1402e5a5f2f03dd2b497323a"], G_S=window["feature_group_d9909a7fb75c167a45e8f7279751f65a"], G_M=window["feature_group_c1c47bc6dfdab1a19dae9c29cbae7296"],
+            BASE_LIGHT=window["tile_layer_5fcc44580034f07e264e0030fc3faec6"], BASE_BERGFEX=window["tile_layer_5664c5ebf809612acd45d29905834ff1"];
+      if(mapObj && G_W && G_S && G_M && BASE_LIGHT && BASE_BERGFEX && mapObj.addControl){
+        clearInterval(iv); boot(mapObj,G_W,G_S,G_M,BASE_LIGHT,BASE_BERGFEX);
+      } else if(++tries>maxTries){ clearInterval(iv); console.error("❌ Leaflet objects not ready."); }
+    },120);
+  }
+
+  function boot(mapObj, G_W, G_S, G_M, BASE_LIGHT, BASE_BERGFEX){
+    let showRel=true, showRes=false, sizeOn=false;   // 👈 default: only Release ON
+    let L_W=null, L_S=null, highlighted=null, didFit=false;
+    let scenario='winter';                            // 👈 default: Winter
+
+    // snap & clamp zoom; (+/- controls hidden via CSS and zoom_control=False)
+    mapObj.options.zoomSnap=1; mapObj.options.zoomDelta=1;
+    mapObj.setZoom(Math.min(Math.max(START_ZOOM, MIN_ZOOM), MAX_ZOOM));
+
+    // Add Leaflet scale bar
+    if (L && L.control && L.control.scale) {
+      L.control.scale({metric:true, imperial:false}).addTo(mapObj);
+    }
+
+    // banner helpers
+    function updateBanner(){
+      const img = document.getElementById('ava-banner-img');
+      if (!img) return;
+      img.src = ((scenario === 'winter') ? bannerWinter : bannerSpring) + CACHE;
+    }
+
+    // visibility + styling
+    function isVisibleByType(p){
+      const t=((p&&p.modType)||"").toLowerCase();
+      return (t==="rel" && showRel) || (t==="res" && showRes);
+    }
+    function pickHex(p){
+      if(!p) return null;
+      if(sizeOn) return p.hex_size||p.hexSize||p.hexsize||p.size_hex||p.__size_hex||null;
+      return p.hex_relRes||p.hex_relres||p.hexRelRes||p.hexrelres||p.hex_rel||null;
+    }
+    function styleFromProps(p){
+      const visible=isVisibleByType(p);
+      const hex=pickHex(p)||"#808080";
+      return { color:hex, fillColor:hex, weight:CONFIG.STROKE_WEIGHT,
+               opacity:visible?1:0, fillOpacity:visible?FILL_OPACITY:0 };
+    }
+    function styleHighlight(p){
+      const base=styleFromProps(p);
+      return { color:CONFIG.HIGHLIGHT_BORDER, weight:CONFIG.HIGHLIGHT_WEIGHT, opacity:CONFIG.HIGHLIGHT_STROKE_OPACITY,
+               fillColor:base.fillColor,
+               fillOpacity:Math.min(CONFIG.HIGHLIGHT_MAX_FILL,(base.fillOpacity||0)+CONFIG.HIGHLIGHT_EXTRA_FILL) };
+    }
+    function bindPopupsAndHighlight(layer){
+      if(!layer||!layer.eachLayer) return;
+      layer.eachLayer(function(ch){
+        const p=ch&&ch.feature?ch.feature.properties:null; if(!p) return;
+        let rows="";
+        for(let k of ATTRS){
+          if(Object.prototype.hasOwnProperty.call(p,k)){
+            rows+=`<tr><td><b>${k}</b></td><td>${p[k]}</td></tr>`;
+          }
+        }
+        if(rows && ch.bindPopup){
+          ch.bindPopup(
+            `<table style="font-size:11px">${rows}</table>`,
+            { maxWidth:270, className:'ava-popup' }
+          );
+        }
+        ch.on('click', ()=>{
+          if(highlighted&&highlighted.setStyle){
+            const pp=highlighted.feature?highlighted.feature.properties:null;
+            highlighted.setStyle(styleFromProps(pp));
+          }
+          highlighted=ch;
+          ch.setStyle(styleHighlight(p));
+          if(ch.bringToFront) ch.bringToFront();
+          if(ch.openPopup) ch.openPopup();
+        });
+      });
+    }
+    function applyStyleToGeoJSON(layer){
+      if(!layer||!layer.eachLayer) return;
+      layer.eachLayer(function(ch){
+        const p=ch&&ch.feature?ch.feature.properties:null;
+        const s=(highlighted===ch)?styleHighlight(p):styleFromProps(p);
+        if(ch&&ch.setStyle) ch.setStyle(s);
+      });
+    }
+    function loadGeo(url, intoGroup){
+      return fetch(url,{cache:"no-store"}).then(r=>r.json()).then(geo=>{
+        const layer=L.geoJSON(geo,{style:f=>styleFromProps(f&&f.properties?f.properties:null)});
+        bindPopupsAndHighlight(layer); if(intoGroup) layer.addTo(intoGroup); return layer;
+      });
+    }
+
+    /* Combined Settings panel (bottom-left) */
+    const StyleControl=L.Control.extend({
+      options:{position:STYLE_POS},
+      onAdd:function(map){
+        const div=L.DomUtil.create('div','ava-style leaflet-control');
+        div.innerHTML=`
+          <div class="hdr" id="ava-hdr">
+            <span>SETTINGS     </span>
+            <span class="caret" id="ava-caret">▾</span>
+          </div>
+          <div class="body" id="ava-body">
+
+            <!-- Base Layer -->
+            <div class="row" style="margin-top:2px;font-weight:700">Base Layer:</div>
+            <div class="row radio-row">
+              <label><input type="radio" name="base" id="base-light"> Hillshade</label>
+              <label><input type="radio" name="base" id="base-berg" checked> Bergfex Topo</label> <!-- 👈 default bergfex -->
+            </div>
+
+            <!-- Scenario -->
+            <div class="row" style="margin-top:6px;font-weight:700">Scenario:</div>
+            <div class="row radio-row">
+              <label><input type="radio" name="scn" id="scn-winter" checked> Winter (New Snow)</label>
+              <label><input type="radio" name="scn" id="scn-spring"> Spring (Wet Snow)</label>
+            </div>
+
+            <hr style="margin:6px 0;border:none;border-top:1px solid #ddd">
+
+            <!-- Show Avalanche -->
+            <div class="row" style="font-weight:700">Potential Avalanche Paths:</div>
+
+            <!-- Transparency (applies to all visible features) -->
+            <div class="alpha-row">
+              <div class="alpha-btn" data-alpha="0.10">10%</div>
+              <div class="alpha-btn active" data-alpha="0.30">30%</div>
+              <div class="alpha-btn" data-alpha="0.50">50%</div>
+            </div>
+
+            <div class="row cb">
+              <label><input id="chk-rel" type="checkbox" checked> Release area</label>
+              <span class="swatch" style="background:${CONFIG.REL_COLOR}"></span>
+            </div>
+            <div class="row cb">
+              <label><input id="chk-res" type="checkbox"> Runout area</label> <!-- 👈 default off -->
+              <span class="swatch" style="background:${CONFIG.RES_COLOR}"></span>
+            </div>
+
+            <div class="row cb">
+              <label><input id="chk-size" type="checkbox"> Release Vol. Size </label>
+            </div>
+
+            <!-- Size legend -->
+            <div id="legend-size" class="legend-size" style="display:none;">
+              <div id="size-grad" class="size-grad"></div>
+              <div class="size-labels">
+                <span>${CONFIG.SIZE_CLASSES[0].label||"Size 1"}</span>
+                <span>${CONFIG.SIZE_CLASSES[2].label||"Size 3"}</span>
+                <span>${CONFIG.SIZE_CLASSES[4].label||"Size 5"}</span>
+              </div>
+            </div>
+          </div>
+        `;
+        L.DomEvent.disableClickPropagation(div);
+        return div;
+      }
+    });
+    mapObj.addControl(new StyleControl());
+
+    // Collapsible behavior
+    function initCollapse(){
+      const wrap=document.querySelector('.ava-style');
+      const hdr=document.getElementById('ava-hdr');
+      const caret=document.getElementById('ava-caret');
+      if(!wrap||!hdr||!caret) return;
+
+      // collapsed by default on small screens
+      const shouldCollapse = window.matchMedia && window.matchMedia('(max-width: 480px)').matches;
+      if (shouldCollapse){ wrap.classList.add('collapsed'); caret.textContent='▸'; }
+
+      hdr.addEventListener('click', ()=>{
+        const isCollapsed = wrap.classList.toggle('collapsed');
+        caret.textContent = isCollapsed ? '▸' : '▾';
+      });
+    }
+
+    /* Build continuous gradient bar from the 5 class colors */
+    function paintSizeGradient(){
+      const el=document.getElementById("size-grad"); if(!el) return;
+      const colors=CONFIG.SIZE_CLASSES.map(c=>c.color);
+      const stops=colors.map((c,i)=>`${c} ${(i*100)/(colors.length-1)}%`).join(', ');
+      el.style.background=`linear-gradient(to right, ${stops})`;
+    }
+
+    function refreshLegend(){
+      const ls=document.getElementById("legend-size");
+      if(ls) ls.style.display = sizeOn ? "block" : "none";
+      if(sizeOn) paintSizeGradient();
+    }
+    function reStyleAll(){
+      applyStyleToGeoJSON(L_W); applyStyleToGeoJSON(L_S);
+      refreshLegend();
+    }
+
+    function bindBasics(){
+      const rLight = document.getElementById('base-light');
+      const rBerg  = document.getElementById('base-berg');
+      const sWin   = document.getElementById('scn-winter');
+      const sSpr   = document.getElementById('scn-spring');
+    
+      // helper: toggle hillshade based on active base
+      function syncHillshade(){
+        if (!base_hill) return;
+        const isLight = rLight && rLight.checked;
+        if (isLight) {
+          if (!mapObj.hasLayer(base_hill)) mapObj.addLayer(base_hill);       // show with Light Gray
+        } else {
+          if (mapObj.hasLayer(base_hill)) mapObj.removeLayer(base_hill);      // hide with Bergfex
+        }
+      }
+    
+      if (rLight && rBerg){
+        rLight.addEventListener('change', ()=> {
+          if (rLight.checked){
+            if (mapObj.hasLayer(BASE_BERGFEX)) mapObj.removeLayer(BASE_BERGFEX);
+            if (!mapObj.hasLayer(BASE_LIGHT))  mapObj.addLayer(BASE_LIGHT);
+            syncHillshade();   // 👈 hillshade ON with Light
+          }
+        });
+        rBerg.addEventListener('change', ()=> {
+          if (rBerg.checked){
+            if (mapObj.hasLayer(BASE_LIGHT))   mapObj.removeLayer(BASE_LIGHT);
+            if (!mapObj.hasLayer(BASE_BERGFEX)) mapObj.addLayer(BASE_BERGFEX);
+            syncHillshade();   // 👈 hillshade OFF with Bergfex
+          }
+        });
+      }
+    
+      if (sWin && sSpr){
+        sWin.addEventListener('change', ()=>{ 
+          if (sWin.checked){
+            scenario='winter';
+            if (mapObj.hasLayer(G_S)) mapObj.removeLayer(G_S);
+            if (!mapObj.hasLayer(G_W)) mapObj.addLayer(G_W);
+            updateBanner(); reStyleAll();
+          }
+        });
+        sSpr.addEventListener('change', ()=>{ 
+          if (sSpr.checked){
+            scenario='spring';
+            if (mapObj.hasLayer(G_W)) mapObj.removeLayer(G_W);
+            if (!mapObj.hasLayer(G_S)) mapObj.addLayer(G_S);
+            updateBanner(); reStyleAll();
+          }
+        });
+      }
+    
+      // make sure hillshade visibility matches the initially selected base
+      syncHillshade();
+    }
+
+    function bindPanel(){
+      const cRel=document.getElementById("chk-rel");
+      const cRes=document.getElementById("chk-res");
+      const cSize=document.getElementById("chk-size");
+      if(!cRel||!cRes||!cSize) return false;
+      cRel.addEventListener('change', ()=>{ showRel=!!cRel.checked; reStyleAll(); });
+      cRes.addEventListener('change', ()=>{ showRes=!!cRes.checked; reStyleAll(); });
+      cSize.addEventListener('change', ()=>{ sizeOn=!!cSize.checked; reStyleAll(); });
+
+      // transparency buttons
+      const alphas=[...document.querySelectorAll('.alpha-btn')];
+      alphas.forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          alphas.forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          const v=parseFloat(btn.getAttribute('data-alpha')) || 0.3;
+          FILL_OPACITY = v;         // live change for all layers/modes
+          reStyleAll();
+        });
+      });
+      return true;
+    }
+
+    // helper: hide loader
+    function hideLoaderSoon(){
+      const ld=document.getElementById('ava-loader');
+      if(!ld) return;
+      setTimeout(()=>{ ld.classList.add('hide'); setTimeout(()=>ld.remove(), 380); }, LOADER_MS);
+    }
+
+    /* Load layers */
+    Promise.all([
+      loadGeo(winterUrl, G_W).then(l=>{L_W=l}),
+      loadGeo(springUrl, G_S).then(l=>{L_S=l}),
+      fetch(microUrl,{cache:"no-store"}).then(r=>r.ok?r.json():null).then(geo=>{
+        if(!geo) return null;
+        return L.geoJSON(geo,{style:{color:"#666",weight:1,opacity:0.9,fillOpacity:0}}).addTo(G_M);
+      }).catch(()=>null)
+    ]).then(()=>{
+      // initial: Winter visible, base = Bergfex, Release only
+      if(mapObj.hasLayer(G_S)) mapObj.removeLayer(G_S);
+      if(!mapObj.hasLayer(G_W)) mapObj.addLayer(G_W);
+      // force bergfex as base at start
+      if(mapObj.hasLayer(BASE_LIGHT)) mapObj.removeLayer(BASE_LIGHT);
+      if(!mapObj.hasLayer(BASE_BERGFEX)) mapObj.addLayer(BASE_BERGFEX);
+      document.getElementById('base-berg')?.setAttribute('checked','checked');
+
+      updateBanner();
+      applyStyleToGeoJSON(L_W); applyStyleToGeoJSON(L_S);
+      paintSizeGradient(); refreshLegend();
+      bindBasics(); bindPanel(); initCollapse();
+      hideLoaderSoon();   // 👈 fade out the fake loader
+
+      if(FIT_TO_DATA && !didFit){
+        const active=(mapObj.hasLayer(G_W) && L_W)?L_W:((mapObj.hasLayer(G_S) && L_S)?L_S:null);
+        try{ if(active){ const b=active.getBounds(); if(b && b.isValid && b.isValid()) mapObj.fitBounds(b,{padding:[10,10]}); } }catch(_){}
+        didFit=true;
+      }
+
+    
+    }).catch(err=>console.error("❌ load error", err));
+  }
+
+  waitForVars(80);
+})();
+</script>
+
+    
+            <div class="folium-map" id="map_e371c5d133bee88e415e46b1847b254a" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_e371c5d133bee88e415e46b1847b254a = L.map(
+                "map_e371c5d133bee88e415e46b1847b254a",
+                {
+                    center: [46.9914, 11.416055],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 14,
+  "zoomControl": false,
+  "preferCanvas": true,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_5fcc44580034f07e264e0030fc3faec6 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_5fcc44580034f07e264e0030fc3faec6.addTo(map_e371c5d133bee88e415e46b1847b254a);
+        
+    
+            var tile_layer_5664c5ebf809612acd45d29905834ff1 = L.tileLayer(
+                "https://tiles.bergfex.at/styles/bergfex-osm/{z}/{x}/{y}.jpg",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u00a9 Bergfex OSM",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_5664c5ebf809612acd45d29905834ff1.addTo(map_e371c5d133bee88e415e46b1847b254a);
+        
+    
+            var feature_group_f606cb3d1402e5a5f2f03dd2b497323a = L.featureGroup(
+                {
+}
+            );
+        
+    
+            feature_group_f606cb3d1402e5a5f2f03dd2b497323a.addTo(map_e371c5d133bee88e415e46b1847b254a);
+        
+    
+            var feature_group_d9909a7fb75c167a45e8f7279751f65a = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var feature_group_c1c47bc6dfdab1a19dae9c29cbae7296 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            feature_group_c1c47bc6dfdab1a19dae9c29cbae7296.addTo(map_e371c5d133bee88e415e46b1847b254a);
+        
+    
+            var layer_control_a470ef63a1b1899eee55b5663b1998cd_layers = {
+                base_layers : {
+                    "Light Gray" : tile_layer_5fcc44580034f07e264e0030fc3faec6,
+                    "Bergfex Topo" : tile_layer_5664c5ebf809612acd45d29905834ff1,
+                },
+                overlays :  {
+                    "Winter" : feature_group_f606cb3d1402e5a5f2f03dd2b497323a,
+                    "Spring" : feature_group_d9909a7fb75c167a45e8f7279751f65a,
+                },
+            };
+            let layer_control_a470ef63a1b1899eee55b5663b1998cd = L.control.layers(
+                layer_control_a470ef63a1b1899eee55b5663b1998cd_layers.base_layers,
+                layer_control_a470ef63a1b1899eee55b5663b1998cd_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_e371c5d133bee88e415e46b1847b254a);
+
+        
+</script>
+</html>
