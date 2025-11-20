@@ -15,8 +15,8 @@
 #   Austrian Research Centre for Forests (BFW)
 #   Department of Natural Hazards | Snow and Avalanche Unit
 #
-# Version :
-#   2025-11
+# Date & Version :
+#   2025-11 - 1.0
 #
 # ------------------------------------------------------------------------------ #
 
