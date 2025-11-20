@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_e371c5d133bee88e415e46b1847b254a {
+                #map_e81022b33cd5faee81b57c37b37a3542 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -83,7 +83,13 @@
 
   /* Top banner (...% width, centered) */
   #ava-banner{position:fixed;top:0;left:0;width:100%;z-index:10000;pointer-events:none;display:flex;justify-content:center}
-  #ava-banner img{width:100%;height:auto;opacity:0.9;display:block}
+  #ava-banner img {
+    width: 100%;
+    max-width: 800px;  
+    height: auto;
+    opacity: 0.9;
+    display: block;
+  }
 
   /* Settings panel (bottom-left, collapsible) */
   .ava-style{background:rgba(255,255,255,.9);padding:6px 8px;border:1px solid #ccc;border-radius:4px;
@@ -196,7 +202,7 @@
   const BUST  = new URLSearchParams(location.search).get('v') || Date.now();
   const CACHE = '?v=' + BUST;
   
-  const START_ZOOM = 14, MIN_ZOOM = 12, MAX_ZOOM = 14;
+  const START_ZOOM = 14, MIN_ZOOM = 12, MAX_ZOOM = 15;
   const FIT_TO_DATA = false;
   const TITLE_OFF = 4500;
   const STYLE_POS = "bottomleft";
@@ -210,7 +216,7 @@
     if (HILL_PNG && info && Array.isArray(info.bounds)) {
       const hillBounds = L.latLngBounds(info.bounds);
       base_hill = L.imageOverlay(HILL_PNG + CACHE, hillBounds, {
-        opacity: 0.30,                  // 30% transparency
+        opacity: 0.50,                  // 30% transparency
         interactive: false
       });
     }
@@ -221,9 +227,9 @@
 
   function waitForVars(maxTries){
     let tries=0, iv=setInterval(()=>{
-      const mapObj=window["map_e371c5d133bee88e415e46b1847b254a"],
-            G_W=window["feature_group_f606cb3d1402e5a5f2f03dd2b497323a"], G_S=window["feature_group_d9909a7fb75c167a45e8f7279751f65a"], G_M=window["feature_group_c1c47bc6dfdab1a19dae9c29cbae7296"],
-            BASE_LIGHT=window["tile_layer_5fcc44580034f07e264e0030fc3faec6"], BASE_BERGFEX=window["tile_layer_5664c5ebf809612acd45d29905834ff1"];
+      const mapObj=window["map_e81022b33cd5faee81b57c37b37a3542"],
+            G_W=window["feature_group_a75f5b038da99f06acd409fec537b77e"], G_S=window["feature_group_3cbf51da6bb8c7846f0c4d33e2af41ee"], G_M=window["feature_group_0abc2f791d10a74b826f45f2414e98ec"],
+            BASE_LIGHT=window["tile_layer_f870ae09d355441331cecc149b6ebc49"], BASE_BERGFEX=window["tile_layer_ad0a7670a587c6145d0d96d359c9621e"];
       if(mapObj && G_W && G_S && G_M && BASE_LIGHT && BASE_BERGFEX && mapObj.addControl){
         clearInterval(iv); boot(mapObj,G_W,G_S,G_M,BASE_LIGHT,BASE_BERGFEX);
       } else if(++tries>maxTries){ clearInterval(iv); console.error("❌ Leaflet objects not ready."); }
@@ -231,9 +237,9 @@
   }
 
   function boot(mapObj, G_W, G_S, G_M, BASE_LIGHT, BASE_BERGFEX){
-    let showRel=true, showRes=false, sizeOn=false;   // 👈 default: only Release ON
+    let showRel=true, showRes=false, sizeOn=false;  
     let L_W=null, L_S=null, highlighted=null, didFit=false;
-    let scenario='winter';                            // 👈 default: Winter
+    let scenario='winter';                            
 
     // snap & clamp zoom; (+/- controls hidden via CSS and zoom_control=False)
     mapObj.options.zoomSnap=1; mapObj.options.zoomDelta=1;
@@ -332,7 +338,7 @@
             <div class="row" style="margin-top:2px;font-weight:700">Base Layer:</div>
             <div class="row radio-row">
               <label><input type="radio" name="base" id="base-light"> Hillshade</label>
-              <label><input type="radio" name="base" id="base-berg" checked> Bergfex Topo</label> <!-- 👈 default bergfex -->
+              <label><input type="radio" name="base" id="base-berg" checked> Bergfex Topo</label> 
             </div>
 
             <!-- Scenario -->
@@ -359,7 +365,7 @@
               <span class="swatch" style="background:${CONFIG.REL_COLOR}"></span>
             </div>
             <div class="row cb">
-              <label><input id="chk-res" type="checkbox"> Runout area</label> <!-- 👈 default off -->
+              <label><input id="chk-res" type="checkbox"> Runout area</label> 
               <span class="swatch" style="background:${CONFIG.RES_COLOR}"></span>
             </div>
 
@@ -441,14 +447,14 @@
           if (rLight.checked){
             if (mapObj.hasLayer(BASE_BERGFEX)) mapObj.removeLayer(BASE_BERGFEX);
             if (!mapObj.hasLayer(BASE_LIGHT))  mapObj.addLayer(BASE_LIGHT);
-            syncHillshade();   // 👈 hillshade ON with Light
+            syncHillshade();   
           }
         });
         rBerg.addEventListener('change', ()=> {
           if (rBerg.checked){
             if (mapObj.hasLayer(BASE_LIGHT))   mapObj.removeLayer(BASE_LIGHT);
             if (!mapObj.hasLayer(BASE_BERGFEX)) mapObj.addLayer(BASE_BERGFEX);
-            syncHillshade();   // 👈 hillshade OFF with Bergfex
+            syncHillshade();   
           }
         });
       }
@@ -527,7 +533,7 @@
       applyStyleToGeoJSON(L_W); applyStyleToGeoJSON(L_S);
       paintSizeGradient(); refreshLegend();
       bindBasics(); bindPanel(); initCollapse();
-      hideLoaderSoon();   // 👈 fade out the fake loader
+      hideLoaderSoon();  
 
       if(FIT_TO_DATA && !didFit){
         const active=(mapObj.hasLayer(G_W) && L_W)?L_W:((mapObj.hasLayer(G_S) && L_S)?L_S:null);
@@ -544,14 +550,14 @@
 </script>
 
     
-            <div class="folium-map" id="map_e371c5d133bee88e415e46b1847b254a" ></div>
+            <div class="folium-map" id="map_e81022b33cd5faee81b57c37b37a3542" ></div>
         
 </body>
 <script>
     
     
-            var map_e371c5d133bee88e415e46b1847b254a = L.map(
-                "map_e371c5d133bee88e415e46b1847b254a",
+            var map_e81022b33cd5faee81b57c37b37a3542 = L.map(
+                "map_e81022b33cd5faee81b57c37b37a3542",
                 {
                     center: [46.9914, 11.416055],
                     crs: L.CRS.EPSG3857,
@@ -568,12 +574,12 @@
 
         
     
-            var tile_layer_5fcc44580034f07e264e0030fc3faec6 = L.tileLayer(
+            var tile_layer_f870ae09d355441331cecc149b6ebc49 = L.tileLayer(
                 "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
                 {
   "minZoom": 0,
   "maxZoom": 20,
-  "maxNativeZoom": 19,
+  "maxNativeZoom": 17,
   "noWrap": false,
   "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
   "subdomains": "abcd",
@@ -585,15 +591,15 @@
             );
         
     
-            tile_layer_5fcc44580034f07e264e0030fc3faec6.addTo(map_e371c5d133bee88e415e46b1847b254a);
+            tile_layer_f870ae09d355441331cecc149b6ebc49.addTo(map_e81022b33cd5faee81b57c37b37a3542);
         
     
-            var tile_layer_5664c5ebf809612acd45d29905834ff1 = L.tileLayer(
+            var tile_layer_ad0a7670a587c6145d0d96d359c9621e = L.tileLayer(
                 "https://tiles.bergfex.at/styles/bergfex-osm/{z}/{x}/{y}.jpg",
                 {
   "minZoom": 0,
   "maxZoom": 18,
-  "maxNativeZoom": 19,
+  "maxNativeZoom": 17,
   "noWrap": false,
   "attribution": "\u00a9 Bergfex OSM",
   "subdomains": "abc",
@@ -605,52 +611,52 @@
             );
         
     
-            tile_layer_5664c5ebf809612acd45d29905834ff1.addTo(map_e371c5d133bee88e415e46b1847b254a);
+            tile_layer_ad0a7670a587c6145d0d96d359c9621e.addTo(map_e81022b33cd5faee81b57c37b37a3542);
         
     
-            var feature_group_f606cb3d1402e5a5f2f03dd2b497323a = L.featureGroup(
+            var feature_group_a75f5b038da99f06acd409fec537b77e = L.featureGroup(
                 {
 }
             );
         
     
-            feature_group_f606cb3d1402e5a5f2f03dd2b497323a.addTo(map_e371c5d133bee88e415e46b1847b254a);
+            feature_group_a75f5b038da99f06acd409fec537b77e.addTo(map_e81022b33cd5faee81b57c37b37a3542);
         
     
-            var feature_group_d9909a7fb75c167a45e8f7279751f65a = L.featureGroup(
+            var feature_group_3cbf51da6bb8c7846f0c4d33e2af41ee = L.featureGroup(
                 {
 }
             );
         
     
-            var feature_group_c1c47bc6dfdab1a19dae9c29cbae7296 = L.featureGroup(
+            var feature_group_0abc2f791d10a74b826f45f2414e98ec = L.featureGroup(
                 {
 }
             );
         
     
-            feature_group_c1c47bc6dfdab1a19dae9c29cbae7296.addTo(map_e371c5d133bee88e415e46b1847b254a);
+            feature_group_0abc2f791d10a74b826f45f2414e98ec.addTo(map_e81022b33cd5faee81b57c37b37a3542);
         
     
-            var layer_control_a470ef63a1b1899eee55b5663b1998cd_layers = {
+            var layer_control_54793b0e59770872df87f83903d26524_layers = {
                 base_layers : {
-                    "Light Gray" : tile_layer_5fcc44580034f07e264e0030fc3faec6,
-                    "Bergfex Topo" : tile_layer_5664c5ebf809612acd45d29905834ff1,
+                    "Light Gray" : tile_layer_f870ae09d355441331cecc149b6ebc49,
+                    "Bergfex Topo" : tile_layer_ad0a7670a587c6145d0d96d359c9621e,
                 },
                 overlays :  {
-                    "Winter" : feature_group_f606cb3d1402e5a5f2f03dd2b497323a,
-                    "Spring" : feature_group_d9909a7fb75c167a45e8f7279751f65a,
+                    "Winter" : feature_group_a75f5b038da99f06acd409fec537b77e,
+                    "Spring" : feature_group_3cbf51da6bb8c7846f0c4d33e2af41ee,
                 },
             };
-            let layer_control_a470ef63a1b1899eee55b5663b1998cd = L.control.layers(
-                layer_control_a470ef63a1b1899eee55b5663b1998cd_layers.base_layers,
-                layer_control_a470ef63a1b1899eee55b5663b1998cd_layers.overlays,
+            let layer_control_54793b0e59770872df87f83903d26524 = L.control.layers(
+                layer_control_54793b0e59770872df87f83903d26524_layers.base_layers,
+                layer_control_54793b0e59770872df87f83903d26524_layers.overlays,
                 {
   "position": "topright",
   "collapsed": false,
   "autoZIndex": true,
 }
-            ).addTo(map_e371c5d133bee88e415e46b1847b254a);
+            ).addTo(map_e81022b33cd5faee81b57c37b37a3542);
 
         
 </script>
