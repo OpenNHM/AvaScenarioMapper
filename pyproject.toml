@@ -17,7 +17,7 @@ dependencies = [
 # ----------------------------------------------------------------------
 # Pixi PROJECT configuration
 # ----------------------------------------------------------------------
-[tool.pixi]
+[tool.pixi.project]
 channels  = ["https://prefix.dev/conda-forge"]
 platforms = ["linux-64", "win-64", "osx-64"]
 
