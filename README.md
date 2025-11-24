@@ -14,11 +14,12 @@
 
 ### Overview
 
-- The Avalanche Scenario Mapper was developed within the **EUREGIO Project CAIROS**.  
-- It represents **Step 16** of the **Avalanche Scenario Model Chain**.  
-- The Mapper post-processes avalanche simulation results from Step 15 (AvaDirectoryResults)  
+- The Avalanche Scenario Mapper is developed within the **project CAIROS**.
+  - **The project CAIROS is funded by the European Regional Development Fund and Interreg VI-A Italy-Austria 2021-2027**.
+- This repo represents **Step 16** of the **Avalanche Scenario Model Chain**.  
+- The Avalanche Scenario Mapper post-processes avalanche simulation results from Step 15 (AvaDirectoryResults)  
   and generates **scenario-specific subsets** for visualization, mapping, and publication.  
-- It consumes `AvaDirectoryResults.parquet` and produces per-scenario GeoDataFrames / GeoJSONs.  
+- the Mapper consumes `AvaDirectoryResults.parquet` and produces per-scenario GeoDataFrames / GeoJSONs.  
 - Logging, configuration, and folder hierarchy follow the Avalanche Scenario Model Chain conventions.
 
 | Component | Description |
