@@ -80,9 +80,9 @@ def runAvaScenMapper(
     t0 = time.perf_counter()
     log.info(
         "\n\n"
-        "       ============================================================================\n"
+        "       ==============================================================================\n"
         f"          ... Start Avalanche Scenario Mapper (Step 17)  ({time.strftime('%Y-%m-%d %H:%M:%S')}) ...\n"
-        "       ============================================================================\n"
+        "       ==============================================================================\n"
     )
 
     # ------------------ Resolve paths ------------------ #
@@ -125,34 +125,114 @@ def runAvaScenMapper(
         log.warning("Step 17: No scenarios configured → exiting Mapper.")
         return
 
+      # ------------------ Output format flags ------------------ #
+    writeParquet = cfg.getboolean("WORKFLOW", "writeScenarioParquet", fallback=True)
+    writeGeoJson = cfg.getboolean("WORKFLOW", "writeScenarioGeoJson", fallback=False)
+    writeGpkg = cfg.getboolean("WORKFLOW", "writeScenarioGpkg", fallback=False)
+    writeCsv = cfg.getboolean("WORKFLOW", "writeScenarioCsv", fallback=False)
+    csvWkt = cfg.getboolean("WORKFLOW", "writeScenarioCsvWkt", fallback=False)
+
+    # ------------------ Pre-skip: scenario outputs already exist ------------------ #
+    criteriaToRun: List[Dict] = []
+    skipped = 0
+
+    for crit in areaCriteriaList:
+        scenName = crit.get("name", "unnamed")
+        scenNameClean = "".join(ch for ch in scenName if ch.isalnum() or ch in "-_").strip() or "unnamed"
+
+        outParquet = (scenMapsDir / f"avaScen_{scenNameClean}.parquet") if writeParquet else None
+        outGeoJson = (scenMapsDir / f"avaScen_{scenNameClean}.geojson") if writeGeoJson else None
+        outGpkg = (scenMapsDir / f"avaScen_{scenNameClean}.gpkg") if writeGpkg else None
+        outCsv = (scenMapsDir / f"avaScen_{scenNameClean}.csv") if writeCsv else None
+
+        enabledOuts = [p for p in (outParquet, outGpkg, outGeoJson, outCsv) if p is not None]
+        existing = next((p for p in enabledOuts if p.exists()), None)
+
+        if existing is not None:
+            skipped += 1
+            log.info(
+                "Step 17: Skipping scenario '%s' because output already exists: %s",
+                scenName,
+                relPath(existing, baseDir),
+            )
+            continue
+
+        criteriaToRun.append(crit)
+
+    if not criteriaToRun:
+        log.warning("Step 17: All %d scenario(s) already exist → nothing to do.", len(areaCriteriaList))
+        return
+
+    log.info(
+        "Step 17: Running %d scenario(s) (skipped %d already existing) --------------------------------",
+        len(criteriaToRun),
+        skipped,
+    )
+
     # ------------------ Run scenario filtering ------------------ #
-    log.info("Step 17: Running %d scenario(s) -------------------------------------------------", len(areaCriteriaList))
-    results = avaScenFilter.runScenarioFilters(gdf, areaCriteriaList, avaLegend)
+    # IMPORTANT: runScenarioFilters must return List[(crit, gdf)]
+    results = avaScenFilter.runScenarioFilters(gdf, criteriaToRun, avaLegend)
 
     if not results:
         log.warning("Step 17: No scenario produced output; nothing to export.")
         return
 
     # ------------------ Write per-scenario outputs ------------------ #
-    for df, crit in zip(results, areaCriteriaList):
+    for crit, df in results:
         scenName = crit.get("name", "unnamed")
-        scenNameClean = "".join(ch for ch in scenName if ch.isalnum() or ch in "-_").strip()
-        outParquet = scenMapsDir / f"avaScen_{scenNameClean}.parquet"
-        outGeoJson = scenMapsDir / f"avaScen_{scenNameClean}.geojson"
+        scenNameClean = "".join(ch for ch in scenName if ch.isalnum() or ch in "-_").strip() or "unnamed"
 
-        log.info("Step 17: Writing scenario '%s' → %s", scenName, relPath(outParquet, baseDir))
-        mapperUtils.writeScenarioOutputs(df, outParquet, outGeoJson)
+        outParquet = (scenMapsDir / f"avaScen_{scenNameClean}.parquet") if writeParquet else None
+        outGeoJson = (scenMapsDir / f"avaScen_{scenNameClean}.geojson") if writeGeoJson else None
+        outGpkg = (scenMapsDir / f"avaScen_{scenNameClean}.gpkg") if writeGpkg else None
+        outCsv = (scenMapsDir / f"avaScen_{scenNameClean}.csv") if writeCsv else None
+
+        mainOut = outParquet or outGpkg or outGeoJson or outCsv
+        if mainOut is None:
+            log.warning("Step 17: No output format enabled for scenario '%s' (skipping write).", scenName)
+            continue
+
+        log.info("Step 17: Writing scenario '%s' → %s", scenName, relPath(mainOut, baseDir))
+
+        mapperUtils.writeScenarioOutputs(
+            df,
+            outParquet=outParquet,
+            outGeoJson=outGeoJson,
+            outGpkg=outGpkg,
+            outCsv=outCsv,
+            csvWkt=csvWkt,
+        )
 
     # ------------------ Combine master file (optional) ------------------ #
     makeMaster = cfg.getboolean("WORKFLOW", "mapperMakeMaster", fallback=False)
     if makeMaster:
         log.info("Step 17: Combining all scenarios into avaScen_Master --------------------------------")
-        master = gpd.GeoDataFrame(pd.concat(results, ignore_index=True), crs=results[0].crs)
-        outParquet = scenMapsDir / "avaScen_Master.parquet"
-        outGeoJson = scenMapsDir / "avaScen_Master.geojson"
-        mapperUtils.writeScenarioOutputs(master, outParquet, outGeoJson)
+
+        dfs = [df for _, df in results]
+        master = gpd.GeoDataFrame(pd.concat(dfs, ignore_index=True), crs=dfs[0].crs)
+
+        outParquet = (scenMapsDir / "avaScen_Master.parquet") if writeParquet else None
+        outGeoJson = (scenMapsDir / "avaScen_Master.geojson") if writeGeoJson else None
+        outGpkg = (scenMapsDir / "avaScen_Master.gpkg") if writeGpkg else None
+        outCsv = (scenMapsDir / "avaScen_Master.csv") if writeCsv else None
+
+        mainOut = outParquet or outGpkg or outGeoJson or outCsv
+        if mainOut is None:
+            log.warning("Step 17: No output format enabled for master (skipping write).")
+        else:
+            log.info("Step 17: Writing master → %s", relPath(mainOut, baseDir))
+            mapperUtils.writeScenarioOutputs(
+                master,
+                outParquet=outParquet,
+                outGeoJson=outGeoJson,
+                outGpkg=outGpkg,
+                outCsv=outCsv,
+                csvWkt=csvWkt,
+            )
+
         mapperUtils.logScenarioSummary(master, "avaScen_Master")
         log.info("Master file CRS inherited from first scenario for consistency.")
+
 
     # ------------------ Completion ------------------ #
     dt = time.perf_counter() - t0
@@ -161,6 +241,7 @@ def runAvaScenMapper(
         f"          ... Step 17: Avalanche Scenario Mapper finished successfully in {dt:.2f}s ...\n"
         "       ============================================================================\n"
     )
+
 
 # --------------------------- MAIN ENTRYPOINT --------------------------- #
 def main(argv: Optional[list] = None) -> int:
@@ -173,7 +254,8 @@ def main(argv: Optional[list] = None) -> int:
         cfgPath = Path(argv[1])
 
     if not cfgPath.exists():
-        print(f"Configuration file not found: {cfgPath}")
+        # logging may not be configured yet here, so use stderr
+        sys.stderr.write(f"Configuration file not found: {cfgPath}\n")
         return 1
 
     cfg = cfgUtils.readCfg(cfgPath)
@@ -185,7 +267,7 @@ def main(argv: Optional[list] = None) -> int:
         log.exception("Step 17: Avalanche Scenario Mapper failed.")
         return 1
 
-    baseDir = Path(cfg.get("PATHS", "baseDir", fallback=Path.cwd()))
+    baseDir = Path(cfg.get("PATHS", "baseDir", fallback=str(Path.cwd())))
     log.info("Avalanche Scenario Mapper log saved at: %s\n", relPath(log_path, baseDir))
     return 0
 
