@@ -2,6 +2,8 @@
 ### Avalanche Scenario Mapper (2025-11 Update)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17662779.svg)](https://doi.org/10.5281/zenodo.17662779)
 
+
+
 <p align="center">
   <img src="https://media.giphy.com/media/3Xzlefv57zcrVIPPRN/giphy.gif"
        alt="Avalanche Scenario Mapper"
@@ -11,7 +13,6 @@
 <h4 align="center">⚠️ Handle with care — work in progress</h4>
 
 ---
-
 ### Overview
 
 - The Avalanche Scenario Mapper is developed within the **project CAIROS**.
