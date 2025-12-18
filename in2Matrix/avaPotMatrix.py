@@ -90,18 +90,23 @@ def avaPotMatrix() -> pd.DataFrame:
         ("very high", 4): [(5,4,"res / rel"), (4,4,"res / rel"), (3,3,"res / rel"), (2,2,"res / rel")],
         ("very high", 3): [(5,3,"res / rel"), (4,3,"res / rel"), (3,3,"res / rel"), (2,2,"res / rel")],
         ("very high", 2): [(5,2,"res / rel"), (4,2,"res / rel"), (3,2,"res / rel"), (2,2,"res / rel")],
+        ("very high", 1): [(5,1,"rel"),       (4,1,"rel"),       (3,1,"rel"),       (2,1,"rel")],
 
         # HIGH
-        ("high", 4):      [(5,4,"res / rel"), (4,3,"res / rel"), (3,2,"res / rel"), (2,2,"rel")],
-        ("high", 3):      [(5,3,"res / rel"), (4,3,"res / rel"), (3,2,"res / rel"), (2,2,"rel")],
-        ("high", 2):      [(5,2,"res / rel"), (4,2,"res / rel"), (3,2,"res / rel"), (2,2,"rel")],
+        ("high", 4):      [(5,4,"res / rel"), (4,3,"res / rel"), (3,2,"res / rel"), (2,1,"rel")],
+        ("high", 3):      [(5,3,"res / rel"), (4,3,"res / rel"), (3,2,"res / rel"), (2,1,"rel")],
+        ("high", 2):      [(5,2,"res / rel"), (4,2,"res / rel"), (3,2,"res / rel"), (2,1,"rel")],
+        ("high", 1):      [(5,1,"rel"),       (4,1,"rel"),       (3,1,"rel"),       (2,1,"rel")],
 
         # MODERATE
-        ("moderate", 3):  [(5,3,"res / rel"), (4,2,"res / rel"), (3,3,"rel"),       (2,2,"rel")],
-        ("moderate", 2):  [(5,2,"res / rel"), (4,2,"res / rel"), (3,3,"rel"),       (2,2,"rel")],
+        ("moderate", 3):  [(5,3,"res / rel"), (4,2,"res / rel"), (3,1,"rel"),       (2,1,"rel")],
+        ("moderate", 2):  [(5,2,"res / rel"), (4,2,"res / rel"), (3,1,"rel"),       (2,1,"rel")],
+        ("moderate", 1):  [(5,1,"rel"),       (4,1,"rel"),       (3,1,"rel"),       (2,1,"rel")],
 
         # LOW
-        ("low", 2):       [(5,2,"res / rel"), (4,4,"rel"),       (3,3,"rel"),       (2,2,"rel")],
+        ("low", 2):       [(5,2,"res / rel"), (4,1,"rel"),       (3,1,"rel"),       (2,1,"rel")],
+        ("low", 1):       [(5,1,"rel"),       (4,1,"rel"),       (3,1,"rel"),       (2,1,"rel")],
+
     }
 
     # --- Flatten all combinations ---

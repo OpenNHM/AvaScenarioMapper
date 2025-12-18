@@ -38,38 +38,54 @@ def resolvePaths(cfg) -> dict:
                            directory hierarchy under baseDir
       - customPaths      : reads explicit paths from [PATHS]
     """
-    paths = {}
-    mode = cfg.get("WORKFLOW", "mapperPathMode", fallback="AvaScenDirectory").lower()
-    baseDir = Path(os.path.expandvars(cfg.get("PATHS", "baseDir", fallback=os.getcwd())))
+    paths: dict = {}
+
+    mode = cfg.get("WORKFLOW", "mapperPathMode", fallback="AvaScenDirectory").strip().lower()
+
+    # baseDir: always define (even for customPaths, used for relPath logging)
+    baseDir = Path(os.path.expandvars(cfg.get("PATHS", "baseDir", fallback=os.getcwd()))).expanduser()
+    paths["baseDir"] = baseDir
 
     if mode == "custompaths":
         log.info("Path mode: customPaths (using explicit [PATHS] entries)")
-        paths["avaDirectoryResultsParquet"] = Path(cfg.get("PATHS", "avaDirectoryResults"))
-        paths["avaScenMapsDir"] = Path(cfg.get("PATHS", "avaScenMapsDir"))
-        paths["refTif"] = Path(cfg.get("PATHS", "refTif", fallback=""))
+        paths["avaDirectoryResultsParquet"] = Path(cfg.get("PATHS", "avaDirectoryResults")).expanduser()
+        paths["avaScenMapsDir"] = Path(cfg.get("PATHS", "avaScenMapsDir")).expanduser()
+        paths["refTif"] = Path(cfg.get("PATHS", "refTif", fallback="")).expanduser()
+
     else:
         log.info("Path mode: AvaScenDirectory (auto-resolved under baseDir)")
-        paths["baseDir"] = baseDir
-        avaDirRoot = baseDir / "12_avaDirectory"
 
-        candidates = list(avaDirRoot.glob("*/avaDirectoryResults.parquet"))
-        if candidates:
+        avaDirRoot = baseDir / "12_avaDirectory"
+        paths["avaScenMapsDir"] = baseDir / "13_avaScenMaps"
+
+        # pick avaDirectoryResults.parquet deterministically
+        candidates = sorted(avaDirRoot.glob("*/avaDirectoryResults.parquet"))
+
+        if len(candidates) == 1:
             paths["avaDirectoryResultsParquet"] = candidates[0]
-            log.info("Detected AvaDirectoryResults in subfolder: %s",
-                     relPath(paths["avaDirectoryResultsParquet"].parent, baseDir))
+            log.info(
+                "Detected AvaDirectoryResults in subfolder: %s",
+                relPath(paths["avaDirectoryResultsParquet"].parent, baseDir),
+            )
+        elif len(candidates) > 1:
+            raise RuntimeError(
+                f"Multiple avaDirectoryResults.parquet found under {avaDirRoot}:\n"
+                + "\n".join([f"  - {c}" for c in candidates])
+                + "\n\nPlease set mapperPathMode=customPaths and provide [PATHS].avaDirectoryResults."
+            )
         else:
             paths["avaDirectoryResultsParquet"] = avaDirRoot / "avaDirectoryResults.parquet"
 
-        paths["avaScenMapsDir"] = baseDir / "13_avaScenMaps"
-        refCandidates = list((baseDir / "00_input").glob("10DTM_*.tif"))
+        refCandidates = sorted((baseDir / "00_input").glob("10DTM_*.tif"))
         paths["refTif"] = refCandidates[0] if refCandidates else baseDir / "00_input" / "refDTM.tif"
 
+    # ensure output dir exists (now guaranteed key exists)
     paths["avaScenMapsDir"].mkdir(parents=True, exist_ok=True)
-    log.info("Resolved AvaDirectoryResults : %s",
-             relPath(paths["avaDirectoryResultsParquet"], baseDir))
-    log.info("Resolved AvaScenMaps output  : %s",
-             relPath(paths["avaScenMapsDir"], baseDir))
+
+    log.info("Resolved AvaDirectoryResults : %s", relPath(paths["avaDirectoryResultsParquet"], baseDir))
+    log.info("Resolved AvaScenMaps output  : %s", relPath(paths["avaScenMapsDir"], baseDir))
     return paths
+
 
 
 # ------------------ I/O Helpers ------------------ #
@@ -85,28 +101,65 @@ def readGdf(parquetPath: Path) -> gpd.GeoDataFrame:
     return gdf
 
 
-def writeScenarioOutputs(filteredGdf: gpd.GeoDataFrame,
-                         outParquet: Path,
-                         outGeoJson: Path = None):
-    """Save scenario results to Parquet and optionally GeoJSON."""
+def writeScenarioOutputs(filteredGdf, outParquet=None, outGeoJson=None, outGpkg=None, outCsv=None, csvWkt=False):
+    """
+    Save scenario results to one or more formats.
+
+    - Parquet: main artifact (fast, compact)
+    - GeoJSON: optional (can get huge)
+    - GPKG: GIS-friendly, compact
+    - CSV: optional (no geometry unless csvWkt=True)
+    """
     if filteredGdf.empty:
-        log.warning("No filtered results to write for %s", outParquet.name)
+        log.warning("No filtered results to write.")
         return
 
-    outParquet.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        filteredGdf.to_parquet(outParquet, index=False)
-        log.info("Wrote Parquet: %s", outParquet.name)
-    except Exception:
-        log.exception("Failed to write Parquet for %s", outParquet)
-        return
+    # Ensure parent folder exists (use first defined output)
+    for p in (outParquet, outGeoJson, outGpkg, outCsv):
+        if p is not None:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            break
 
-    if outGeoJson:
+    # --- Parquet ---
+    if outParquet is not None:
+        try:
+            filteredGdf.to_parquet(outParquet, index=False)
+            log.info("Wrote Parquet: %s", outParquet.name)
+        except Exception:
+            log.exception("Failed to write Parquet for %s", outParquet)
+
+    # --- GeoJSON (expensive) ---
+    if outGeoJson is not None:
         try:
             filteredGdf.to_file(outGeoJson, driver="GeoJSON")
             log.info("Wrote GeoJSON: %s", outGeoJson.name)
         except Exception:
             log.warning("GeoJSON write warning for %s", outGeoJson.name)
+
+    # --- GeoPackage ---
+    if outGpkg is not None:
+        try:
+            layerName = outGpkg.stem  # e.g. "avaScen_WinterForNTirol"
+            filteredGdf.to_file(outGpkg, layer=layerName, driver="GPKG")
+            log.info("Wrote GPKG: %s (layer=%s)", outGpkg.name, layerName)
+        except Exception:
+            log.exception("Failed to write GPKG for %s", outGpkg)
+
+    # --- CSV (attribute table export) ---
+    if outCsv is not None:
+        try:
+            if csvWkt:
+                df = filteredGdf.copy()
+                df["geometry"] = df.geometry.to_wkt()
+                pd.DataFrame(df).to_csv(outCsv, index=False)
+            else:
+                df = pd.DataFrame(filteredGdf.drop(columns=["geometry"], errors="ignore"))
+                df.to_csv(outCsv, index=False)
+
+            log.info("Wrote CSV: %s (wkt=%s)", outCsv.name, csvWkt)
+        except Exception:
+            log.exception("Failed to write CSV for %s", outCsv)
+
 
 
 # ------------------ Data integrity check ------------------ #
@@ -131,7 +184,7 @@ def checkInputData(gdf: gpd.GeoDataFrame, parquetPath: Path, cfg=None) -> bool:
         return False
 
     checkFlag = cfg and cfg.getboolean("WORKFLOW", "checkAvaDirResult", fallback=False)
-    if not checkFlag:
+    if checkFlag:
         printAvailableOptions(parquetPath)
 
     log.info("Input data integrity check passed (%d rows, %d columns).",
@@ -176,15 +229,28 @@ def printAvailableOptions(parquetPath: Path):
 
 # ------------------ Normalization ------------------ #
 def normalizeAvaCols(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    """Ensure numeric and categorical consistency across columns."""
-    gdf = gdf.rename(columns={c.lower(): c.upper() for c in gdf.columns if c.lower() in ["ppm", "pem"]})
+    """
+    Ensure numeric and categorical consistency across columns.
+
+    Key fix:
+    - Normalize any PPM/PEM casing reliably (e.g. 'ppm', 'Ppm', 'PEM' -> 'PPM'/'PEM').
+    """
+    # --- Fix PPM/PEM casing robustly ---
+    rename_map = {c: c.upper() for c in gdf.columns if str(c).lower() in ("ppm", "pem")}
+    if rename_map:
+        gdf = gdf.rename(columns=rename_map)
+
+    # --- Numeric conversions ---
     for col in ["subC", "elevMin", "elevMax", "rSize", "PEM", "PPM"]:
         if col in gdf.columns:
             gdf[col] = pd.to_numeric(gdf[col], errors="coerce")
+
+    # --- Categorical normalization ---
     if "flow" in gdf.columns:
         gdf["flow"] = gdf["flow"].astype(str).str.lower().str.strip()
     if "modType" in gdf.columns:
         gdf["modType"] = gdf["modType"].astype(str).str.lower().str.strip()
+
     return gdf
 
 
