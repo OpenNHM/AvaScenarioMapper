@@ -4,8 +4,9 @@
 #   Shared utility functions for the Avalanche Scenario Mapper.
 #
 #   Provides common methods for path resolution, GeoDataFrame I/O,
-#   attribute diagnostics, data normalization, and scenario configuration
-#   parsing consistent with the Avalanche Scenario Model Chain conventions.
+#   attribute diagnostics, data normalization, scenario configuration
+#   parsing, and shared output helpers consistent with the
+#   Avalanche Scenario Model Chain conventions.
 #
 # Author :
 #   Christoph Hesselbach
@@ -15,22 +16,73 @@
 #   Department of Natural Hazards | Snow and Avalanche Unit
 #
 # Date & Version :
-#   2025-11 - 1.0
+#   2026-03 - 1.1
 #
 # ------------------------------------------------------------------------------ #
 
 import os
+import json
 import logging
 from pathlib import Path
+from typing import Optional, Sequence, Iterable
+
 import pandas as pd
 import geopandas as gpd
+import pyarrow.parquet as pq
 
 from in1Utils.cfgUtils import relPath
 
 log = logging.getLogger(__name__)
 
 
+# ------------------ Small generic helpers ------------------ #
+
+def sanitizeScenarioName(scenName: str) -> str:
+    """
+    Keep only alnum, dash, underscore. Never return empty.
+    """
+    scenName = str(scenName or "unnamed")
+    scenNameClean = "".join(ch for ch in scenName if ch.isalnum() or ch in "-_")
+    return scenNameClean or "unnamed"
+
+
+def batched(seq: Sequence, batchSize: int) -> Iterable[Sequence]:
+    """
+    Yield sequence slices in fixed-size batches.
+    """
+    for i in range(0, len(seq), batchSize):
+        yield seq[i:i + batchSize]
+
+
 # ------------------ Path resolution ------------------ #
+
+def deriveRegionName(baseDir: Path) -> str:
+    """
+    Derive a stable region name for master outputs.
+
+    Priority:
+      1) If path contains .../Euregio/<region>/...
+      2) Else use baseDir.name
+    """
+    parts = list(baseDir.parts)
+    if "Euregio" in parts:
+        idx = parts.index("Euregio")
+        if idx + 1 < len(parts):
+            return parts[idx + 1]
+    return baseDir.name
+
+
+def getMasterName(cfg, baseDir: Path) -> str:
+    """
+    Master name format:
+      avaScen_<Region><prefix>
+
+    Example:
+      avaScen_NTirol_report20260223
+    """
+    region = deriveRegionName(baseDir)
+    prefix = cfg.get("WORKFLOW", "mapperMasterPrefix", fallback="").strip()
+    return f"avaScen_{region}{prefix}"
 
 
 def resolvePaths(cfg) -> dict:
@@ -68,8 +120,6 @@ def resolvePaths(cfg) -> dict:
         avaResultsPath = Path(os.path.expandvars(avaResultsRaw)).expanduser()
         scenMapsDir = Path(os.path.expandvars(scenMapsRaw)).expanduser()
 
-        # meaningful baseDir for logging / relPath:
-        # use common parent if possible, else parent of output dir
         try:
             baseDir = Path(os.path.commonpath([str(avaResultsPath.parent), str(scenMapsDir)])).expanduser()
         except Exception:
@@ -93,10 +143,7 @@ def resolvePaths(cfg) -> dict:
         avaDirRoot = baseDir / "12_avaDirectory"
         scenMapsDir = baseDir / "13_avaScenMaps"
 
-        # first try the direct standard location
         directParquet = avaDirRoot / "avaDirectoryResults.parquet"
-
-        # if not there, check one level below for special structures
         candidates = sorted(avaDirRoot.glob("*/avaDirectoryResults.parquet"))
 
         if directParquet.exists():
@@ -132,39 +179,153 @@ def resolvePaths(cfg) -> dict:
 
     return paths
 
-# ------------------ I/O Helpers ------------------ #
-def readGdf(parquetPath: Path) -> gpd.GeoDataFrame:
-    """Read GeoDataFrame from Parquet or GeoJSON."""
-    if not parquetPath.exists():
-        log.error("Input file not found: %s", parquetPath)
-        raise FileNotFoundError(parquetPath)
 
-    gdf = gpd.read_file(parquetPath) if parquetPath.suffix.lower() == ".geojson" \
-          else gpd.read_parquet(parquetPath)
-    log.info("Loaded %d rows from %s", len(gdf), parquetPath.name)
+# ------------------ Output helpers ------------------ #
+
+def buildScenarioOutputPaths(
+    scenMapsDir: Path,
+    scenNameClean: str,
+    writeParquet: bool,
+    writeGeoJson: bool,
+    writeGpkg: bool,
+    writeCsv: bool,
+) -> list[Optional[Path]]:
+    """
+    Build a list of scenario output paths for existence checks.
+    """
+    return [
+        (scenMapsDir / f"avaScen_{scenNameClean}.parquet") if writeParquet else None,
+        (scenMapsDir / f"avaScen_{scenNameClean}.gpkg") if writeGpkg else None,
+        (scenMapsDir / f"avaScen_{scenNameClean}.geojson") if writeGeoJson else None,
+        (scenMapsDir / f"avaScen_{scenNameClean}.csv") if writeCsv else None,
+    ]
+
+
+def parseDeleteColumns(cfg) -> list[str]:
+    """
+    Parse columns to delete from outputs.
+
+    Current compatibility:
+      reads from [WORKFLOW] deleteColumns
+    """
+    raw = cfg.get("WORKFLOW", "deleteColumns", fallback="").strip()
+    if not raw:
+        return []
+
+    cols = [c.strip() for c in raw.split(",") if c.strip()]
+    cols = list(dict.fromkeys(cols))
+
+    protected = {"scenarioName", "geometry"}
+    filtered = [c for c in cols if c not in protected]
+
+    removed = [c for c in cols if c in protected]
+    if removed:
+        log.warning(
+            "Ignoring protected column(s) in deleteColumns: %s",
+            ", ".join(removed),
+        )
+
+    return filtered
+
+
+def dropConfiguredColumns(
+    gdf: gpd.GeoDataFrame,
+    deleteCols: Sequence[str],
+) -> gpd.GeoDataFrame:
+    """
+    Drop configured columns if present. Silent for missing columns.
+    """
+    if gdf is None or not deleteCols:
+        return gdf
+
+    existing = [c for c in deleteCols if c in gdf.columns]
+    if existing:
+        gdf = gdf.drop(columns=existing).copy()
+
     return gdf
 
 
-def writeScenarioOutputs(filteredGdf, outParquet=None, outGeoJson=None, outGpkg=None, outCsv=None, csvWkt=False):
+def addScenarioColumns(
+    gdf: gpd.GeoDataFrame,
+    scenarioName: str,
+) -> gpd.GeoDataFrame:
     """
-    Save scenario results to one or more formats.
+    Add scenario-related output columns.
+    """
+    if gdf is None:
+        return gdf
 
-    - Parquet: main artifact (fast, compact)
-    - GeoJSON: optional (can get huge)
-    - GPKG: GIS-friendly, compact
-    - CSV: optional (no geometry unless csvWkt=True)
+    gdf = gdf.copy()
+    gdf["scenarioName"] = scenarioName
+    return gdf
+
+
+def prepareScenarioOutput(
+    gdf: gpd.GeoDataFrame,
+    scenarioName: str,
+    deleteColumns: Sequence[str],
+) -> gpd.GeoDataFrame:
     """
-    if filteredGdf.empty:
+    Prepare final scenario output table:
+      - drop configured removable columns
+      - remove helper column 'scenario' if present
+      - add scenarioName
+    """
+    if gdf is None or gdf.empty:
+        return gdf
+
+    gdf = dropConfiguredColumns(gdf, deleteColumns)
+    gdf = gdf.drop(columns=["scenario"], errors="ignore")
+    gdf = addScenarioColumns(gdf, scenarioName)
+    return gdf
+
+
+# ------------------ I/O Helpers ------------------ #
+
+def readGdf(path: Path) -> gpd.GeoDataFrame:
+    """
+    Read GeoDataFrame from supported formats.
+    """
+    if not path.exists():
+        log.error("Input file not found: %s", path)
+        raise FileNotFoundError(path)
+
+    suffix = path.suffix.lower()
+
+    if suffix in {".geojson", ".gpkg"}:
+        gdf = gpd.read_file(path)
+    else:
+        gdf = gpd.read_parquet(path)
+
+    log.info("Loaded %d rows from %s", len(gdf), path.name)
+    return gdf
+
+
+def writeScenarioOutputs(
+    filteredGdf,
+    outParquet=None,
+    outGeoJson=None,
+    outGpkg=None,
+    outCsv=None,
+    csvWkt=False,
+):
+    """
+    Save scenario or master results to one or more formats.
+
+    - Parquet: main artifact
+    - GeoJSON: optional
+    - GPKG: GIS-friendly
+    - CSV: optional, no geometry unless csvWkt=True
+    """
+    if filteredGdf is None or filteredGdf.empty:
         log.warning("No filtered results to write.")
         return
 
-    # Ensure parent folder exists (use first defined output)
     for p in (outParquet, outGeoJson, outGpkg, outCsv):
         if p is not None:
             p.parent.mkdir(parents=True, exist_ok=True)
             break
 
-    # --- Parquet ---
     if outParquet is not None:
         try:
             filteredGdf.to_parquet(outParquet, index=False)
@@ -172,7 +333,6 @@ def writeScenarioOutputs(filteredGdf, outParquet=None, outGeoJson=None, outGpkg=
         except Exception:
             log.exception("Failed to write Parquet for %s", outParquet)
 
-    # --- GeoJSON (expensive) ---
     if outGeoJson is not None:
         try:
             filteredGdf.to_file(outGeoJson, driver="GeoJSON")
@@ -180,16 +340,14 @@ def writeScenarioOutputs(filteredGdf, outParquet=None, outGeoJson=None, outGpkg=
         except Exception:
             log.warning("GeoJSON write warning for %s", outGeoJson.name)
 
-    # --- GeoPackage ---
     if outGpkg is not None:
         try:
-            layerName = outGpkg.stem  # e.g. "avaScen_WinterForNTirol"
+            layerName = outGpkg.stem
             filteredGdf.to_file(outGpkg, layer=layerName, driver="GPKG")
             log.info("Wrote GPKG: %s (layer=%s)", outGpkg.name, layerName)
         except Exception:
             log.exception("Failed to write GPKG for %s", outGpkg)
 
-    # --- CSV (attribute table export) ---
     if outCsv is not None:
         try:
             if csvWkt:
@@ -205,62 +363,71 @@ def writeScenarioOutputs(filteredGdf, outParquet=None, outGeoJson=None, outGpkg=
             log.exception("Failed to write CSV for %s", outCsv)
 
 
-def readGdfRowGroup(parquetPath: Path, row_group: int) -> gpd.GeoDataFrame:
+def readGdfRowGroup(
+    parquetPath: Path,
+    rowGroup: int,
+    dropCols: Optional[Sequence[str]] = None,
+) -> gpd.GeoDataFrame:
     """
     Read a single GeoParquet row group as GeoDataFrame.
 
-    Supports standard GeoParquet geometry encoding (WKB).
-    Preserves CRS if available in GeoParquet metadata.
+    Supports GeoParquet geometry encoding (WKB/WKT),
+    preserves CRS if available, and can drop configured
+    columns immediately after loading.
     """
-    import json
-    import pyarrow.parquet as pq
-
     if not parquetPath.exists():
         log.error("Input file not found: %s", parquetPath)
         raise FileNotFoundError(parquetPath)
 
     pf = pq.ParquetFile(parquetPath)
-    table = pf.read_row_group(row_group)
+    table = pf.read_row_group(rowGroup)
 
     metadata = table.schema.metadata or {}
     if b"geo" not in metadata:
         raise ValueError(f"Missing GeoParquet metadata in {parquetPath}")
 
     geo = json.loads(metadata[b"geo"].decode("utf-8"))
-    geom_col = geo["primary_column"]
-    geom_meta = geo.get("columns", {}).get(geom_col, {})
+    geomCol = geo.get("primary_column", "geometry")
+    geomMeta = geo.get("columns", {}).get(geomCol, {})
+    encoding = str(geomMeta.get("encoding", "")).lower()
 
     df = table.to_pandas()
 
-    if geom_col not in df.columns:
-        raise ValueError(f"Geometry column '{geom_col}' not found in row group {row_group}")
+    if dropCols:
+        colsToDrop = [c for c in dropCols if c in df.columns and c != geomCol]
+        if colsToDrop:
+            df = df.drop(columns=colsToDrop)
 
-    encoding = str(geom_meta.get("encoding", "")).lower()
+    if geomCol not in df.columns:
+        raise ValueError(f"Geometry column '{geomCol}' not found in row group {rowGroup}")
 
     if encoding == "wkb":
-        geometry = gpd.GeoSeries.from_wkb(df[geom_col], crs=None)
+        geometry = gpd.GeoSeries.from_wkb(df[geomCol], crs=None)
     elif encoding == "wkt":
-        geometry = gpd.GeoSeries.from_wkt(df[geom_col], crs=None)
+        geometry = gpd.GeoSeries.from_wkt(df[geomCol], crs=None)
     else:
         raise ValueError(
             f"Unsupported geometry encoding '{encoding}' in {parquetPath}. "
             f"Expected 'WKB' or 'WKT'."
         )
 
-    df = df.drop(columns=[geom_col])
+    df = df.drop(columns=[geomCol])
     gdf = gpd.GeoDataFrame(df, geometry=geometry)
 
-    crs = geom_meta.get("crs")
+    crs = geomMeta.get("crs")
     if crs:
         gdf.set_crs(crs, inplace=True, allow_override=True)
 
     return gdf
 
 
-
 # ------------------ Data integrity check ------------------ #
+
 def checkInputData(gdf: gpd.GeoDataFrame, parquetPath: Path, cfg=None) -> bool:
-    """Validate that the input avaDirectoryResults dataset contains all required columns."""
+    """
+    Validate that the input avaDirectoryResults dataset contains
+    all required columns.
+    """
     requiredCols = [
         "praID", "flow", "sector", "subC",
         "elevMin", "elevMax", "rSize",
@@ -268,6 +435,7 @@ def checkInputData(gdf: gpd.GeoDataFrame, parquetPath: Path, cfg=None) -> bool:
     ]
 
     log.info("Checking input data integrity for: %s", parquetPath.name)
+
     missing = [c for c in requiredCols if c not in gdf.columns]
     if missing:
         log.error("Missing required columns in %s: %s", parquetPath.name, ", ".join(missing))
@@ -283,16 +451,22 @@ def checkInputData(gdf: gpd.GeoDataFrame, parquetPath: Path, cfg=None) -> bool:
     if checkFlag:
         printAvailableOptions(parquetPath)
 
-    log.info("Input data integrity check passed (%d rows, %d columns).",
-             len(gdf), len(gdf.columns))
+    log.info(
+        "Input data integrity check passed (%d rows, %d columns).",
+        len(gdf), len(gdf.columns)
+    )
     return True
 
 
 # ------------------ Diagnostic Mode ------------------ #
+
 def handleAvaDirCheckMode(cfg, parquetPath: Path) -> bool:
-    """Diagnostic mode: list attributes and exit early if requested."""
+    """
+    Diagnostic mode: list attributes and exit early if requested.
+    """
     if not cfg.getboolean("WORKFLOW", "checkAvaDirResult", fallback=False):
         return True
+
     log.info("------------------------------------------------------------")
     log.info("Diagnostic mode enabled: checkAvaDirResult = True")
     log.info("Inspecting available attributes in AvaDirectoryResults...")
@@ -305,14 +479,18 @@ def handleAvaDirCheckMode(cfg, parquetPath: Path) -> bool:
 
 
 # ------------------ Diagnostics ------------------ #
+
 def printAvailableOptions(parquetPath: Path):
-    """List available filterable attributes in avaDirectoryResults.parquet."""
+    """
+    List available filterable attributes in avaDirectoryResults.parquet.
+    """
     if not parquetPath.exists():
         log.warning("File not found for diagnostics: %s", parquetPath)
         return
 
     df = pd.read_parquet(parquetPath)
     log.info("Available attributes in: %s", parquetPath.name)
+
     for col in [
         "praAreaM", "praAreaSized", "praAreaVol", "praElevMin",
         "praElevMax", "praElevMean", "LKGebietID", "subC",
@@ -324,46 +502,52 @@ def printAvailableOptions(parquetPath: Path):
 
 
 # ------------------ Normalization ------------------ #
+
 def normalizeAvaCols(df):
     """
     Ensure numeric and categorical consistency across columns.
 
     Works for both pandas.DataFrame and geopandas.GeoDataFrame.
-    Key fix:
-    - Normalize any PPM/PEM casing reliably (e.g. 'ppm', 'Ppm', 'PEM' -> 'PPM'/'PEM').
     """
-    # --- Fix PPM/PEM casing robustly ---
-    rename_map = {c: str(c).upper() for c in df.columns if str(c).lower() in ("ppm", "pem")}
-    if rename_map:
-        df = df.rename(columns=rename_map)
+    renameMap = {c: str(c).upper() for c in df.columns if str(c).lower() in ("ppm", "pem")}
+    if renameMap:
+        df = df.rename(columns=renameMap)
 
-    # --- Numeric conversions ---
     for col in ["subC", "elevMin", "elevMax", "rSize", "PEM", "PPM"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    # --- Categorical normalization ---
     if "flow" in df.columns:
         df["flow"] = df["flow"].astype(str).str.lower().str.strip()
+
     if "modType" in df.columns:
         df["modType"] = df["modType"].astype(str).str.lower().str.strip()
 
     return df
 
+
 # ------------------ Scenario summary ------------------ #
+
 def logScenarioSummary(gdf: gpd.GeoDataFrame, name: str = ""):
-    """Log quick summary of scenario result counts."""
+    """
+    Log quick summary of scenario result counts.
+    """
     if gdf.empty:
         log.warning("Scenario %s: no results", name)
         return
+
     resCount = (gdf["modType"] == "res").sum() if "modType" in gdf.columns else 0
     relCount = (gdf["modType"] == "rel").sum() if "modType" in gdf.columns else 0
     uniquePra = gdf["praID"].nunique() if "praID" in gdf.columns else None
-    log.info("Scenario %s: total=%d (res=%d, rel=%d), uniquePRAs=%s",
-             name, len(gdf), resCount, relCount, uniquePra)
+
+    log.info(
+        "Scenario %s: total=%d (res=%d, rel=%d), uniquePRAs=%s",
+        name, len(gdf), resCount, relCount, uniquePra
+    )
 
 
 # ------------------ Parse filter config ------------------ #
+
 def parseFilterConfig(cfg) -> list[dict]:
     """
     Parse [FILTER] and [FILTER.*] sections into scenario dictionaries.
@@ -380,6 +564,7 @@ def parseFilterConfig(cfg) -> list[dict]:
       applySingleRsizeRule
     """
     criteriaList: list[dict] = []
+
     if not cfg.has_section("FILTER"):
         log.warning("No [FILTER] section found; no scenarios defined.")
         return criteriaList
@@ -395,7 +580,6 @@ def parseFilterConfig(cfg) -> list[dict]:
         return cfg.get(section, key, fallback="").strip()
 
     def _getList(section: str, key: str):
-        """Return list[str] or None; empty / missing -> None."""
         if not cfg.has_option(section, key):
             return None
         raw = cfg.get(section, key, fallback="").strip()
@@ -405,7 +589,6 @@ def parseFilterConfig(cfg) -> list[dict]:
         return vals or None
 
     def _getInt(section: str, key: str):
-        """Return int or None (single value)."""
         if not cfg.has_option(section, key):
             return None
         raw = cfg.get(section, key, fallback="").strip()
@@ -418,10 +601,10 @@ def parseFilterConfig(cfg) -> list[dict]:
             return None
 
     def _getIntList(section: str, key: str):
-        """Return list[int] or None; supports comma-separated ints."""
         vals = _getList(section, key)
         if not vals:
             return None
+
         out: list[int] = []
         for v in vals:
             try:
@@ -438,14 +621,11 @@ def parseFilterConfig(cfg) -> list[dict]:
 
         crit: dict = {"name": cfg.get(section, "name", fallback=shortName)}
 
-        # --- Region criteria (attribute-table names) ---
-        # Keep as lists (or None). Empty in INI -> None.
         crit["LKGebiet"] = _getList(section, "LKGebiet")
         crit["LKGebietID"] = _getIntList(section, "LKGebietID")
         crit["LWDGebietID"] = _getList(section, "LWDGebietID")
         crit["regionMode"] = _getStr(section, "regionMode").lower() or "or"
 
-        # --- Scenario filters ---
         subC = _getInt(section, "subC")
         if subC is not None:
             crit["subCs"] = [subC]
@@ -455,12 +635,8 @@ def parseFilterConfig(cfg) -> list[dict]:
         crit["elevMin"] = _getInt(section, "elevMin")
         crit["elevMax"] = _getInt(section, "elevMax")
 
-        # --- Legend filters ---
-        # Keep as list[str] (or None). Your avaScenFilter handles str/list fine.
         crit["AvaDistributionPotential"] = _getList(section, "AvaDistributionPotential")
         crit["AvaSizePotential"] = _getInt(section, "AvaSizePotential")
-
-        # --- Dedup ---
         crit["applySingleRsizeRule"] = cfg.getboolean(section, "applySingleRsizeRule", fallback=True)
 
         criteriaList.append(crit)
