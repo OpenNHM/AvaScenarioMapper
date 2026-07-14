@@ -32,24 +32,48 @@ os.environ["GDAL_PAM_ENABLED"] = "NO"
 
 # ------------------ CFG ------------------ #
 
-inputTable = Path(
-    "/media/christoph/SSD 500 GB/Cairos/ModelChainResults/Euregio/cairosAvaMaps/13_avaScenMaps/"
-    "pilotStubai/FruehlingWet/avaScen_pilotStubai_FruehlingWet.parquet"
+scenarioRoot = Path(
+    "/home/christoph/Documents/ForsiteII/avaScenModelChain/output/13_avaScenMaps/"
 )
+
+# One or multiple avalanche scenarios to process sequentially.
+# Each scenario must exist as:
+#   <scenarioRoot>/<scenarioName>.gpkg
+# or
+#   <scenarioRoot>/<scenarioName>.parquet
+
+scenarioNames = [
+    "avaScen_pem5",
+    "avaScen_pem3",
+]
+
+inputFormat = ".gpkg"
+# allowed: ".gpkg", ".parquet"
 
 dataRoot = Path(
-    "/media/christoph/SSD 500 GB/Cairos/ModelChainResults/Euregio/cairosAvaMaps"
+    "/home/christoph/Documents/ForsiteII/avaScenModelChain/output/"
 )
 
-outDir = Path(
-    "/media/christoph/SSD 500 GB/Cairos/ModelChainResults/Euregio/"
-    "cairosAvaMaps/13_avaScenMaps/pilotStubai/FruehlingWet"
-)
+# Create outputs in a dedicated folder per scenario:
+#   .../pilotStubai/avaScen_HochwinterDry5_WorstCase/
+createScenarioSubdir = True
 
-mapType = "all"
-# mapType = "pathTravelanglemax"
-# mapType = "pathZdelta_sized"
-# mapType = "pathCellcounts,pathZdelta"
+# mapType options:
+#   pathCellcounts
+#   pathTravelanglemax
+#   pathTravelanglemax_sized
+#   pathTravellengthmax
+#   pathTravellengthmax_sized
+#   pathZdelta
+#   pathZdelta_sized
+
+#mapType = "all"
+#mapType = "pathTravelanglemax"
+#mapType = "pathZdelta_sized"
+#mapType = "pathCellcounts,pathZdelta"
+#mapType = "pathTravelanglemax,pathTravellengthmax,pathZdelta"
+
+mapType = "pathZdelta,pathTravelanglemax,pathTravellengthmax"
 
 resolution = 10.0
 noData = -9999.0
@@ -84,6 +108,23 @@ knownDataFolders = [
     "12_avaScenFiles",
     "13_avaScenMaps",
 ]
+
+
+# ------------------ Path helpers ------------------ #
+
+def buildScenarioPaths():
+    inputExt = inputFormat.lower().strip()
+    if inputExt not in {".gpkg", ".parquet"}:
+        raise ValueError(f"Invalid inputFormat: {inputFormat}")
+
+    inputTable = scenarioRoot / f"{scenarioName}{inputExt}"
+
+    if createScenarioSubdir:
+        outDir = scenarioRoot / scenarioName
+    else:
+        outDir = scenarioRoot
+
+    return inputTable, outDir
 
 
 # ------------------ Helpers ------------------ #
@@ -291,8 +332,8 @@ def fillNoData(dst):
         dst.write(block[:h, :w], 1, window=window)
 
 
-def buildOutputName(columnName):
-    return f"{inputTable.stem}_{columnName}.tif"
+def buildOutputName(inputStem, columnName):
+    return f"{inputStem}_{columnName}.tif"
 
 
 def mergeOneRaster(item, dst):
@@ -369,9 +410,15 @@ def mergeOneRaster(item, dst):
 def runMakeAvaScenTif():
     t0 = time.perf_counter()
 
+    inputTable, outDir = buildScenarioPaths()
     selectedColumns = normalizeMapType(mapType)
 
+    if not inputTable.exists():
+        raise FileNotFoundError(f"Input table not found: {inputTable}")
+
     log.info("Step 13: Start avalanche scenario TIFF merge...")
+    log.info("Step 13: Scenario root = %s", scenarioRoot)
+    log.info("Step 13: Scenario name = %s", scenarioName)
     log.info("Step 13: Input table = %s", inputTable)
     log.info("Step 13: Data root = %s", dataRoot)
     log.info("Step 13: Output directory = %s", outDir)
@@ -418,7 +465,7 @@ def runMakeAvaScenTif():
             continue
 
         mergeMode = "minimum" if columnName in minMergeColumns else "maximum"
-        outPath = outDir / buildOutputName(columnName)
+        outPath = outDir / buildOutputName(inputTable.stem, columnName)
 
         log.info(
             "Step 13: Start %s with %s merge (%d rasters)",
@@ -453,4 +500,10 @@ def runMakeAvaScenTif():
 
 if __name__ == "__main__":
     setupLogging()
-    runMakeAvaScenTif()
+
+    # Loop through all configured scenarios and create merged TIFF maps
+    for scenarioName in scenarioNames:
+        log.info("========================================")
+        log.info("Processing scenario: %s", scenarioName)
+
+        runMakeAvaScenTif()
