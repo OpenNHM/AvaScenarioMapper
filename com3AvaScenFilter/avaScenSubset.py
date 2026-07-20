@@ -33,7 +33,6 @@ from typing import Dict, List, Sequence, Set, Tuple
 
 import pandas as pd
 import geopandas as gpd
-import pyarrow as pa
 import pyarrow.parquet as pq
 
 import in1Utils.mapperUtils as mapperUtils

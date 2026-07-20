@@ -128,7 +128,11 @@ def parseOutputConfig(cfg: configparser.ConfigParser) -> Dict:
         "allowScenarioDuplicatesInMaster",
         fallback=cfg.getboolean("WORKFLOW", "allowScenarioDuplicatesInMaster", fallback=True),
     )
-    csvWkt = cfg.getboolean("WORKFLOW", "writeScenarioCsvWkt", fallback=False)
+    csvWkt = cfg.getboolean(
+        "OUTPUT",
+        "writeScenarioCsvWkt",
+        fallback=cfg.getboolean("WORKFLOW", "writeScenarioCsvWkt", fallback=False),
+    )
 
     if outputMode not in {"scenarioOnly", "scenarioAndMaster", "masterOnly"}:
         raise ValueError(f"Unsupported OUTPUT.outputMode: {outputMode}")
@@ -798,7 +802,8 @@ def buildMasterFromScenarioParquets(
     parquetPaths: List[Path] = []
     for scenName in scenarioNames:
         scenNameClean = mapperUtils.sanitizeScenarioName(scenName)
-        p = scenMapsDir / f"avaScen_{scenNameClean}.parquet"
+        baseName = f"avaScen_{scenNameClean}"
+        p = scenMapsDir / baseName / f"{baseName}.parquet"
         if p.exists():
             parquetPaths.append(p)
         else:

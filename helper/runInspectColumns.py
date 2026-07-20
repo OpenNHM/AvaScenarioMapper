@@ -5,8 +5,6 @@ from pathlib import Path
 import subprocess
 import shutil
 import sqlite3
-import tempfile
-import os
 import pandas as pd
 
 try:
