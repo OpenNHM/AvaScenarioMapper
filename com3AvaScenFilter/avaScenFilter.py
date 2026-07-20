@@ -60,6 +60,8 @@ def filterScenarioResults(
       - subC
       - sector
       - flow
+      - filterElevBand
+      - filterElevMean
       - elevMin
       - elevMax
       - AvaDistributionPotential
@@ -169,11 +171,16 @@ def filterScenarioResults(
     criteria["regionMode"] = (criteria.get("regionMode") or "or").strip().lower()
     debugJoinKeys = bool(criteria.get("debugJoinKeys", False))
 
+    filterElevBand = bool(criteria.get("filterElevBand", True))
+    filterElevMean = bool(criteria.get("filterElevMean", False))
+    elevationMode = "band" if filterElevBand else ("mean" if filterElevMean else "off")
+
     log.info(
-        "Scenario criteria: subC=%s | sector=%s | flow=%s | elevMin=%s elevMax=%s | pots=%s size=%s | region(LKname)=%d region(LKid)=%d region(LWD)=%d mode=%s",
+        "Scenario criteria: subC=%s | sector=%s | flow=%s | elevationMode=%s elevMin=%s elevMax=%s | pots=%s size=%s | region(LKname)=%d region(LKid)=%d region(LWD)=%d mode=%s",
         subC,
         sector,
         flow,
+        elevationMode,
         criteria.get("elevMin"),
         criteria.get("elevMax"),
         criteria.get("AvaDistributionPotential"),
@@ -249,6 +256,8 @@ def filterScenarioResults(
 
     elevMin = criteria.get("elevMin")
     elevMax = criteria.get("elevMax")
+    if filterElevBand and filterElevMean:
+        raise ValueError("filterElevBand and filterElevMean cannot both be True.")
 
     if subC:
         if "subC" not in gdf.columns:
@@ -278,23 +287,45 @@ def filterScenarioResults(
             gdf = gdf[tmpFlow.isin(flowSet)].copy()
             log.info("Filter flow=%s kept %d/%d", sorted(flowSet), len(gdf), before2)
 
-    if elevMin is not None:
-        if "elevMin" not in gdf.columns:
-            log.warning("Filter elevMin requested, but column 'elevMin' not found.")
-        else:
-            tmpElevMin = pd.to_numeric(gdf["elevMin"], errors="coerce")
-            before2 = len(gdf)
-            gdf = gdf[tmpElevMin >= float(elevMin)].copy()
-            log.info("Filter elevMin>=%s kept %d/%d", elevMin, len(gdf), before2)
+    if filterElevBand:
+        if elevMin is not None:
+            if "elevMin" not in gdf.columns:
+                log.warning("Filter elevMin requested, but column 'elevMin' not found.")
+            else:
+                tmpElevMin = pd.to_numeric(gdf["elevMin"], errors="coerce")
+                before2 = len(gdf)
+                gdf = gdf[tmpElevMin >= float(elevMin)].copy()
+                log.info("Filter elevMin>=%s kept %d/%d", elevMin, len(gdf), before2)
 
-    if elevMax is not None:
-        if "elevMax" not in gdf.columns:
-            log.warning("Filter elevMax requested, but column 'elevMax' not found.")
-        else:
-            tmpElevMax = pd.to_numeric(gdf["elevMax"], errors="coerce")
-            before2 = len(gdf)
-            gdf = gdf[tmpElevMax <= float(elevMax)].copy()
-            log.info("Filter elevMax<=%s kept %d/%d", elevMax, len(gdf), before2)
+        if elevMax is not None:
+            if "elevMax" not in gdf.columns:
+                log.warning("Filter elevMax requested, but column 'elevMax' not found.")
+            else:
+                tmpElevMax = pd.to_numeric(gdf["elevMax"], errors="coerce")
+                before2 = len(gdf)
+                gdf = gdf[tmpElevMax <= float(elevMax)].copy()
+                log.info("Filter elevMax<=%s kept %d/%d", elevMax, len(gdf), before2)
+
+    if filterElevMean:
+        if "praElevMean" not in gdf.columns:
+            raise ValueError("filterElevMean=True requires column 'praElevMean'.")
+
+        meanElev = pd.to_numeric(gdf["praElevMean"], errors="coerce")
+        meanMask = meanElev.notna()
+        if elevMin is not None:
+            meanMask &= meanElev >= float(elevMin)
+        if elevMax is not None:
+            meanMask &= meanElev <= float(elevMax)
+
+        before2 = len(gdf)
+        gdf = gdf[meanMask].copy()
+        log.info(
+            "Filter praElevMean in [%s, %s] kept %d/%d",
+            elevMin if elevMin is not None else "-inf",
+            elevMax if elevMax is not None else "+inf",
+            len(gdf),
+            before2,
+        )
 
     log.info("Scenario filters total kept %d/%d", len(gdf), before)
     _logStage("after_scenario", gdf)

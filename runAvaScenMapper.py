@@ -14,7 +14,7 @@
 # ───────────────────────────────────────────────────────────────────────────────────────────────
 #
 # Purpose :
-#   Step 17 of the Avalanche Scenario Model Chain.
+#   Step 16 of the Avalanche Scenario Model Chain.
 #   Filters avaDirectoryResults.parquet into scenario-specific outputs
 #   for visualization, mapping, and publication.
 #
@@ -64,22 +64,13 @@ import com3AvaScenFilter.avaScenFilter as avaScenFilter
 import com3AvaScenFilter.avaScenSubset as avaScenSubset
 import in2Matrix.avaPotMatrix as avaPotMatrix
 import out1Utils.mapperOutUtils as mapperOutUtils
+import out1Utils.scenarioRasterUtils as scenarioRasterUtils
 
 # ------------------ Logger ------------------ #
 log = logging.getLogger(__name__)
 
 
 # ------------------ Small runner helpers ------------------ #
-def parseBaseDirs(cfg: configparser.ConfigParser) -> List[Path]:
-    """
-    Parse baseDir config; supports one or multiple absolute paths (newline separated).
-    """
-    baseDirRaw = cfg.get("PATHS", "baseDir", fallback="").strip()
-    if not baseDirRaw:
-        return []
-    return [Path(b.strip()).expanduser() for b in baseDirRaw.splitlines() if b.strip()]
-
-
 def logStartBanner(stepName: str, stepId: str) -> None:
     log.info(
         "\n\n"
@@ -108,6 +99,10 @@ def resolveSubsetInputPath(
     subsetAreaName = cfg.get("SUBSET", "subsetAreaName", fallback="").strip()
     subsetAreaPathRaw = cfg.get("SUBSET", "subsetAreaPath", fallback="").strip()
     subsetAvaDirectoryDirRaw = cfg.get("SUBSET", "subsetAvaDirectoryDir", fallback="").strip()
+    if not subsetAvaDirectoryDirRaw:
+        subsetAvaDirectoryDirRaw = cfg.get(
+            "SUBSET", "subsetAreaAvaDirectoryOut", fallback=""
+        ).strip()
     subsetAvaDirectoryFileTypes = cfg.get("SUBSET", "subsetAvaDirectoryFileTypes", fallback="parquet").strip()
 
     if not subsetAreaName:
@@ -159,20 +154,20 @@ def collectCriteriaToRun(
     for crit in areaCriteriaList:
         scenName = crit.get("name", "unnamed")
         scenNameClean = mapperUtils.sanitizeScenarioName(scenName)
+        baseName = f"avaScen_{scenNameClean}"
+        scenarioDir = scenMapsDir / baseName
 
-        outputs = mapperUtils.buildScenarioOutputPaths(
-            scenMapsDir=scenMapsDir,
-            scenNameClean=scenNameClean,
-            writeParquet=("parquet" in scenarioFileTypes),
-            writeGeoJson=("geojson" in scenarioFileTypes),
-            writeGpkg=("gpkg" in scenarioFileTypes),
-            writeCsv=("csv" in scenarioFileTypes),
+        outputPaths = mapperOutUtils.buildOutputPaths(
+            scenarioDir,
+            baseName,
+            scenarioFileTypes,
         )
+        outputs = [path for path in outputPaths.values() if path is not None]
+        outputs.append(scenarioDir / f"{baseName}.json")
 
-        existing = next((p for p in outputs if p and p.exists()), None)
-        if existing:
+        if outputs and all(path.exists() for path in outputs):
             skipped += 1
-            log.info("Skipping scenario '%s' (already exists: %s)", scenName, relPath(existing, baseDir))
+            log.info("Skipping scenario '%s' (all requested feature outputs exist)", scenName)
             continue
 
         criteriaToRun.append(crit)
@@ -219,7 +214,7 @@ def filterScenarios(
     gdf = mapperUtils.normalizeAvaCols(gdf)
 
     if not mapperUtils.checkInputData(gdf, avaResultsPath, cfg):
-        log.error("Step 17 aborted: input dataset incomplete or invalid.")
+        log.error("Step 16 aborted: input dataset incomplete or invalid.")
         return []
 
     return avaScenFilter.runScenarioFilters(gdf, criteriaToRun, avaLegend)
@@ -259,10 +254,21 @@ def writeScenarioOutputs(
     """
     for crit, gdfOut in enrichedResults:
         scenName = mapperUtils.sanitizeScenarioName(crit.get("name", "unnamed"))
+        baseName = f"avaScen_{scenName}"
+        scenarioDir = scenMapsDir / baseName
+        outputPaths = mapperOutUtils.buildOutputPaths(
+            scenarioDir,
+            baseName,
+            scenarioFileTypes,
+        )
+        requestedPaths = [path for path in outputPaths.values() if path is not None]
+        if requestedPaths and all(path.exists() for path in requestedPaths):
+            log.info("Scenario feature outputs already complete, skipping: %s", scenName)
+            continue
         mapperOutUtils.writeOutputsByFileTypes(
             gdfOut,
-            scenMapsDir,
-            f"avaScen_{scenName}",
+            scenarioDir,
+            baseName,
             scenarioFileTypes,
             csvWkt=csvWkt,
         )
@@ -275,10 +281,10 @@ def runAvaScenMapper(
     areaCriteriaList: Optional[List[Dict]] = None,
 ) -> None:
     """
-    Main entry point for the Avalanche Scenario Mapper (Step 17).
+    Main entry point for the Avalanche Scenario Mapper (Step 16).
     """
     t0 = time.perf_counter()
-    logStartBanner("Avalanche Scenario Mapper", "Step 17")
+    logStartBanner("Avalanche Scenario Mapper", "Step 16")
 
     if paths is None:
         paths = mapperUtils.resolvePaths(cfg)
@@ -301,20 +307,27 @@ def runAvaScenMapper(
         return
 
     avaLegend = avaPotMatrix.avaPotMatrix()
-    log.info("Step 17: Avalanche Distribution–Size matrix loaded (%d entries)", len(avaLegend))
+    log.info("Step 16: Avalanche Distribution–Size matrix loaded (%d entries)", len(avaLegend))
 
     if areaCriteriaList is None:
         if cfg.getboolean("WORKFLOW", "mapperUseCaaml", fallback=False):
-            log.info("Step 17: CAAML integration requested (not yet implemented).")
+            log.info("Step 16: CAAML integration requested (not yet implemented).")
             areaCriteriaList = []
         else:
             areaCriteriaList = mapperUtils.parseFilterConfig(cfg)
 
     if not areaCriteriaList:
-        log.warning("Step 17: No scenarios configured -> exiting Mapper.")
+        log.warning("Step 16: No scenarios configured -> exiting Mapper.")
         return
 
     outputCfg = mapperOutUtils.parseOutputConfig(cfg)
+    mapScenFeatures = cfg.getboolean("WORKFLOW", "mapScenFeatures", fallback=True)
+    mapScenRasters = cfg.getboolean("WORKFLOW", "mapScenRasters", fallback=False)
+
+    if not mapScenFeatures and not mapScenRasters:
+        log.warning("Both mapScenFeatures and mapScenRasters are False -> nothing to create.")
+        return
+
     outputMode = outputCfg["outputMode"]
     scenarioFileTypes = outputCfg["scenarioFileTypes"]
     masterFileTypes = outputCfg["masterFileTypes"]
@@ -328,15 +341,20 @@ def runAvaScenMapper(
     log.info("Master file types: %s", ", ".join(masterFileTypes) if masterFileTypes else "<none>")
     log.info("Master duplicate handling: allowScenarioDuplicatesInMaster=%s", allowScenarioDuplicatesInMaster)
     log.info("Add scenarioName field: %s", addScenarioNameField)
+    log.info("Map scenario features: %s", mapScenFeatures)
+    log.info("Map scenario rasters : %s", mapScenRasters)
     log.info("Configured deleteColumns: %s", ", ".join(deleteColumns) if deleteColumns else "<none>")
 
-    criteriaToRun = collectCriteriaToRun(
-        areaCriteriaList=areaCriteriaList,
-        scenMapsDir=scenMapsDir,
-        baseDir=baseDir,
-        outputMode=outputMode,
-        scenarioFileTypes=scenarioFileTypes,
-    )
+    if mapScenRasters:
+        criteriaToRun = areaCriteriaList
+    else:
+        criteriaToRun = collectCriteriaToRun(
+            areaCriteriaList=areaCriteriaList,
+            scenMapsDir=scenMapsDir,
+            baseDir=baseDir,
+            outputMode=outputMode,
+            scenarioFileTypes=scenarioFileTypes,
+        )
 
     if not criteriaToRun:
         log.warning("Nothing to process -> exiting Mapper.")
@@ -345,7 +363,7 @@ def runAvaScenMapper(
     fileSizeGb = avaResultsPath.stat().st_size / (1024 ** 3)
     useChunked = fileSizeGb >= 1.0
 
-    if useChunked and outputMode == "masterOnly":
+    if useChunked and outputMode == "masterOnly" and mapScenFeatures and not mapScenRasters:
         masterName = mapperUtils.getMasterName(cfg, baseDir)
         mapperOutUtils.streamMasterOnlyChunked(
             avaResultsPath=avaResultsPath,
@@ -360,7 +378,7 @@ def runAvaScenMapper(
             addScenarioNameField=addScenarioNameField,
             masterFileTypes=masterFileTypes,
         )
-        log.info("Step 17 finished in %.2fs", time.perf_counter() - t0)
+        log.info("Step 16 finished in %.2fs", time.perf_counter() - t0)
         return
 
     results = filterScenarios(
@@ -373,6 +391,37 @@ def runAvaScenMapper(
 
     if not results:
         log.warning("No scenario produced output.")
+        return
+
+    for crit, _ in results:
+        scenarioName = f"avaScen_{mapperUtils.sanitizeScenarioName(crit.get('name', 'unnamed'))}"
+        scenarioDir = scenMapsDir / scenarioName
+        cfgUtils.writeConfigSnapshot(
+            cfg,
+            scenarioDir / f"{scenarioName}.json",
+            scenarioName=scenarioName,
+            filterSection=crit.get("_filterSection"),
+        )
+
+    if mapScenRasters:
+        rasterConfig = scenarioRasterUtils.parseRasterConfig(cfg)
+        dataRoot = scenarioRasterUtils.deriveDataRoot(fullAvaResultsPath)
+        log.info("Scenario raster data root: %s", dataRoot)
+
+        for crit, scenarioGdf in results:
+            scenarioName = f"avaScen_{mapperUtils.sanitizeScenarioName(crit.get('name', 'unnamed'))}"
+            scenarioRasterUtils.makeScenarioRasters(
+                scenarioGdf=scenarioGdf,
+                scenarioName=scenarioName,
+                scenMapsDir=scenMapsDir,
+                pathBaseDir=avaResultsPath.parent,
+                dataRoot=dataRoot,
+                rasterConfig=rasterConfig,
+            )
+
+    if not mapScenFeatures:
+        log.info("Scenario feature output disabled; raster stage complete.")
+        log.info("Step 16 finished in %.2fs", time.perf_counter() - t0)
         return
 
     enrichedResults = enrichScenarioOutputs(
@@ -449,7 +498,7 @@ def runAvaScenMapper(
                 allowScenarioDuplicatesInMaster=allowScenarioDuplicatesInMaster,
             )
 
-    log.info("Step 17 finished in %.2fs", time.perf_counter() - t0)
+    log.info("Step 16 finished in %.2fs", time.perf_counter() - t0)
 
 
 # --------------------------- MAIN ENTRYPOINT --------------------------- #
@@ -468,75 +517,14 @@ def main(argv: Optional[list] = None) -> int:
     cfg = cfgUtils.readCfg(cfgPath)
     logPath = cfgUtils.setupMapperLogging(cfg)
 
-    mapperPathMode = cfg.get(
-        "WORKFLOW",
-        "mapperPathMode",
-        fallback="AvaScenDirectory",
-    ).strip().lower()
-
-    if mapperPathMode == "custompaths":
-        avaResultsRaw = cfg.get("PATHS", "avaDirectoryResults", fallback="").strip()
-        scenMapsRaw = cfg.get("PATHS", "avaScenMapsDir", fallback="").strip()
-
-        if not avaResultsRaw:
-            log.error("No avaDirectoryResults configured in [PATHS] for customPaths mode.")
-            return 1
-        if not scenMapsRaw:
-            log.error("No avaScenMapsDir configured in [PATHS] for customPaths mode.")
-            return 1
-
-        avaResultsPath = Path(avaResultsRaw).expanduser()
-        scenMapsDir = Path(scenMapsRaw).expanduser()
-
-        if not avaResultsPath.exists():
-            log.error("avaDirectoryResults does not exist: %s", avaResultsPath)
-            return 1
-
-        scenMapsDir.mkdir(parents=True, exist_ok=True)
-
-        log.info("Running Avalanche Scenario Mapper in customPaths mode:")
-        log.info("  avaDirectoryResults: %s", avaResultsPath)
-        log.info("  avaScenMapsDir     : %s", scenMapsDir)
-
-        try:
-            runAvaScenMapper(cfg)
-        except Exception:
-            log.exception("Scenario Mapper failed in customPaths mode.")
-            return 1
-
-        log.info("Avalanche Scenario Mapper log saved at: %s\n", logPath)
-        return 0
-
-    baseDirs = parseBaseDirs(cfg)
-    if not baseDirs:
-        log.error("No baseDir configured in [PATHS] for AvaScenDirectory mode.")
+    try:
+        paths = mapperUtils.resolvePaths(cfg)
+        runAvaScenMapper(cfg, paths=paths)
+    except (FileNotFoundError, ValueError) as exc:
+        log.error("Invalid Mapper configuration: %s", exc)
         return 1
-
-    ranAny = False
-
-    for baseDir in baseDirs:
-        if not baseDir.exists():
-            log.error("baseDir does not exist: %s", baseDir)
-            continue
-
-        ranAny = True
-        log.info("Running Avalanche Scenario Mapper for baseDir:")
-        log.info("  %s", baseDir)
-
-        cfgRun = configparser.ConfigParser()
-        cfgRun.read_dict({s: dict(cfg[s]) for s in cfg.sections()})
-
-        if not cfgRun.has_section("PATHS"):
-            cfgRun.add_section("PATHS")
-        cfgRun.set("PATHS", "baseDir", str(baseDir))
-
-        try:
-            runAvaScenMapper(cfgRun)
-        except Exception:
-            log.exception("Scenario Mapper failed for baseDir: %s", baseDir)
-
-    if not ranAny:
-        log.error("No valid baseDir could be processed.")
+    except Exception:
+        log.exception("Scenario Mapper failed.")
         return 1
 
     log.info("Avalanche Scenario Mapper log saved at: %s\n", logPath)

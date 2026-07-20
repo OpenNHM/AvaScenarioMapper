@@ -31,10 +31,10 @@
 import os
 import sys
 import time
+import json
 import logging
 import configparser
 from pathlib import Path
-from functools import wraps
 
 
 # ------------------ Small config helpers ------------------ #
@@ -69,18 +69,11 @@ def getDefaultMapperLogDir(cfg: configparser.ConfigParser) -> Path:
     """
     Determine a sensible default log directory without depending on mapperUtils.
 
-    Priority:
-      1) [PATHS] avaScenMapsDir
-      2) [PATHS] baseDir / 13_avaScenMaps
-      3) current working directory
+    Use [PATHS] avaScenMapsDir, falling back to the current directory.
     """
     avaScenMapsDir = getConfiguredPath(cfg, "PATHS", "avaScenMapsDir")
     if avaScenMapsDir is not None:
         return avaScenMapsDir
-
-    baseDir = getConfiguredPath(cfg, "PATHS", "baseDir")
-    if baseDir is not None:
-        return baseDir / "13_avaScenMaps"
 
     return Path.cwd()
 
@@ -97,7 +90,7 @@ def setupMapperLogging(
 
     - Console: no timestamps, compact format
     - File: timestamps, detailed logs
-    - Output: log file stored in avaScenMapsDir or baseDir/13_avaScenMaps
+    - Output: log file stored in avaScenMapsDir
 
     Parameters
     ----------
@@ -180,6 +173,31 @@ def readCfg(cfgPath: Path) -> configparser.ConfigParser:
     return cfg
 
 
+def writeConfigSnapshot(
+    cfg: configparser.ConfigParser,
+    outputPath: Path,
+    scenarioName: str,
+    filterSection: str | None = None,
+) -> Path:
+    """Write the effective INI configuration used for one scenario as JSON."""
+    outputPath = Path(outputPath)
+    outputPath.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "scenarioName": scenarioName,
+        "filterSection": filterSection,
+        "createdAt": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        "config": {
+            section: dict(cfg[section])
+            for section in cfg.sections()
+        },
+    }
+    with outputPath.open("w", encoding="utf-8") as stream:
+        json.dump(payload, stream, indent=2, ensure_ascii=False)
+        stream.write("\n")
+    logging.getLogger(__name__).info("Wrote scenario config snapshot: %s", outputPath)
+    return outputPath
+
+
 # ------------------ Path helper ------------------ #
 
 def relPath(path: Path, baseDir: Path) -> str:
@@ -191,21 +209,3 @@ def relPath(path: Path, baseDir: Path) -> str:
         return os.path.relpath(path, baseDir)
     except Exception:
         return str(path)
-
-
-# ------------------ Timing helper ------------------ #
-
-def timeIt(func):
-    """
-    Decorator for timing function execution with INFO-level logging.
-    """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        log = logging.getLogger(func.__module__)
-        t0 = time.perf_counter()
-        try:
-            return func(*args, **kwargs)
-        finally:
-            dt = time.perf_counter() - t0
-            log.info("%s finished in %.2fs", func.__name__, dt)
-    return wrapper

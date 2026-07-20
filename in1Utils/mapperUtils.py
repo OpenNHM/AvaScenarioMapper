@@ -86,120 +86,80 @@ def getMasterName(cfg, baseDir: Path) -> str:
 
 
 def resolvePaths(cfg) -> dict:
-    """
-    Resolve all input/output paths depending on mapperPathMode.
+    """Resolve the explicitly configured Mapper input and output paths."""
+    mode = cfg.get("WORKFLOW", "mapperPathMode", fallback="customPaths").strip().lower()
+    if mode != "custompaths":
+        raise ValueError("Only mapperPathMode=customPaths is supported.")
 
-      - AvaScenDirectory :
-            assumes standard Avalanche Scenario Model Chain structure under baseDir
-            baseDir/
-              12_avaDirectory/avaDirectoryResults.parquet
-              13_avaScenMaps/
+    avaResultsRaw = cfg.get("PATHS", "avaDirectoryResults", fallback="").strip()
+    scenMapsRaw = cfg.get("PATHS", "avaScenMapsDir", fallback="").strip()
+    if not avaResultsRaw:
+        raise ValueError("Missing [PATHS] avaDirectoryResults.")
+    if not scenMapsRaw:
+        raise ValueError("Missing [PATHS] avaScenMapsDir.")
 
-      - customPaths :
-            reads explicit paths from [PATHS]
-            avaDirectoryResults = ...
-            avaScenMapsDir      = ...
-            refTif              = ...   (optional)
-    """
-    paths: dict = {}
+    avaResultsPath = Path(os.path.expandvars(avaResultsRaw)).expanduser()
+    scenMapsDir = Path(os.path.expandvars(scenMapsRaw)).expanduser()
+    try:
+        baseDir = Path(os.path.commonpath([str(avaResultsPath.parent), str(scenMapsDir)]))
+    except ValueError:
+        baseDir = scenMapsDir.parent
 
-    mode = cfg.get("WORKFLOW", "mapperPathMode", fallback="AvaScenDirectory").strip().lower()
+    paths = {
+        "baseDir": baseDir,
+        "avaDirectoryResultsParquet": avaResultsPath,
+        "avaScenMapsDir": scenMapsDir,
+    }
 
-    if mode == "custompaths":
-        log.info("Path mode: customPaths (using explicit [PATHS] entries)")
-
-        avaResultsRaw = cfg.get("PATHS", "avaDirectoryResults", fallback="").strip()
-        scenMapsRaw = cfg.get("PATHS", "avaScenMapsDir", fallback="").strip()
-        refTifRaw = cfg.get("PATHS", "refTif", fallback="").strip()
-
-        if not avaResultsRaw:
-            raise ValueError("Missing [PATHS] avaDirectoryResults for customPaths mode.")
-        if not scenMapsRaw:
-            raise ValueError("Missing [PATHS] avaScenMapsDir for customPaths mode.")
-
-        avaResultsPath = Path(os.path.expandvars(avaResultsRaw)).expanduser()
-        scenMapsDir = Path(os.path.expandvars(scenMapsRaw)).expanduser()
-
-        try:
-            baseDir = Path(os.path.commonpath([str(avaResultsPath.parent), str(scenMapsDir)])).expanduser()
-        except Exception:
-            baseDir = scenMapsDir.parent
-
-        paths["baseDir"] = baseDir
-        paths["avaDirectoryResultsParquet"] = avaResultsPath
-        paths["avaScenMapsDir"] = scenMapsDir
-        paths["refTif"] = Path(os.path.expandvars(refTifRaw)).expanduser() if refTifRaw else None
-
-    else:
-        log.info("Path mode: AvaScenDirectory (auto-resolved under baseDir)")
-
-        baseDirRaw = cfg.get("PATHS", "baseDir", fallback="").strip()
-        if not baseDirRaw:
-            raise ValueError("Missing [PATHS] baseDir for AvaScenDirectory mode.")
-
-        baseDir = Path(os.path.expandvars(baseDirRaw)).expanduser()
-        paths["baseDir"] = baseDir
-
-        avaDirRoot = baseDir / "12_avaDirectory"
-        scenMapsDir = baseDir / "13_avaScenMaps"
-
-        directParquet = avaDirRoot / "avaDirectoryResults.parquet"
-        candidates = sorted(avaDirRoot.glob("*/avaDirectoryResults.parquet"))
-
-        if directParquet.exists():
-            avaResultsPath = directParquet
-        elif len(candidates) == 1:
-            avaResultsPath = candidates[0]
-            log.info(
-                "Detected AvaDirectoryResults in subfolder: %s",
-                relPath(avaResultsPath.parent, baseDir),
-            )
-        elif len(candidates) > 1:
-            raise RuntimeError(
-                f"Multiple avaDirectoryResults.parquet found under {avaDirRoot}:\n"
-                + "\n".join([f"  - {c}" for c in candidates])
-                + "\n\nPlease set mapperPathMode=customPaths and provide [PATHS].avaDirectoryResults."
-            )
-        else:
-            avaResultsPath = directParquet
-
-        refCandidates = sorted((baseDir / "00_input").glob("10DTM_*.tif"))
-        refTif = refCandidates[0] if refCandidates else None
-
-        paths["avaDirectoryResultsParquet"] = avaResultsPath
-        paths["avaScenMapsDir"] = scenMapsDir
-        paths["refTif"] = refTif
+    if not paths["avaDirectoryResultsParquet"].is_file():
+        raise FileNotFoundError(paths["avaDirectoryResultsParquet"])
 
     paths["avaScenMapsDir"].mkdir(parents=True, exist_ok=True)
 
     log.info("Resolved AvaDirectoryResults : %s", relPath(paths["avaDirectoryResultsParquet"], paths["baseDir"]))
     log.info("Resolved AvaScenMaps output  : %s", relPath(paths["avaScenMapsDir"], paths["baseDir"]))
-    if paths.get("refTif"):
-        log.info("Resolved refTif             : %s", relPath(paths["refTif"], paths["baseDir"]))
-
     return paths
 
 
+def resolveRasterPath(
+    pathValue,
+    relativeTo: Path,
+    dataRoot: Optional[Path] = None,
+) -> Path:
+    """Resolve raster paths stored by both AvaDirectory layouts.
+
+    Relative paths are first interpreted relative to the table containing them.
+    For copied scenario tables, ``dataRoot`` can be supplied to rebuild paths
+    from a known model-chain directory anchor.
+    """
+    rasterPath = Path(str(pathValue).strip())
+    if rasterPath.is_absolute():
+        return rasterPath.resolve()
+
+    directPath = (relativeTo / rasterPath).resolve()
+    if directPath.exists() or dataRoot is None:
+        return directPath
+
+    dataRoot = Path(dataRoot)
+    knownAnchors = {"11_avaDirectoryData", "12_avaDirectory", "13_avaScenMaps"}
+    parts = rasterPath.parts
+
+    for index, part in enumerate(parts):
+        if part in knownAnchors:
+            anchoredPath = dataRoot.joinpath(*parts[index:]).resolve()
+            if anchoredPath.exists():
+                return anchoredPath
+
+    strippedParts = [part for part in parts if part not in {"", ".", ".."}]
+    if strippedParts:
+        fallbackPath = dataRoot.joinpath(*strippedParts).resolve()
+        if fallbackPath.exists():
+            return fallbackPath
+
+    return directPath
+
+
 # ------------------ Output helpers ------------------ #
-
-def buildScenarioOutputPaths(
-    scenMapsDir: Path,
-    scenNameClean: str,
-    writeParquet: bool,
-    writeGeoJson: bool,
-    writeGpkg: bool,
-    writeCsv: bool,
-) -> list[Optional[Path]]:
-    """
-    Build a list of scenario output paths for existence checks.
-    """
-    return [
-        (scenMapsDir / f"avaScen_{scenNameClean}.parquet") if writeParquet else None,
-        (scenMapsDir / f"avaScen_{scenNameClean}.gpkg") if writeGpkg else None,
-        (scenMapsDir / f"avaScen_{scenNameClean}.geojson") if writeGeoJson else None,
-        (scenMapsDir / f"avaScen_{scenNameClean}.csv") if writeCsv else None,
-    ]
-
 
 def parseDeleteColumns(cfg) -> list[str]:
     """
@@ -429,8 +389,8 @@ def checkInputData(gdf: gpd.GeoDataFrame, parquetPath: Path, cfg=None) -> bool:
     all required columns.
     """
     requiredCols = [
-        "praID", "flow", "sector", "subC",
-        "elevMin", "elevMax", "rSize",
+        "praID", "resultID", "modType", "flow", "sector", "subC",
+        "elevMin", "elevMax", "PPM", "PEM", "rSize",
         "LKGebietID", "LWDGebietID"
     ]
 
@@ -513,7 +473,7 @@ def normalizeAvaCols(df):
     if renameMap:
         df = df.rename(columns=renameMap)
 
-    for col in ["subC", "elevMin", "elevMax", "rSize", "PEM", "PPM"]:
+    for col in ["subC", "elevMin", "elevMax", "praElevMean", "rSize", "PEM", "PPM"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
@@ -559,7 +519,7 @@ def parseFilterConfig(cfg) -> list[dict]:
       - regionMode (or/and)
 
     Other keys:
-      subC, sector, flow, elevMin, elevMax,
+      subC, sector, flow, filterElevBand, filterElevMean, elevMin, elevMax,
       AvaDistributionPotential, AvaSizePotential,
       applySingleRsizeRule
     """
@@ -620,6 +580,7 @@ def parseFilterConfig(cfg) -> list[dict]:
             continue
 
         crit: dict = {"name": cfg.get(section, "name", fallback=shortName)}
+        crit["_filterSection"] = section
 
         crit["LKGebiet"] = _getList(section, "LKGebiet")
         crit["LKGebietID"] = _getIntList(section, "LKGebietID")
@@ -628,12 +589,25 @@ def parseFilterConfig(cfg) -> list[dict]:
 
         subC = _getInt(section, "subC")
         if subC is not None:
-            crit["subCs"] = [subC]
+            crit["subC"] = [subC]
 
-        crit["sectors"] = _getList(section, "sector")
-        crit["flows"] = _getList(section, "flow")
+        crit["sector"] = _getList(section, "sector")
+        crit["flow"] = _getList(section, "flow")
         crit["elevMin"] = _getInt(section, "elevMin")
         crit["elevMax"] = _getInt(section, "elevMax")
+        globalFilterElevBand = cfg.getboolean("FILTER", "filterElevBand", fallback=True)
+        globalFilterElevMean = cfg.getboolean("FILTER", "filterElevMean", fallback=False)
+        crit["filterElevBand"] = cfg.getboolean(
+            section, "filterElevBand", fallback=globalFilterElevBand
+        )
+        crit["filterElevMean"] = cfg.getboolean(
+            section, "filterElevMean", fallback=globalFilterElevMean
+        )
+
+        if crit["filterElevBand"] and crit["filterElevMean"]:
+            raise ValueError(
+                f"[{section}] filterElevBand and filterElevMean cannot both be True."
+            )
 
         crit["AvaDistributionPotential"] = _getList(section, "AvaDistributionPotential")
         crit["AvaSizePotential"] = _getInt(section, "AvaSizePotential")

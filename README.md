@@ -67,8 +67,9 @@
 ### Results
 - Each configured scenario is exported as:
 ```
-13_avaScenMaps/avaScen_<Scenario>.parquet
-13_avaScenMaps/avaScen_<Scenario>.geojson
+13_avaScenMaps/avaScen_<Scenario>/avaScen_<Scenario>.parquet
+13_avaScenMaps/avaScen_<Scenario>/avaScen_<Scenario>.geojson
+13_avaScenMaps/avaScen_<Scenario>/avaScen_<Scenario>.json
 ```
 
 Optionally, a combined master file can be created:
@@ -141,7 +142,7 @@ python runAvaScenMapper.py --cfg /path/to/local_avaScenMapperCfg.ini
 #   pixi run -e dev python runAvaScenMapper.py
 #
 # Input  :  12_avaDirectory/avaDirectoryResults.parquet  (from Step 15)
-# Output :  13_avaScenMaps/avaScen_<Scenario>.parquet / .geojson
+# Output :  13_avaScenMaps/avaScen_<Scenario>/avaScen_<Scenario>.*
 #
 # Workflow context :
 #   Consumes Step 15 Avalanche Directory results and prepares
@@ -169,8 +170,11 @@ python runAvaScenMapper.py --cfg /path/to/local_avaScenMapperCfg.ini
 #   False → continue full workflow
 checkAvaDirResult = True
 
-# Enable or disable the Scenario Mapper (Step 16)
-mapperRun = True
+# Create vector scenario outputs
+mapScenFeatures = True
+
+# Create merged scenario TIFF outputs
+mapScenRasters = False
 
 # If True, merge all scenario results into one master dataset
 mapperMakeMaster = False
@@ -178,10 +182,8 @@ mapperMakeMaster = False
 # Log level (DEBUG, INFO, WARNING, ERROR)
 logLevel = INFO
 
-# Path resolution mode :
-#   AvaScenDirectory : auto-resolve based on standard Model Chain folder tree
-#   customPaths      : use explicit entries in [PATHS]
-mapperPathMode = AvaScenDirectory
+# Only explicit custom paths are supported
+mapperPathMode = customPaths
 
 # Enable external CAAML JSON feed (not yet implemented)
 mapperUseCaaml = False
@@ -192,13 +194,25 @@ mapperUseCaaml = False
 
 # ------------------ Path definitions ------------------ #
 [PATHS]
-# Base project directory (used when mapperPathMode = AvaScenDirectory)
-baseDir = /path/to/AvaScenarioModelChain/Directory
+avaDirectoryResults = /path/to/12_avaDirectory/avaDirectoryResults.parquet
+avaScenMapsDir = /path/to/13_avaScenMaps
 
-# Optional explicit paths (used only when mapperPathMode = customPaths)
-#avaDirectoryResults = /path/to/avaDirectoryResults.parquet
-#avaScenMapsDir      = /path/to/output/avaScenMaps
-#refTif              = /path/to/00_input/10DTM_projectName.tif
+[SCENARIORASTERS]
+mapTypes = pathZdelta, pathTravelanglemax, pathTravellengthmax
+resolution = 10
+nodata = -9999
+extent =
+relTo100 = False
+ignoreZero = False
+overwrite = False
+
+# Optional spatial subset preprocessing:
+[SUBSET]
+enableSubsetAreaMask = False
+subsetAreaName =
+subsetAreaPath =
+subsetAvaDirectoryDir =
+subsetAvaDirectoryFileTypes = parquet
 
 
 
@@ -229,8 +243,10 @@ baseDir = /path/to/AvaScenarioModelChain/Directory
 #   subC       : Subcatchment identifier (integer, e.g. 500)
 #   sector     : Aspect / direction of potential release areas (E, N, S, W)
 #   flow       : Flow type (dry / wet) defining the avalanche regime
-#   elevMin / elevMax : Elevation band (m a.s.l.) restricting PRA selection
-#                       to a specific vertical range
+#   filterElevBand : use the existing elevMin/elevMax band filter
+#   filterElevMean : filter praElevMean inclusively between elevMin and elevMax
+#                    (the two elevation filter modes are mutually exclusive)
+#   elevMin / elevMax : elevation limits in m a.s.l.
 #
 # --- Avalanche distribution & size potential ---
 # Define the avalanche hazard and target scenario size class :
@@ -244,7 +260,7 @@ baseDir = /path/to/AvaScenarioModelChain/Directory
 # --- Output ---
 # During execution, each scenario will be filtered and exported
 # separately as :
-#     13_avaScenMaps/avaScen_<name>.parquet / .geojson
+#     13_avaScenMaps/avaScen_<name>/avaScen_<name>.parquet / .geojson
 #
 # The syntax and key names follow the Avalanche Scenario Model Chain
 # convention and are parsed automatically by mapperUtils.parseFilterConfig().
@@ -254,6 +270,10 @@ baseDir = /path/to/AvaScenarioModelChain/Directory
 [FILTER]
 # Active scenario filters (by section name)
 filters = winter, spring
+
+# Global elevation filter mode for all scenarios
+filterElevBand = True
+filterElevMean = False
 
 
 # ------------------ Scenario: Winter ------------------ #
@@ -446,8 +466,11 @@ applySingleRsizeRule     = True
 
 ```text
 13_avaScenMaps/
-├── avaScen_<Scenario>.parquet         ← per-scenario results (GeoDataFrame)
-├── avaScen_<Scenario>.geojson         ← per-scenario GeoJSON export
+├── avaScen_<Scenario>/
+│   ├── avaScen_<Scenario>.parquet     ← per-scenario results (GeoDataFrame)
+│   ├── avaScen_<Scenario>.geojson     ← per-scenario GeoJSON export
+│   ├── avaScen_<Scenario>.json        ← effective INI settings
+│   └── avaScen_<Scenario>_*.tif       ← optional merged raster products
 ├── avaScen_Master.parquet             ← combined dataset (optional)
 ├── avaScen_Master.geojson             ← combined dataset (optional)
 └── runAvaScenMapper_<timestamp>.log   ← log file

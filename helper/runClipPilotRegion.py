@@ -332,16 +332,6 @@ def _validateFlowPyRoots(rootsByRegion: dict[str, Path]) -> dict[str, Path]:
     return validRoots
 
 
-def _resolveRegionRoot(regionName: str | None, rootsByRegion: dict[str, Path]) -> Path | None:
-    if regionName in rootsByRegion:
-        return rootsByRegion[regionName]
-
-    if useFallbackRoot:
-        return fallbackFlowPyBigDataRoot
-
-    return None
-
-
 # ------------------ Raster source helpers ------------------ #
 def _buildResDirIndices(root: Path) -> tuple[dict[str, Path], dict[str, Path]]:
     t0 = time.perf_counter()
