@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"/>
+<title>Avalanche Scenario Mapper — mobile preview</title>
+
+<!-- Leaflet: bundled locally (vendor/), CDN only as fallback -->
+<link rel="stylesheet" href="vendor/leaflet.css"/>
+<script src="vendor/leaflet.js"></script>
+<script>
+  if(!window.L){
+    document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>');
+    document.write('<scr'+'ipt src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"><\/scr'+'ipt>');
+  }
+</script>
+<!-- Phosphor icons = same icon font as albina-admin-gui. Online only; every
+     control also carries a text label, so the UI stays usable without it. -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+<style>
+/* ============================================================================
+   DESIGN TOKENS
+   Palette taken from albina-admin-gui  src/scss/settings/_colors.scss
+   Danger colours = EAWS danger scale 1..5
+   ========================================================================== */
+:root{
+  --albina-blue:#19abff;
+  --albina-blue-dark:#1e83ba;
+  --albina-blue-subtle:#bdddf1;
+  --albina-blue-pale:#eaf4fb;
+
+  --eaws-1:#ccff66;
+  --eaws-2:#ffff00;
+  --eaws-3:#ff9900;
+  --eaws-4:#ff0000;
+  --eaws-5:#000000;
+
+  /* Avalanche Scenario Mapper feature colours (kept from current build) */
+  --rel:#ff00ff;
+  --res:#1e00ff;
+
+  --ink:#101418;
+  --ink-2:#5b6670;
+  --ink-3:#8d979f;
+  --line:#e3e7ea;
+  --line-2:#f1f4f6;
+  --surface:#ffffff;
+  --surface-2:#f7f9fa;
+
+  --r-sm:8px; --r-md:12px; --r-lg:18px; --r-pill:999px;
+  --sheet-shadow:0 -8px 32px rgba(16,20,24,.18);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;overscroll-behavior:none}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink);background:#dfe4e7;
+  font-size:14px;line-height:1.35;
+}
+#map{position:fixed;inset:0;z-index:0}
+.leaflet-control-zoom{display:none!important}
+.leaflet-control-attribution{font-size:9px;opacity:.65;margin-bottom:2px}
+.leaflet-control-scale{margin-bottom:6px}
+
+/* ---------------------------------------------------------------- loader */
+#loader{
+  position:fixed;inset:0;z-index:900;display:grid;place-items:center;
+  background:rgba(255,255,255,.82);backdrop-filter:blur(3px);
+  transition:opacity .35s ease;
+}
+#loader.hide{opacity:0;pointer-events:none}
+.loader-box{text-align:center}
+.loader-box img{width:190px;max-width:60vw;display:block;margin:0 auto 10px;border-radius:var(--r-md)}
+.loader-title{font-weight:700;font-size:16px;letter-spacing:.01em}
+.loader-sub{font-size:12px;color:var(--ink-2);margin-top:2px}
+
+/* ---------------------------------------------------------------- top bar */
+#topbar{
+  position:fixed;z-index:500;top:calc(var(--safe-t) + 8px);left:8px;right:8px;
+  display:flex;gap:8px;align-items:flex-start;pointer-events:none;
+}
+.card{
+  background:var(--surface);border-radius:var(--r-md);
+  box-shadow:0 2px 10px rgba(16,20,24,.14);pointer-events:auto;
+}
+#status{padding:8px 12px;flex:1;min-width:0}
+#status .eyebrow{
+  font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)
+}
+#status .headline{
+  font-size:15px;font-weight:700;margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+#status .sub{font-size:11px;color:var(--ink-2);margin-top:2px}
+#status .sub b{color:var(--ink);font-variant-numeric:tabular-nums}
+.iconbtn{
+  width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;
+  border:0;background:var(--surface);color:var(--ink);font-size:20px;cursor:pointer;
+  border-radius:var(--r-md);box-shadow:0 2px 10px rgba(16,20,24,.14);pointer-events:auto;
+}
+.iconbtn.on{background:var(--ink);color:#fff}
+.iconbtn:active{transform:scale(.96)}
+.topstack{display:flex;flex-direction:column;gap:8px}
+
+/* ---------------------------------------------------------------- sheet */
+#sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:600;
+  height:92dvh;max-height:92dvh;
+  background:var(--surface);
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+  box-shadow:var(--sheet-shadow);
+  display:flex;flex-direction:column;
+  transform:translateY(70%);
+  transition:transform .28s cubic-bezier(.22,.61,.36,1);
+  touch-action:none;
+}
+#sheet.dragging{transition:none}
+.grab{padding:6px 14px 8px;flex:0 0 auto;cursor:grab;touch-action:none}
+.grab .bar{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 8px}
+.grab-row{display:flex;align-items:center;gap:10px}
+.grab-row h1{font-size:15px;font-weight:700;margin:0;flex:1}
+.badge{
+  font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;
+  background:var(--albina-blue-pale);color:var(--albina-blue-dark);
+  padding:3px 8px;border-radius:var(--r-pill)
+}
+.linkbtn{
+  border:0;background:transparent;color:var(--albina-blue-dark);
+  font-size:12px;font-weight:600;padding:4px 2px;cursor:pointer
+}
+.sheet-body{
+  flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+  padding:2px 14px calc(24px + var(--safe-b));
+}
+
+/* ---------------------------------------------------------------- blocks */
+.block{padding:14px 0;border-top:1px solid var(--line-2)}
+.block:first-child{border-top:0;padding-top:6px}
+.label{
+  font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:8px;display:flex;align-items:center;gap:6px
+}
+.label .val{
+  margin-left:auto;text-transform:none;letter-spacing:0;font-size:12px;
+  color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums
+}
+.hint{font-size:11px;color:var(--ink-3);margin-top:8px}
+
+/* segmented control */
+.seg{display:flex;background:var(--surface-2);border-radius:var(--r-md);padding:3px;gap:3px}
+.seg button{
+  flex:1;border:0;background:transparent;border-radius:9px;
+  padding:9px 6px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px
+}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(16,20,24,.16)}
+
+/* EAWS avalanche problem icons */
+.problems{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.problems.optional{grid-template-columns:repeat(2,1fr);margin-top:6px}
+.prob{
+  border:1px solid var(--line);background:var(--surface);border-radius:var(--r-md);
+  padding:6px 3px 5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px
+}
+.prob.on{border-color:var(--ink);background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--ink)}
+.prob img{width:100%;max-width:46px;aspect-ratio:1;object-fit:contain;display:block}
+.prob span{font-size:9px;line-height:1.15;text-align:center;color:var(--ink-2);hyphens:auto}
+.prob.on span{color:var(--ink);font-weight:600}
+
+/* aspect rose + elevation side by side */
+.release{display:grid;grid-template-columns:132px 1fr;gap:14px;align-items:start}
+.rose{width:132px;height:132px;display:block;touch-action:manipulation}
+.rose polygon{cursor:pointer;transition:fill .12s ease}
+.rose text{pointer-events:none;font-family:inherit;font-weight:600}
+
+/* dual range */
+.range{position:relative;height:34px;margin-top:2px}
+.range .track{
+  position:absolute;top:15px;left:0;right:0;height:4px;border-radius:2px;background:var(--line)
+}
+.range .fill{position:absolute;top:15px;height:4px;border-radius:2px;background:var(--ink)}
+.range input[type=range]{
+  position:absolute;top:0;left:0;width:100%;height:34px;margin:0;
+  -webkit-appearance:none;appearance:none;background:transparent;pointer-events:none
+}
+.range input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;pointer-events:auto;width:24px;height:24px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:grab
+}
+.range input[type=range]::-moz-range-thumb{
+  pointer-events:auto;width:22px;height:22px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:grab
+}
+.single input[type=range]{pointer-events:auto}
+.ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-3);margin-top:-2px}
+
+.row{display:flex;align-items:center;gap:8px}
+.row + .row{margin-top:8px}
+.chip{
+  border:1px solid var(--line);background:var(--surface);border-radius:var(--r-pill);
+  padding:7px 12px;font-size:12px;font-weight:600;color:var(--ink-2);cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px
+}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip .sw{width:14px;height:14px;border-radius:4px;display:inline-block}
+
+/* size scale */
+.sizebar{height:10px;border-radius:5px;background:linear-gradient(to right,#09a2ff,#66ff31,#fff300,#ff0000,#5b0069)}
+.sizelabels{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-3);margin-top:4px}
+
+/* popup */
+.leaflet-popup-content-wrapper{border-radius:var(--r-md);box-shadow:0 6px 24px rgba(16,20,24,.22)}
+.leaflet-popup-content{margin:10px 12px;font-size:12px}
+.pop h4{margin:0 0 6px;font-size:13px}
+.pop table{border-collapse:collapse;width:100%}
+.pop td{padding:2px 0;vertical-align:top}
+.pop td:first-child{color:var(--ink-3);padding-right:10px;white-space:nowrap}
+.pop td:last-child{font-variant-numeric:tabular-nums}
+
+#banner{
+  position:fixed;z-index:400;left:0;right:0;top:0;display:flex;justify-content:center;pointer-events:none
+}
+#banner img{width:100%;max-width:760px;opacity:.9}
+
+@media (min-width:820px){
+  #sheet{left:auto;right:14px;bottom:14px;width:400px;height:min(760px,88dvh);border-radius:var(--r-lg)}
+  #topbar{left:14px;right:auto;width:min(420px,50vw)}
+}
+@media (prefers-reduced-motion:reduce){
+  #sheet{transition:none}
+}
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+<div id="banner"><img id="banner-img" alt="" hidden/></div>
+
+<!-- ------------------------------------------------------------- loader -->
+<div id="loader">
+  <div class="loader-box">
+    <img src="https://media.giphy.com/media/3Xzlefv57zcrVIPPRN/giphy.gif" alt="" onerror="this.hidden=true"/>
+    <div class="loader-title">Avalanche Scenario Mapper</div>
+    <div class="loader-sub" id="loader-sub">Loading scenarios …</div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------- top bar -->
+<div id="topbar">
+  <div class="card" id="status">
+    <div class="eyebrow" id="st-eyebrow">Scenario</div>
+    <div class="headline" id="st-title">Winter · new snow</div>
+    <div class="sub" id="st-sub">— paths shown</div>
+  </div>
+  <div class="topstack">
+    <button class="iconbtn" id="btn-base" title="Switch base map" aria-label="Switch base map"><i class="ph ph-stack"></i></button>
+    <button class="iconbtn" id="btn-locate" title="My position" aria-label="My position"><i class="ph ph-crosshair-simple"></i></button>
+  </div>
+</div>
+
+<!-- --------------------------------------------------------------- sheet -->
+<section id="sheet" aria-label="Scenario settings">
+  <div class="grab" id="grab">
+    <div class="bar"></div>
+    <div class="grab-row">
+      <h1 id="sheet-title">Scenario</h1>
+      <span class="badge" id="count">0</span>
+      <button class="linkbtn" id="btn-reset">Reset</button>
+    </div>
+  </div>
+
+  <div class="sheet-body">
+
+    <!-- 1 — preset ------------------------------------------------------ -->
+    <div class="block">
+      <div class="label">Preset</div>
+      <div class="seg" id="seg-preset">
+        <button data-preset="winter" class="on"><i class="ph ph-snowflake"></i>Winter</button>
+        <button data-preset="spring"><i class="ph ph-drop"></i>Spring</button>
+        <button data-preset="custom"><i class="ph ph-sliders-horizontal"></i>Custom</button>
+      </div>
+      <div class="hint" id="preset-hint">Config scenarios from <code>avaScenMapperCfg.ini</code>. Change anything below to build your own.</div>
+    </div>
+
+    <!-- 2 — avalanche problem ------------------------------------------- -->
+    <div class="block">
+      <div class="label">Avalanche problem <span class="val" id="v-problem">New snow</span></div>
+      <div class="problems" id="problems"></div>
+      <div class="problems optional" id="problems-opt"></div>
+      <div class="hint">Problem sets the flow regime used for filtering: dry (new snow, wind slab, PWL, cornices) or wet (wet snow, gliding snow).</div>
+    </div>
+
+    <!-- 3 — release area ------------------------------------------------- -->
+    <div class="block">
+      <div class="label">Release area <span class="val" id="v-release">All aspects</span></div>
+      <div class="release">
+        <svg class="rose" id="rose" viewBox="0 0 600 600" aria-label="Aspects"></svg>
+        <div>
+          <div class="label" style="margin-bottom:2px">Elevation <span class="val" id="v-elev">1800–5000 m</span></div>
+          <div class="range" id="elev-range">
+            <div class="track"></div><div class="fill" id="elev-fill"></div>
+            <input type="range" id="elev-lo" min="1400" max="3200" step="100" value="1800"/>
+            <input type="range" id="elev-hi" min="1400" max="3200" step="100" value="3200"/>
+          </div>
+          <div class="ticks"><span>1400</span><span>2300</span><span>3200 m</span></div>
+          <div class="row" style="margin-top:6px">
+            <button class="chip" id="chip-treeline"><i class="ph ph-tree-evergreen"></i>Above treeline</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 — expected size ------------------------------------------------ -->
+    <div class="block">
+      <div class="label">Max. expected size (PEM) <span class="val" id="v-size">4 — very large</span></div>
+      <div class="range single" id="size-range">
+        <div class="track"></div><div class="fill" id="size-fill"></div>
+        <input type="range" id="size" min="1" max="5" step="1" value="5"/>
+      </div>
+      <div class="ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      <div class="hint">EAWS avalanche size. Shows all modelled events up to the selected size.</div>
+    </div>
+
+    <!-- 5 — display ------------------------------------------------------ -->
+    <div class="block">
+      <div class="label">Display</div>
+      <div class="row">
+        <button class="chip on" id="chip-rel"><span class="sw" style="background:var(--rel)"></span>Release</button>
+        <button class="chip" id="chip-res"><span class="sw" style="background:var(--res)"></span>Runout</button>
+        <button class="chip" id="chip-size"><i class="ph ph-palette"></i>Size colour</button>
+      </div>
+      <div class="label" style="margin:14px 0 2px">Transparency <span class="val" id="v-alpha">30 %</span></div>
+      <div class="range single" id="alpha-range">
+        <div class="track"></div><div class="fill" id="alpha-fill"></div>
+        <input type="range" id="alpha" min="5" max="85" step="5" value="30"/>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="chip on" id="chip-micro"><i class="ph ph-polygon"></i>Warning regions</button>
+        <button class="chip" id="chip-hill"><i class="ph ph-mountains"></i>Hillshade</button>
+      </div>
+    </div>
+
+    <!-- 6 — legend -------------------------------------------------------- -->
+    <div class="block">
+      <div class="label">Release volume size class</div>
+      <div class="sizebar"></div>
+      <div class="sizelabels"><span>1 · ~1 truck</span><span>3 · ~100</span><span>5 · ~10 000</span></div>
+      <div class="hint" id="src-note">
+        Step 16 of the Avalanche Scenario Model Chain · CAIROS / BFW.
+        Colours &amp; icons follow EAWS + albina-admin-gui conventions.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+/* ============================================================================
+   AVALANCHE SCENARIO MAPPER — mobile draft
+   Data model: AvaDirectoryResults subset (Step 16 output)
+     modType rel|res · sector N/E/S/W · flow dry|wet · PPM · PEM · rSize
+     praElevMin/Max/Mean · avaPotential · hex_relRes · hex_size
+   ========================================================================== */
+(function(){
+"use strict";
+
+/* --------------------------------------------------------- error surfacing
+   A silent JS exception used to leave the splash screen up forever. Anything
+   that throws now shows up on screen instead of only in the console. */
+function showError(msg){
+  hideLoader();
+  let box=document.getElementById("errbox");
+  if(!box){
+    box=document.createElement("div");
+    box.id="errbox";
+    box.style.cssText="position:fixed;z-index:960;left:8px;right:8px;bottom:8px;background:#2b1416;"+
+      "color:#ffd9dc;border-radius:12px;padding:12px 14px;font:12px/1.45 ui-monospace,Consolas,monospace;"+
+      "box-shadow:0 6px 24px rgba(0,0,0,.4);max-height:40vh;overflow:auto";
+    box.addEventListener("click",()=>box.remove());
+    document.body.appendChild(box);
+  }
+  box.innerHTML += "<div><b>"+String(msg).replace(/</g,"&lt;")+"</b></div>";
+  box.innerHTML += '<div style="opacity:.6;margin-top:4px">tap to dismiss</div>';
+}
+window.addEventListener("error",e=>{
+  showError("JS error: "+e.message+"  ("+String(e.filename||"").split("/").pop()+":"+e.lineno+")");
+});
+window.addEventListener("unhandledrejection",e=>{
+  showError("Unhandled: "+((e.reason&&e.reason.message)||e.reason));
+});
+/* if loading is not finished after 60 s, stop hiding the map behind the splash */
+setTimeout(()=>{
+  const l=document.getElementById("loader");
+  if(l && !l.classList.contains("hide")){
+    hideLoader();
+    showError("Loading did not finish within 60 s — last step was: "+
+      (document.getElementById("loader-sub")||{textContent:"?"}).textContent);
+  }
+},60000);
+
+/* ------------------------------------------------------------------ config */
+const CFG = {
+  center:[46.9914, 11.416055], zoom:13, minZoom:11, maxZoom:16,
+  data:{
+    dry:  "data/avaScen_Winter_mobile_hex.geojson",
+    wet:  "data/avaScen_Spring_mobile_hex.geojson",
+    micro:"data/avaScenMaster_avaReportMicroRegionsPilotBrenner_wgs84.geojson",
+    hill: "data/HS10m_pilotBrenner_wgs84.png"
+  },
+  banners:{ winter:"data/avaScenWinter.png", spring:"data/avaScenSpring.png" },
+  hillBounds:[[46.91571776781058,11.239491625878523],[47.080879561592,11.593290591056762]],
+  REL:"#ff00ff", RES:"#1e00ff",
+  /* EAWS problem icons (colour + greyscale), as used by albina-admin-gui.
+     First hit wins; each <img> falls through the list on error. */
+  iconBases:[
+    "assets/img/",                                             /* shipped next to this file */
+    "../../../albina-admin-gui-master/src/assets/img/",         /* Downloads/albina-admin-gui-master */
+    "../../albina-admin-gui-master/src/assets/img/",
+    "../albina-admin-gui-master/src/assets/img/",
+    "https://cdn.jsdelivr.net/gh/albina-euregio/albina-admin-gui@master/src/assets/img/"
+  ]
+};
+
+/* EAWS avalanche problems. flow = which modelled regime the problem maps to.
+   This mapping is a working assumption — expose it in the INI later. */
+const PROBLEMS = [
+  {id:"new_snow",               file:"New_snow",               label:"New snow",   flow:"dry"},
+  {id:"wind_slab",              file:"Wind_slab",              label:"Wind slab",  flow:"dry"},
+  {id:"persistent_weak_layers", file:"Persistent_weak_layers", label:"Persist. WL",flow:"dry"},
+  {id:"wet_snow",               file:"Wet_snow",               label:"Wet snow",   flow:"wet"},
+  {id:"gliding_snow",           file:"Gliding_snow",           label:"Gliding",    flow:"wet"}
+];
+const PROBLEMS_OPT = [
+  {id:"cornices",                     file:"Cornices",                     label:"Cornices", flow:"dry"},
+  {id:"no_distinct_avalanche_problem",file:"No_distinct_avalanche_problem",label:"No distinct problem", flow:"both"}
+];
+const ALL_PROBLEMS = PROBLEMS.concat(PROBLEMS_OPT);
+
+const SIZE_LABEL = {1:"small",2:"medium",3:"large",4:"very large",5:"extreme"};
+
+/* Aspect rose geometry copied 1:1 from albina-admin-gui aspects.component.html
+   so the control is visually identical to the bulletin GUI. */
+const ROSE = {
+  N :"300,300 200,100 300,0 400,100",
+  NE:"300,300 400,100 500,100 500,200",
+  E :"300,300 500,200 600,300 500,400",
+  SE:"300,300 500,400 500,500 400,500",
+  S :"300,300 200,500 300,600 400,500",
+  SW:"300,300 200,500 100,500 100,400",
+  W :"300,300 100,200 0,300 100,400",
+  NW:"300,300 100,200 100,100 200,100"
+};
+/* pilot dataset only carries 4 sectors → map the 8-way rose onto them */
+const SECTOR_MAP = {N:["N"],NE:["N","E"],E:["E"],SE:["S","E"],S:["S"],SW:["S","W"],W:["W"],NW:["N","W"]};
+
+const PRESETS = {
+  winter:{label:"Winter · new snow", problems:["new_snow"],
+          aspects:["N","NE","E","SE","S","SW","W","NW"], elev:[1800,3200], size:5, banner:"winter"},
+  spring:{label:"Spring · wet snow", problems:["wet_snow"],
+          aspects:["E","SE","S","SW","W"], elev:[1800,2200], size:3, banner:"spring"}
+};
+
+/* ------------------------------------------------------------------- state */
+const S = {
+  preset:"winter",
+  problems:new Set(["new_snow"]),
+  aspects:new Set(["N","NE","E","SE","S","SW","W","NW"]),
+  elev:[1800,3200],
+  size:5,
+  showRel:true, showRes:false, sizeColour:false,
+  alpha:0.30,
+  base:"bergfex", hillshade:false, micro:true,
+  demo:false
+};
+
+const $ = s=>document.querySelector(s);
+const $$ = s=>Array.from(document.querySelectorAll(s));
+
+/* --------------------------------------------------------------------- map */
+const map = L.map("map",{center:CFG.center,zoom:CFG.zoom,minZoom:CFG.minZoom,
+  maxZoom:CFG.maxZoom,zoomControl:false,preferCanvas:true,attributionControl:true});
+L.control.scale({metric:true,imperial:false,position:"bottomleft"}).addTo(map);
+
+const baseBergfex = L.tileLayer("https://tiles.bergfex.at/styles/bergfex-osm/{z}/{x}/{y}.jpg",
+  {maxZoom:18,maxNativeZoom:17,attribution:"© Bergfex OSM"});
+const baseLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  {maxZoom:20,maxNativeZoom:17,subdomains:"abcd",
+   attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>'});
+baseBergfex.addTo(map);
+
+const hill = L.imageOverlay(CFG.data.hill, L.latLngBounds(CFG.hillBounds),
+  {opacity:.5, interactive:false, errorOverlayUrl:""});
+
+let microLayer=null;
+const featLayers=[];              // {layer, p}  every rel/res polygon
+const gAva = L.layerGroup().addTo(map);
+
+/* Boot happens at the very bottom of this file: loadAll() touches const
+   bindings declared further down, and const is not hoisted. */
+
+/* ---------------------------------------------------------------- UI build */
+let ICON_BASE_IDX = 0;                     // index of the first base that worked
+function iconFile(p,on){ return p.file + (on?"_c":"_bw") + ".svg"; }
+function setIcon(img,p,on){
+  img.dataset.file = iconFile(p,on);
+  img.dataset.idx  = ICON_BASE_IDX;
+  img.style.visibility = "visible";
+  img.src = CFG.iconBases[ICON_BASE_IDX] + img.dataset.file;
+}
+function onIconError(ev){
+  const img = ev.currentTarget;
+  const next = (+img.dataset.idx) + 1;
+  if(next < CFG.iconBases.length){
+    img.dataset.idx = next;
+    img.src = CFG.iconBases[next] + img.dataset.file;
+  } else {
+    img.style.visibility = "hidden";       // labels still carry the meaning
+  }
+}
+function onIconLoad(ev){
+  const i = +ev.currentTarget.dataset.idx;
+  if(i < ICON_BASE_IDX || ICON_BASE_IDX === 0) ICON_BASE_IDX = i;
+}
+
+function buildProblems(){
+  const mk = (list,host)=>{
+    host.innerHTML = list.map(p=>`
+      <button class="prob" data-problem="${p.id}">
+        <img alt="${p.label}"/><span>${p.label}</span>
+      </button>`).join("");
+    list.forEach(p=>{
+      const img = host.querySelector(`[data-problem="${p.id}"] img`);
+      img.addEventListener("error",onIconError);
+      img.addEventListener("load",onIconLoad);
+      setIcon(img,p,false);
+    });
+  };
+  mk(PROBLEMS, $("#problems"));
+  mk(PROBLEMS_OPT, $("#problems-opt"));
+  $$("[data-problem]").forEach(b=>b.addEventListener("click",()=>{
+    const id=b.dataset.problem;
+    if(S.problems.has(id)) S.problems.delete(id); else S.problems.add(id);
+    if(!S.problems.size) S.problems.add(id);           // never empty
+    markCustom(); syncProblems(); refresh();
+  }));
+}
+function syncProblems(){
+  $$("[data-problem]").forEach(b=>{
+    const p = ALL_PROBLEMS.find(x=>x.id===b.dataset.problem);
+    const on = S.problems.has(p.id);
+    b.classList.toggle("on",on);
+    setIcon(b.querySelector("img"),p,on);
+  });
+  const names=[...S.problems].map(id=>ALL_PROBLEMS.find(p=>p.id===id).label);
+  $("#v-problem").textContent = names.length>2 ? names.length+" selected" : names.join(" + ");
+}
+
+function buildRose(){
+  const svg=$("#rose"); let h="";
+  for(const k in ROSE) h+=`<polygon data-aspect="${k}" points="${ROSE[k]}" fill="#fff" stroke="#999" stroke-width="5"/>`;
+  h+=`<text x="300" y="140" text-anchor="middle" fill="#999" font-size="86">N</text>
+      <text x="300" y="530" text-anchor="middle" fill="#999" font-size="86">S</text>
+      <text x="118" y="330" text-anchor="middle" fill="#999" font-size="86">W</text>
+      <text x="482" y="330" text-anchor="middle" fill="#999" font-size="86">E</text>`;
+  svg.innerHTML=h;
+  svg.querySelectorAll("polygon").forEach(el=>el.addEventListener("click",()=>{
+    const a=el.dataset.aspect;
+    if(S.aspects.has(a)) S.aspects.delete(a); else S.aspects.add(a);
+    if(!S.aspects.size) S.aspects.add(a);
+    markCustom(); syncRose(); refresh();
+  }));
+}
+function syncRose(){
+  $("#rose").querySelectorAll("polygon").forEach(el=>{
+    el.setAttribute("fill", S.aspects.has(el.dataset.aspect)?"#000":"#fff");
+  });
+  const n=S.aspects.size;
+  $("#v-release").textContent = n===8 ? "All aspects" : [...S.aspects].join(" ");
+}
+
+/* --------------------------------------------------------------- sheet UX */
+function snapPoints(){
+  const h=window.innerHeight, sh=document.getElementById("sheet").offsetHeight;
+  return {full:0, half:Math.max(0,sh-Math.round(h*0.52)), peek:Math.max(0,sh-118)};
+}
+let sheetY=null, snapName="peek";
+function setSnap(name){
+  snapName=name; const p=snapPoints(); sheetY=p[name];
+  $("#sheet").style.transform=`translateY(${sheetY}px)`;
+}
+function bindSheet(){
+  const sheet=$("#sheet"), grab=$("#grab");
+  requestAnimationFrame(()=>setSnap("peek"));
+  window.addEventListener("resize",()=>setSnap(snapName));
+
+  let startY=0,startT=0,drag=false,moved=false;
+  const down=e=>{drag=true;moved=false;startY=e.clientY;startT=sheetY;sheet.classList.add("dragging");grab.setPointerCapture(e.pointerId);};
+  const move=e=>{
+    if(!drag)return;
+    const p=snapPoints(), d=e.clientY-startY;
+    if(Math.abs(d)>4) moved=true;
+    sheetY=Math.min(p.peek+40, Math.max(-10, startT+d));
+    sheet.style.transform=`translateY(${sheetY}px)`;
+  };
+  const up=()=>{
+    if(!drag)return; drag=false; sheet.classList.remove("dragging");
+    if(!moved){ setSnap(snapName==="peek" ? "half" : (snapName==="half" ? "full":"peek")); return; }
+    const p=snapPoints();
+    let best="peek",bd=1e9;
+    for(const k in p){const d=Math.abs(p[k]-sheetY); if(d<bd){bd=d;best=k;}}
+    setSnap(best);
+  };
+  grab.addEventListener("pointerdown",down);
+  grab.addEventListener("pointermove",move);
+  grab.addEventListener("pointerup",up);
+  grab.addEventListener("pointercancel",up);
+}
+
+/* ------------------------------------------------------------- controls */
+function bindControls(){
+  $$("#seg-preset button").forEach(b=>b.addEventListener("click",()=>applyPreset(b.dataset.preset)));
+  $("#btn-reset").addEventListener("click",()=>applyPreset(S.preset==="custom"?"winter":S.preset));
+
+  /* elevation dual range */
+  const lo=$("#elev-lo"), hi=$("#elev-hi");
+  const onElev=()=>{
+    let a=+lo.value,b=+hi.value;
+    if(a>b-100){ if(document.activeElement===lo) a=b-100; else b=a+100; lo.value=a; hi.value=b; }
+    S.elev=[a,b]; markCustom(); syncElev(); refresh();
+  };
+  lo.addEventListener("input",onElev); hi.addEventListener("input",onElev);
+
+  $("#chip-treeline").addEventListener("click",e=>{
+    const on=!e.currentTarget.classList.contains("on");
+    e.currentTarget.classList.toggle("on",on);
+    if(on){ lo.value=2000; hi.value=3200; }            // treeline ≈ 2000 m in the pilot area
+    else  { lo.value=1400; hi.value=3200; }
+    onElev();
+  });
+
+  $("#size").addEventListener("input",e=>{S.size=+e.target.value;markCustom();syncSize();refresh();});
+  $("#alpha").addEventListener("input",e=>{S.alpha=(+e.target.value)/100;syncAlpha();restyle();});
+
+  const tog=(sel,key,fn)=>$(sel).addEventListener("click",e=>{
+    S[key]=!S[key]; e.currentTarget.classList.toggle("on",S[key]); (fn||restyle)();
+  });
+  tog("#chip-rel","showRel",refresh);
+  $("#chip-res").addEventListener("click",async e=>{
+    S.showRes=!S.showRes; e.currentTarget.classList.toggle("on",S.showRes);
+    if(S.showRes) await ensureRunout();
+    refresh();
+  });
+  tog("#chip-size","sizeColour",restyle);
+  tog("#chip-micro","micro",()=>{ if(microLayer){ S.micro?microLayer.addTo(map):map.removeLayer(microLayer);} });
+  tog("#chip-hill","hillshade",()=>{ S.hillshade?hill.addTo(map):map.removeLayer(hill); });
+
+  $("#btn-base").addEventListener("click",e=>{
+    S.base = S.base==="bergfex" ? "light" : "bergfex";
+    if(S.base==="light"){ map.removeLayer(baseBergfex); baseLight.addTo(map); }
+    else { map.removeLayer(baseLight); baseBergfex.addTo(map); }
+    e.currentTarget.classList.toggle("on",S.base==="light");
+  });
+
+  $("#btn-locate").addEventListener("click",()=>{
+    map.locate({setView:true,maxZoom:15});
+  });
+  map.on("locationfound",e=>{
+    L.circleMarker(e.latlng,{radius:7,color:"#fff",weight:3,fillColor:"#19abff",fillOpacity:1})
+      .addTo(map);
+  });
+}
+
+function applyPreset(name,opt){
+  opt=opt||{};
+  $$("#seg-preset button").forEach(b=>b.classList.toggle("on",b.dataset.preset===name));
+  S.preset=name;
+  if(name!=="custom"){
+    const p=PRESETS[name];
+    S.problems=new Set(p.problems);
+    S.aspects=new Set(p.aspects);
+    S.elev=p.elev.slice();
+    S.size=p.size;
+    $("#elev-lo").value=p.elev[0]; $("#elev-hi").value=p.elev[1];
+    $("#size").value=p.size;
+    $("#chip-treeline").classList.remove("on");
+    setBanner(p.banner);
+  } else {
+    setBanner(null);
+  }
+  syncAll();
+  if(!opt.silent) refresh();
+}
+function markCustom(){
+  if(S.preset==="custom") return;
+  S.preset="custom";
+  $$("#seg-preset button").forEach(b=>b.classList.toggle("on",b.dataset.preset==="custom"));
+  setBanner(null);
+}
+function setBanner(key){
+  const img=$("#banner-img");
+  if(!key){ img.hidden=true; return; }
+  img.src=CFG.banners[key]; img.hidden=false;
+  img.onerror=()=>{img.hidden=true;};
+}
+
+function syncElev(){
+  const lo=+$("#elev-lo").value, hi=+$("#elev-hi").value, min=1400, max=3200;
+  const f=$("#elev-fill");
+  f.style.left=((lo-min)/(max-min)*100)+"%";
+  f.style.width=((hi-lo)/(max-min)*100)+"%";
+  $("#v-elev")
+    .textContent = (hi>=3200 ? lo+"–5000 m" : lo+"–"+hi+" m");
+}
+function syncSize(){
+  const f=$("#size-fill"); f.style.left="0"; f.style.width=((S.size-1)/4*100)+"%";
+  $("#v-size").textContent = S.size+" — "+SIZE_LABEL[S.size];
+}
+function syncAlpha(){
+  const v=+$("#alpha").value, f=$("#alpha-fill");
+  f.style.left="0"; f.style.width=((v-5)/80*100)+"%";
+  $("#v-alpha").textContent = v+" %";
+}
+function syncAll(){ syncProblems(); syncRose(); syncElev(); syncSize(); syncAlpha(); }
+
+/* --------------------------------------------------------------- filtering */
+function activeFlows(){
+  const f=new Set();
+  [...S.problems].forEach(id=>{
+    const p=ALL_PROBLEMS.find(x=>x.id===id);
+    if(p.flow==="both"){f.add("dry");f.add("wet");} else f.add(p.flow);
+  });
+  return f;
+}
+function activeSectors(){
+  const s=new Set();
+  [...S.aspects].forEach(a=>SECTOR_MAP[a].forEach(x=>s.add(x)));
+  return s;
+}
+function matches(p,flows,sectors){
+  if(!flows.has(p.flow)) return false;
+  if(!sectors.has(p.sector)) return false;
+  const e = (p.praElevMean!=null) ? p.praElevMean : (p.praElevMin+p.praElevMax)/2;
+  const hi = S.elev[1]>=3200 ? 9999 : S.elev[1];
+  if(e < S.elev[0] || e > hi) return false;
+  if((p.PEM||0) > S.size) return false;
+  return true;
+}
+function styleFor(p,visible){
+  if(!visible) return {opacity:0,fillOpacity:0,weight:0};
+  const hex = S.sizeColour ? (p.hex_size||"#808080")
+                           : (p.hex_relRes || (p.modType==="rel"?CFG.REL:CFG.RES));
+  return {color:hex,fillColor:hex,weight:0,opacity:1,fillOpacity:S.alpha};
+}
+
+let raf=null;
+function refresh(){ if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(doRefresh); }
+function doRefresh(){
+  const flows=activeFlows(), sectors=activeSectors();
+  /* per-feature colour only depends on sizeColour, so one key covers all
+     visible features — lets us skip setStyle for anything that did not change */
+  const shownKey = S.alpha.toFixed(2) + (S.sizeColour ? "|size" : "|type");
+  let n=0;
+  for(let i=0;i<featLayers.length;i++){
+    const it=featLayers[i], p=it.p;
+    const typeOn = (p.modType==="rel"&&S.showRel)||(p.modType==="res"&&S.showRes);
+    const ok = typeOn && matches(p,flows,sectors);
+    if(ok && p.modType==="rel") n++;
+    const key = ok ? shownKey : "hidden";
+    if(it.key!==key){ it.key=key; it.visible=ok; it.layer.setStyle(styleFor(p,ok)); }
+  }
+  $("#count").textContent = n.toLocaleString();
+  const names=[...S.problems].map(id=>ALL_PROBLEMS.find(p=>p.id===id).label);
+  $("#st-title").textContent = S.preset==="custom" ? "Custom scenario" : PRESETS[S.preset].label;
+  $("#st-eyebrow").textContent = S.demo ? "Scenario · demo data" : "Scenario";
+  $("#st-sub").innerHTML = `<b>${n.toLocaleString()}</b> release areas · ${names[0]||"—"}${names.length>1?" +"+(names.length-1):""} · ≤ size ${S.size}`;
+}
+function restyle(){ refresh(); }
+
+/* ------------------------------------------------------------------- data */
+const RAW = {dry:null, wet:null};      // kept so runout polygons can be built later
+let resBuilt = false;
+
+const nextFrame = ()=>new Promise(r=>requestAnimationFrame(()=>r()));
+
+/* Build in chunks and yield between them: the browser keeps painting, so a
+   slow machine shows progress instead of a frozen splash screen. */
+async function addFeatures(geo, want, onProgress){
+  const src = (geo && geo.features) || [];
+  const feats = want ? src.filter(f=>f.properties && f.properties.modType===want) : src;
+  const CHUNK = 1200;
+  for(let i=0;i<feats.length;i+=CHUNK){
+    const slice = feats.slice(i, i+CHUNK);
+    L.geoJSON({type:"FeatureCollection", features:slice},{
+      style:()=>({weight:0,opacity:0,fillOpacity:0}),
+      onEachFeature:(f,l)=>{
+        const item={layer:l, p:f.properties||{}, visible:false, key:"hidden"};
+        featLayers.push(item);
+        l.on("click",()=>{ if(item.visible) openPopup(l,item.p); });
+      }
+    }).addTo(gAva);
+    if(onProgress) onProgress(Math.min(i+CHUNK, feats.length), feats.length);
+    await nextFrame();
+  }
+  return feats.length;
+}
+
+/* runout polygons are off by default — build them the first time they are asked for */
+async function ensureRunout(){
+  if(resBuilt) return;
+  resBuilt = true;
+  if(!RAW.dry && !RAW.wet) return;                 // demo mode already has both
+  setBusy("Building runout areas …");
+  if(RAW.dry) await addFeatures(RAW.dry,"res");
+  if(RAW.wet) await addFeatures(RAW.wet,"res");
+  RAW.dry = RAW.wet = null;                        // free the parsed GeoJSON
+  setBusy(null);
+  doRefresh();
+}
+
+function openPopup(l,p){
+  const rows=[["Region",p.LKGebiet],["Warning region",p.LWDGebietID],["Aspect",p.sector],
+    ["Flow",p.flow],["Elevation",Math.round(p.praElevMin)+"–"+Math.round(p.praElevMax)+" m"],
+    ["Release area",p.praAreaM?Math.round(p.praAreaM).toLocaleString()+" m²":null],
+    ["PPM / PEM",(p.PPM??"–")+" / "+(p.PEM??"–")],["rSize",p.rSize],
+    ["Potential",p.avaPotential],["praID",p.praID],["resultID",p.resultID]]
+    .filter(r=>r[1]!=null&&r[1]!=="")
+    .map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");
+  l.bindPopup(`<div class="pop"><h4>${p.modType==="rel"?"Release area":"Avalanche outline"}</h4>
+    <table>${rows}</table></div>`,{maxWidth:280,autoPan:true}).openPopup();
+}
+
+function addMicro(geo){
+  microLayer=L.geoJSON(geo,{style:{color:"#5b6670",weight:1.2,opacity:.9,fillOpacity:0},interactive:false});
+  if(S.micro) microLayer.addTo(map);
+}
+function loadScript(src){
+  return new Promise(res=>{
+    const el=document.createElement("script");
+    el.src=src; el.onload=()=>res(true); el.onerror=()=>res(false);
+    document.head.appendChild(el);
+  });
+}
+
+/* fetch with a visible byte counter — a 15 MB file over localhost should be
+   instant, so a stalled counter tells us the server is the problem */
+async function getJSON(url,label){
+  const r = await fetch(url,{cache:"no-store"});
+  if(!r.ok) throw new Error(url+" → HTTP "+r.status);
+  const total = +(r.headers.get("content-length")||0);
+  if(!r.body || !total){ setLoaderText("Downloading "+label+" …"); return r.json(); }
+  const reader=r.body.getReader(); const parts=[]; let got=0;
+  for(;;){
+    const {done,value}=await reader.read();
+    if(done) break;
+    parts.push(value); got+=value.length;
+    setLoaderText("Downloading "+label+" — "+(got/1048576).toFixed(1)+" / "+(total/1048576).toFixed(1)+" MB");
+  }
+  setLoaderText("Reading "+label+" …");
+  await nextFrame();
+  const buf=new Uint8Array(got); let o=0;
+  for(const part of parts){ buf.set(part,o); o+=part.length; }
+  return JSON.parse(new TextDecoder("utf-8").decode(buf));
+}
+
+async function loadAll(){
+  const fileMode = (location.protocol === "file:");
+  let got=false;
+  try{
+    if(fileMode){
+      setLoaderText("Loading offline data …");
+      const ok = (await loadScript(CFG.data.dry+".js")) && (await loadScript(CFG.data.wet+".js"));
+      if(ok && window.AVA_DRY && window.AVA_WET){
+        RAW.dry=window.AVA_DRY; RAW.wet=window.AVA_WET; got=true;
+      }
+      if(await loadScript(CFG.data.micro+".js")){ if(window.AVA_MICRO) addMicro(window.AVA_MICRO); }
+    } else {
+      RAW.dry = await getJSON(CFG.data.dry,"winter scenario");
+      RAW.wet = await getJSON(CFG.data.wet,"spring scenario");
+      got = true;
+      try{ addMicro(await getJSON(CFG.data.micro,"warning regions")); }catch(e){ console.warn("micro regions",e); }
+    }
+
+    if(got){
+      let done=0;
+      const total = countMod(RAW.dry,"rel") + countMod(RAW.wet,"rel");
+      const prog=(i,n)=>setLoaderText("Building shapes — "+(done+i).toLocaleString()+" / "+total.toLocaleString());
+      done += await addFeatures(RAW.dry,"rel",prog);
+      await addFeatures(RAW.wet,"rel",prog);
+    } else {
+      S.demo=true;
+      await addFeatures(demoData(),null);
+      $("#src-note").innerHTML = fileMode
+        ? "<b>Demo data.</b> Opened straight from disk and <code>data/*.geojson.js</code> is missing. Run <code>make_offline_data.bat</code> once, then reload."
+        : "<b>Demo data.</b> <code>data/avaScen_*_mobile_hex.geojson</code> was not found next to this file.";
+      if(fileMode) showFileWarning();
+      resBuilt = true;
+    }
+    doRefresh();
+  }catch(err){
+    showError(err && err.message ? err.message : String(err));
+  }finally{
+    hideLoader();
+  }
+}
+function countMod(geo,want){
+  if(!geo||!geo.features) return 0;
+  let n=0; for(const f of geo.features) if(f.properties && f.properties.modType===want) n++;
+  return n;
+}
+function setLoaderText(t){ const e=$("#loader-sub"); if(e) e.textContent=t; }
+function hideLoader(){
+  const l=$("#loader"); if(!l) return;
+  l.classList.add("hide"); setTimeout(()=>l.remove(),400);
+}
+/* small transient note in the status card, used while runout is being built */
+function setBusy(t){
+  const e=$("#st-sub"); if(!e) return;
+  if(t){ e.dataset.prev=e.innerHTML; e.textContent=t; }
+  else if(e.dataset.prev!=null){ e.innerHTML=e.dataset.prev; delete e.dataset.prev; }
+}
+
+/* file:// cannot fetch local GeoJSON — say so instead of failing silently */
+function showFileWarning(){
+  const d=document.createElement("div");
+  d.style.cssText="position:fixed;z-index:950;left:12px;right:12px;top:50%;transform:translateY(-50%);"+
+    "background:#fff;border-radius:14px;padding:18px 18px 16px;box-shadow:0 10px 40px rgba(0,0,0,.3);max-width:430px;margin:0 auto";
+  d.innerHTML='<div style="font-weight:700;font-size:15px;margin-bottom:6px">One-time step needed</div>'+
+    '<div style="font-size:13px;color:#5b6670;line-height:1.45">Opened directly from disk, the browser is not allowed to read '+
+    '<code>data\\*.geojson</code>. Two ways out:<br><br>'+
+    '<b>1</b> &nbsp;Double-click <b>make_offline_data.bat</b> once, then reload this page. No install needed.<br><br>'+
+    '<b>2</b> &nbsp;Or run <b>start_mapper.bat</b> if you have Python — it serves the folder on localhost:8000.<br><br>'+
+    'Until then you are looking at demo geometry.</div>'+
+    '<button style="margin-top:14px;width:100%;border:0;background:#101418;color:#fff;padding:11px;border-radius:10px;font-size:14px;font-weight:600">Continue with demo data</button>';
+  d.querySelector("button").onclick=()=>d.remove();
+  document.body.appendChild(d);
+}
+
+/* synthetic stand-in so the UI can be reviewed without the data folder */
+function demoData(){
+  const SIZEHEX={1:"#09a2ff",2:"#66ff31",3:"#fff300",4:"#ff0000",5:"#5b0069"};
+  const sect=["N","E","S","W"], feats=[];
+  let seed=42; const rnd=()=>{seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;};
+  for(let i=0;i<420;i++){
+    const lat=46.945+rnd()*0.10, lon=11.30+rnd()*0.24;
+    const flow = rnd()<0.55?"dry":"wet";
+    const sector=sect[Math.floor(rnd()*4)];
+    const elev=1600+Math.round(rnd()*14)*100;
+    const PEM=2+Math.floor(rnd()*3), PPM=PEM+Math.floor(rnd()*2);
+    const r=0.0035+rnd()*0.004;
+    const ring=[],rings=[];
+    for(let a=0;a<6;a++){const t=a/6*Math.PI*2;ring.push([lon+r*Math.cos(t)*1.4,lat+r*Math.sin(t)]);}
+    ring.push(ring[0]);
+    const base={LKGebiet:"Brenner (demo)",LWDGebietID:"AT-07-22",sector:sector,flow:flow,
+      praElevMin:elev,praElevMax:elev+180,praElevMean:elev+90,praAreaM:Math.round(3000+rnd()*40000),
+      PPM:PPM,PEM:PEM,rSize:5-(PPM-PEM),avaPotential:"very high",
+      hex_relRes:"#ff00ff",hex_size:SIZEHEX[Math.max(1,Math.min(5,PPM))],praID:900000+i,resultID:"demo"+i};
+    feats.push({type:"Feature",properties:Object.assign({},base,{modType:"rel"}),
+      geometry:{type:"Polygon",coordinates:[ring]}});
+    const run=ring.map(c=>[c[0],c[1]-r*2.2]);
+    feats.push({type:"Feature",properties:Object.assign({},base,{modType:"res",hex_relRes:"#1e00ff"}),
+      geometry:{type:"Polygon",coordinates:[run]}});
+  }
+  return {type:"FeatureCollection",features:feats};
+}
+
+/* ------------------------------------------------------------------- boot */
+buildProblems(); buildRose(); bindSheet(); bindControls();
+applyPreset("winter",{silent:true});
+loadAll();
+
+})();
+</script>
+</body>
+</html>
