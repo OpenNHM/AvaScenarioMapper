@@ -38,6 +38,8 @@ pyarrow  = "*"
 # ----------------------------------------------------------------------
 [tool.pixi.tasks]
 mapper = { cmd = "python runAvaScenMapper.py", cwd = "." }
+clip-ava-directory = { cmd = "python runAvaDirClipFromEuregio.py --config avaDirClipCfg.ini", cwd = "." }
+check-ava-directory-clips = { cmd = "python runAvaDirClipFromEuregio.py --config avaDirClipCfg.ini --check", cwd = "." }
 
 # ----------------------------------------------------------------------
 # Environments
