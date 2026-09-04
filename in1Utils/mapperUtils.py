@@ -75,12 +75,17 @@ def deriveRegionName(baseDir: Path) -> str:
 def getMasterName(cfg, baseDir: Path) -> str:
     """
     Master name format:
-      avaScen_<Region><prefix>
+      avaScen_<Region>_<suffix>
 
     Example:
-      avaScen_NTirol_report20260223
+      avaScen_NTirol_2302
     """
     region = deriveRegionName(baseDir)
+    suffix = cfg.get("WORKFLOW", "masterSuffix", fallback="").strip()
+    if suffix:
+        suffix = sanitizeScenarioName(suffix)
+        return f"avaScen_{region}_{suffix}"
+
     prefix = cfg.get("WORKFLOW", "mapperMasterPrefix", fallback="").strip()
     return f"avaScen_{region}{prefix}"
 

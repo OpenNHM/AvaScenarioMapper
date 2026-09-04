@@ -28,6 +28,10 @@ PATH_COLUMNS = [
     "pathTravellengthmax_sized",
     "pathZdelta",
     "pathZdelta_sized",
+    "depVolume",
+    "depVolume_sized",
+    "depDepth",
+    "depDepth_sized",
 ]
 MIN_MERGE_COLUMNS = {"pathTravelanglemax"}
 
