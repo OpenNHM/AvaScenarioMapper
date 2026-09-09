@@ -37,7 +37,7 @@ from typing import Dict, List, Optional, Tuple
 import geopandas as gpd
 import pandas as pd
 
-from in1Utils.mapperUtils import logScenarioSummary, normalizeAvaCols
+from in1Utils.mapperUtils import SIZE_ELEV_COLUMNS, logScenarioSummary, normalizeAvaCols
 from in2Matrix.avaPotMatrix import avaPotMatrix
 
 log = logging.getLogger(__name__)
@@ -57,6 +57,7 @@ def filterScenarioResults(
       - LKGebietID
       - LWDGebietID
       - regionMode
+      - selectedSize_elev1000 / selectedSize_elev1200 / selectedSize_elev1400
       - subC
       - sector
       - flow
@@ -250,6 +251,48 @@ def filterScenarioResults(
     if gdf.empty:
         log.warning("No rows left after region filter.")
         return gdf
+
+    # ------------------ Section 1b: Regional size-class filters ------------------ #
+    # selectedSize_elev{threshold} columns (from buildRegionalSizeMap.py, via
+    # helper/appendRegionalSizeToRelFeatures.py) are populated on 'rel' rows
+    # only. Match on the 'rel' row's value, then keep by praID so the paired
+    # 'res' row survives too - a plain column.isin() mask would silently drop
+    # every res row (always <NA> there).
+    sizeFilters = {
+        col: _asIntList(criteria.get(col))
+        for col in SIZE_ELEV_COLUMNS
+    }
+    sizeFilters = {col: vals for col, vals in sizeFilters.items() if vals}
+
+    if sizeFilters:
+        if "praID" not in gdf.columns or "modType" not in gdf.columns:
+            log.warning("Regional size filter requested but 'praID'/'modType' not found.")
+        else:
+            relRows = gdf[gdf["modType"].eq("rel")]
+            matchingPraIDs = None
+
+            for col, vals in sizeFilters.items():
+                if col not in relRows.columns:
+                    log.warning("Regional size filter requested (%s) but column not found.", col)
+                    matchingPraIDs = set()
+                    continue
+                colVals = pd.to_numeric(relRows[col], errors="coerce").astype("Int64")
+                ids = set(relRows.loc[colVals.isin(vals), "praID"])
+                matchingPraIDs = ids if matchingPraIDs is None else (matchingPraIDs & ids)
+                log.info("Regional size filter %s=%s -> %d matching praID", col, vals, len(ids))
+
+            matchingPraIDs = matchingPraIDs or set()
+            before = len(gdf)
+            gdf = gdf[gdf["praID"].isin(matchingPraIDs)].copy()
+            log.info(
+                "Regional size filter kept %d/%d rows (%d matching praID)",
+                len(gdf), before, len(matchingPraIDs),
+            )
+
+        _logStage("after_size_filter", gdf)
+        if gdf.empty:
+            log.warning("No rows left after regional size filter.")
+            return gdf
 
     # ------------------ Section 2: Scenario filters ------------------ #
     before = len(gdf)

@@ -28,6 +28,10 @@ from typing import Optional, Sequence, Iterable
 
 import pandas as pd
 import geopandas as gpd
+
+# Regional-climate size-class columns added by
+# helper/appendRegionalSizeToRelFeatures.py (rel rows only).
+SIZE_ELEV_COLUMNS = ["selectedSize_elev1000", "selectedSize_elev1200", "selectedSize_elev1400"]
 import pyarrow.parquet as pq
 
 from in1Utils.cfgUtils import relPath
@@ -526,7 +530,10 @@ def parseFilterConfig(cfg) -> list[dict]:
     Other keys:
       subC, sector, flow, filterElevBand, filterElevMean, elevMin, elevMax,
       AvaDistributionPotential, AvaSizePotential,
-      applySingleRsizeRule
+      applySingleRsizeRule,
+      selectedSize_elev1000 / selectedSize_elev1200 / selectedSize_elev1400
+        (optional, int or comma-list of ints; may be empty) - regional
+        climate size class (1-4), matched on 'rel' rows only.
     """
     criteriaList: list[dict] = []
 
@@ -591,6 +598,9 @@ def parseFilterConfig(cfg) -> list[dict]:
         crit["LKGebietID"] = _getIntList(section, "LKGebietID")
         crit["LWDGebietID"] = _getList(section, "LWDGebietID")
         crit["regionMode"] = _getStr(section, "regionMode").lower() or "or"
+
+        for col in SIZE_ELEV_COLUMNS:
+            crit[col] = _getIntList(section, col)
 
         subC = _getInt(section, "subC")
         if subC is not None:
