@@ -1,0 +1,116 @@
+{
+  "style": "D:\\Cairos\\ModelChainResults\\_styles\\styleDST_avaDirV_avySize.qml",
+  "opacity": 0.5,
+  "stops": [
+    {
+      "value": 1.0,
+      "rgb": [
+        0,
+        150,
+        255
+      ]
+    },
+    {
+      "value": 2.0,
+      "rgb": [
+        0,
+        255,
+        0
+      ]
+    },
+    {
+      "value": 3.0,
+      "rgb": [
+        255,
+        213,
+        0
+      ]
+    },
+    {
+      "value": 4.0,
+      "rgb": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "value": 5.0,
+      "rgb": [
+        170,
+        0,
+        255
+      ]
+    }
+  ],
+  "rasters": {
+    "dry/destructive": {
+      "file": "avaSize_dry_destructive.png",
+      "source": "D:\\Cairos\\ModelChainResults\\Euregio\\cairosAvaMaps\\13_avaScenMaps\\issw\\avaScen_ISSW-North2000\\avaScen_ISSW-North2000_pathZdelta_sized.tif",
+      "bounds": [
+        [
+          46.916416249108565,
+          11.240830342023083
+        ],
+        [
+          47.06511821895286,
+          11.591506067821623
+        ]
+      ],
+      "width": 2903,
+      "height": 1231,
+      "bytes": 659314
+    },
+    "dry/runout": {
+      "file": "avaSize_dry_runout.png",
+      "source": "D:\\Cairos\\ModelChainResults\\Euregio\\cairosAvaMaps\\13_avaScenMaps\\issw\\avaScen_ISSW-North2000\\avaScen_ISSW-North2000_pathTravellengthmax_sized.tif",
+      "bounds": [
+        [
+          46.916416249108565,
+          11.240830342023083
+        ],
+        [
+          47.06511821895286,
+          11.591506067821623
+        ]
+      ],
+      "width": 2903,
+      "height": 1231,
+      "bytes": 637152
+    },
+    "wet/destructive": {
+      "file": "avaSize_wet_destructive.png",
+      "source": "D:\\Cairos\\ModelChainResults\\Euregio\\cairosAvaMaps\\13_avaScenMaps\\issw\\avaScen_ISSW-South2500\\avaScen_ISSW-South2500_pathZdelta_sized.tif",
+      "bounds": [
+        [
+          46.91674840534777,
+          11.266948169447867
+        ],
+        [
+          47.0765600304419,
+          11.579056398323834
+        ]
+      ],
+      "width": 2658,
+      "height": 1361,
+      "bytes": 283728
+    },
+    "wet/runout": {
+      "file": "avaSize_wet_runout.png",
+      "source": "D:\\Cairos\\ModelChainResults\\Euregio\\cairosAvaMaps\\13_avaScenMaps\\issw\\avaScen_ISSW-South2500\\avaScen_ISSW-South2500_pathTravellengthmax_sized.tif",
+      "bounds": [
+        [
+          46.91674840534777,
+          11.266948169447867
+        ],
+        [
+          47.0765600304419,
+          11.579056398323834
+        ]
+      ],
+      "width": 2658,
+      "height": 1361,
+      "bytes": 613996
+    }
+  }
+}

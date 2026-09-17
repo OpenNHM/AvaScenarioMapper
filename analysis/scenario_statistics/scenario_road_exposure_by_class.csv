@@ -1,0 +1,13 @@
+scenario,roadClassField,roadClass,exposedKm
+dry_winter,highway,cycleway,0.3862839851445245
+dry_winter,highway,motorway,3.4977422277594226
+dry_winter,highway,motorway_link,0.23889960524470052
+dry_winter,highway,path,0.03166759369368439
+dry_winter,highway,primary,1.6732122458521583
+dry_winter,highway,secondary,0.8620828245823713
+dry_winter,highway,service,1.6568660923232221
+dry_winter,highway,track,0.24897534092828938
+dry_winter,highway,unclassified,1.9982204003917148
+wet_spring,highway,primary,0.20854139603099442
+wet_spring,highway,service,0.06946858734693515
+wet_spring,highway,unclassified,0.18546448811257454

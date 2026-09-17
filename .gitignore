@@ -35,6 +35,7 @@ Thumbs.db
 
 # --- Internal or heavy data ---
 _archiv/
+_archivDocs/
 avaScenMapperCfgs/
 
 
@@ -44,9 +45,9 @@ avaScenMapperCfgs/
 *_plots/
 *_cache/
 
+
 # --- Documentation / assets ---
 *.pdf
-#*.png
 *.zip
 
 # --- Large media (avoid committing videos) ---

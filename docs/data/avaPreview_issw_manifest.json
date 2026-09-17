@@ -1,0 +1,2889 @@
+{
+  "grid": {
+    "originLat": 0,
+    "originLon": 0,
+    "cellSizeDeg": 0.08
+  },
+  "shards": {
+    "rel/dry/N/138_587": {
+      "file": "avaPreview_issw_rel_dry_N_138_587.geojson.gz",
+      "features": 94,
+      "bytes": 11556
+    },
+    "rel/dry/N/138_588": {
+      "file": "avaPreview_issw_rel_dry_N_138_588.geojson.gz",
+      "features": 40,
+      "bytes": 3961
+    },
+    "rel/dry/N/139_586": {
+      "file": "avaPreview_issw_rel_dry_N_139_586.geojson.gz",
+      "features": 52,
+      "bytes": 5004
+    },
+    "rel/dry/N/139_587": {
+      "file": "avaPreview_issw_rel_dry_N_139_587.geojson.gz",
+      "features": 642,
+      "bytes": 78495
+    },
+    "rel/dry/N/139_588": {
+      "file": "avaPreview_issw_rel_dry_N_139_588.geojson.gz",
+      "features": 499,
+      "bytes": 62388
+    },
+    "rel/dry/N/140_585": {
+      "file": "avaPreview_issw_rel_dry_N_140_585.geojson.gz",
+      "features": 317,
+      "bytes": 30729
+    },
+    "rel/dry/N/140_586": {
+      "file": "avaPreview_issw_rel_dry_N_140_586.geojson.gz",
+      "features": 870,
+      "bytes": 88704
+    },
+    "rel/dry/N/140_587": {
+      "file": "avaPreview_issw_rel_dry_N_140_587.geojson.gz",
+      "features": 816,
+      "bytes": 100180
+    },
+    "rel/dry/N/140_588": {
+      "file": "avaPreview_issw_rel_dry_N_140_588.geojson.gz",
+      "features": 645,
+      "bytes": 73821
+    },
+    "rel/dry/N/140_589": {
+      "file": "avaPreview_issw_rel_dry_N_140_589.geojson.gz",
+      "features": 15,
+      "bytes": 1812
+    },
+    "rel/dry/N/141_585": {
+      "file": "avaPreview_issw_rel_dry_N_141_585.geojson.gz",
+      "features": 310,
+      "bytes": 31123
+    },
+    "rel/dry/N/141_586": {
+      "file": "avaPreview_issw_rel_dry_N_141_586.geojson.gz",
+      "features": 582,
+      "bytes": 63958
+    },
+    "rel/dry/N/141_587": {
+      "file": "avaPreview_issw_rel_dry_N_141_587.geojson.gz",
+      "features": 731,
+      "bytes": 85537
+    },
+    "rel/dry/N/141_588": {
+      "file": "avaPreview_issw_rel_dry_N_141_588.geojson.gz",
+      "features": 744,
+      "bytes": 81652
+    },
+    "rel/dry/N/141_589": {
+      "file": "avaPreview_issw_rel_dry_N_141_589.geojson.gz",
+      "features": 82,
+      "bytes": 8002
+    },
+    "rel/dry/N/142_585": {
+      "file": "avaPreview_issw_rel_dry_N_142_585.geojson.gz",
+      "features": 718,
+      "bytes": 71363
+    },
+    "rel/dry/N/142_586": {
+      "file": "avaPreview_issw_rel_dry_N_142_586.geojson.gz",
+      "features": 217,
+      "bytes": 22656
+    },
+    "rel/dry/N/142_587": {
+      "file": "avaPreview_issw_rel_dry_N_142_587.geojson.gz",
+      "features": 511,
+      "bytes": 54232
+    },
+    "rel/dry/N/142_588": {
+      "file": "avaPreview_issw_rel_dry_N_142_588.geojson.gz",
+      "features": 342,
+      "bytes": 35331
+    },
+    "rel/dry/N/142_589": {
+      "file": "avaPreview_issw_rel_dry_N_142_589.geojson.gz",
+      "features": 64,
+      "bytes": 7191
+    },
+    "rel/dry/N/143_585": {
+      "file": "avaPreview_issw_rel_dry_N_143_585.geojson.gz",
+      "features": 452,
+      "bytes": 42413
+    },
+    "rel/dry/N/143_586": {
+      "file": "avaPreview_issw_rel_dry_N_143_586.geojson.gz",
+      "features": 344,
+      "bytes": 36436
+    },
+    "rel/dry/N/143_587": {
+      "file": "avaPreview_issw_rel_dry_N_143_587.geojson.gz",
+      "features": 431,
+      "bytes": 39926
+    },
+    "rel/dry/N/143_588": {
+      "file": "avaPreview_issw_rel_dry_N_143_588.geojson.gz",
+      "features": 207,
+      "bytes": 17759
+    },
+    "rel/dry/N/143_589": {
+      "file": "avaPreview_issw_rel_dry_N_143_589.geojson.gz",
+      "features": 13,
+      "bytes": 1381
+    },
+    "rel/dry/N/144_585": {
+      "file": "avaPreview_issw_rel_dry_N_144_585.geojson.gz",
+      "features": 209,
+      "bytes": 18518
+    },
+    "rel/dry/N/144_586": {
+      "file": "avaPreview_issw_rel_dry_N_144_586.geojson.gz",
+      "features": 690,
+      "bytes": 80222
+    },
+    "rel/dry/N/144_587": {
+      "file": "avaPreview_issw_rel_dry_N_144_587.geojson.gz",
+      "features": 609,
+      "bytes": 67676
+    },
+    "rel/dry/N/144_588": {
+      "file": "avaPreview_issw_rel_dry_N_144_588.geojson.gz",
+      "features": 452,
+      "bytes": 53638
+    },
+    "rel/dry/N/144_589": {
+      "file": "avaPreview_issw_rel_dry_N_144_589.geojson.gz",
+      "features": 231,
+      "bytes": 20525
+    },
+    "rel/dry/N/145_586": {
+      "file": "avaPreview_issw_rel_dry_N_145_586.geojson.gz",
+      "features": 226,
+      "bytes": 28980
+    },
+    "rel/dry/N/145_587": {
+      "file": "avaPreview_issw_rel_dry_N_145_587.geojson.gz",
+      "features": 490,
+      "bytes": 52995
+    },
+    "rel/dry/N/145_588": {
+      "file": "avaPreview_issw_rel_dry_N_145_588.geojson.gz",
+      "features": 428,
+      "bytes": 50873
+    },
+    "rel/dry/N/145_589": {
+      "file": "avaPreview_issw_rel_dry_N_145_589.geojson.gz",
+      "features": 128,
+      "bytes": 14878
+    },
+    "rel/dry/N/146_586": {
+      "file": "avaPreview_issw_rel_dry_N_146_586.geojson.gz",
+      "features": 88,
+      "bytes": 11627
+    },
+    "rel/dry/N/146_587": {
+      "file": "avaPreview_issw_rel_dry_N_146_587.geojson.gz",
+      "features": 138,
+      "bytes": 17035
+    },
+    "rel/dry/E/138_587": {
+      "file": "avaPreview_issw_rel_dry_E_138_587.geojson.gz",
+      "features": 162,
+      "bytes": 18906
+    },
+    "rel/dry/E/138_588": {
+      "file": "avaPreview_issw_rel_dry_E_138_588.geojson.gz",
+      "features": 47,
+      "bytes": 4910
+    },
+    "rel/dry/E/139_586": {
+      "file": "avaPreview_issw_rel_dry_E_139_586.geojson.gz",
+      "features": 92,
+      "bytes": 9372
+    },
+    "rel/dry/E/139_587": {
+      "file": "avaPreview_issw_rel_dry_E_139_587.geojson.gz",
+      "features": 749,
+      "bytes": 88619
+    },
+    "rel/dry/E/139_588": {
+      "file": "avaPreview_issw_rel_dry_E_139_588.geojson.gz",
+      "features": 704,
+      "bytes": 81006
+    },
+    "rel/dry/E/140_585": {
+      "file": "avaPreview_issw_rel_dry_E_140_585.geojson.gz",
+      "features": 340,
+      "bytes": 36565
+    },
+    "rel/dry/E/140_586": {
+      "file": "avaPreview_issw_rel_dry_E_140_586.geojson.gz",
+      "features": 1013,
+      "bytes": 113951
+    },
+    "rel/dry/E/140_587": {
+      "file": "avaPreview_issw_rel_dry_E_140_587.geojson.gz",
+      "features": 833,
+      "bytes": 96729
+    },
+    "rel/dry/E/140_588": {
+      "file": "avaPreview_issw_rel_dry_E_140_588.geojson.gz",
+      "features": 898,
+      "bytes": 98774
+    },
+    "rel/dry/E/140_589": {
+      "file": "avaPreview_issw_rel_dry_E_140_589.geojson.gz",
+      "features": 205,
+      "bytes": 27161
+    },
+    "rel/dry/E/141_585": {
+      "file": "avaPreview_issw_rel_dry_E_141_585.geojson.gz",
+      "features": 243,
+      "bytes": 27459
+    },
+    "rel/dry/E/141_586": {
+      "file": "avaPreview_issw_rel_dry_E_141_586.geojson.gz",
+      "features": 586,
+      "bytes": 64649
+    },
+    "rel/dry/E/141_587": {
+      "file": "avaPreview_issw_rel_dry_E_141_587.geojson.gz",
+      "features": 951,
+      "bytes": 108998
+    },
+    "rel/dry/E/141_588": {
+      "file": "avaPreview_issw_rel_dry_E_141_588.geojson.gz",
+      "features": 713,
+      "bytes": 86221
+    },
+    "rel/dry/E/141_589": {
+      "file": "avaPreview_issw_rel_dry_E_141_589.geojson.gz",
+      "features": 253,
+      "bytes": 27157
+    },
+    "rel/dry/E/142_585": {
+      "file": "avaPreview_issw_rel_dry_E_142_585.geojson.gz",
+      "features": 579,
+      "bytes": 56479
+    },
+    "rel/dry/E/142_586": {
+      "file": "avaPreview_issw_rel_dry_E_142_586.geojson.gz",
+      "features": 158,
+      "bytes": 15573
+    },
+    "rel/dry/E/142_587": {
+      "file": "avaPreview_issw_rel_dry_E_142_587.geojson.gz",
+      "features": 676,
+      "bytes": 78976
+    },
+    "rel/dry/E/142_588": {
+      "file": "avaPreview_issw_rel_dry_E_142_588.geojson.gz",
+      "features": 431,
+      "bytes": 47262
+    },
+    "rel/dry/E/142_589": {
+      "file": "avaPreview_issw_rel_dry_E_142_589.geojson.gz",
+      "features": 17,
+      "bytes": 2064
+    },
+    "rel/dry/E/143_585": {
+      "file": "avaPreview_issw_rel_dry_E_143_585.geojson.gz",
+      "features": 426,
+      "bytes": 38495
+    },
+    "rel/dry/E/143_586": {
+      "file": "avaPreview_issw_rel_dry_E_143_586.geojson.gz",
+      "features": 245,
+      "bytes": 24221
+    },
+    "rel/dry/E/143_587": {
+      "file": "avaPreview_issw_rel_dry_E_143_587.geojson.gz",
+      "features": 441,
+      "bytes": 41197
+    },
+    "rel/dry/E/143_588": {
+      "file": "avaPreview_issw_rel_dry_E_143_588.geojson.gz",
+      "features": 133,
+      "bytes": 10792
+    },
+    "rel/dry/E/143_589": {
+      "file": "avaPreview_issw_rel_dry_E_143_589.geojson.gz",
+      "features": 45,
+      "bytes": 4628
+    },
+    "rel/dry/E/144_585": {
+      "file": "avaPreview_issw_rel_dry_E_144_585.geojson.gz",
+      "features": 167,
+      "bytes": 14991
+    },
+    "rel/dry/E/144_586": {
+      "file": "avaPreview_issw_rel_dry_E_144_586.geojson.gz",
+      "features": 405,
+      "bytes": 41125
+    },
+    "rel/dry/E/144_587": {
+      "file": "avaPreview_issw_rel_dry_E_144_587.geojson.gz",
+      "features": 560,
+      "bytes": 57730
+    },
+    "rel/dry/E/144_588": {
+      "file": "avaPreview_issw_rel_dry_E_144_588.geojson.gz",
+      "features": 567,
+      "bytes": 62565
+    },
+    "rel/dry/E/144_589": {
+      "file": "avaPreview_issw_rel_dry_E_144_589.geojson.gz",
+      "features": 281,
+      "bytes": 30361
+    },
+    "rel/dry/E/145_586": {
+      "file": "avaPreview_issw_rel_dry_E_145_586.geojson.gz",
+      "features": 80,
+      "bytes": 9607
+    },
+    "rel/dry/E/145_587": {
+      "file": "avaPreview_issw_rel_dry_E_145_587.geojson.gz",
+      "features": 277,
+      "bytes": 30435
+    },
+    "rel/dry/E/145_588": {
+      "file": "avaPreview_issw_rel_dry_E_145_588.geojson.gz",
+      "features": 188,
+      "bytes": 19979
+    },
+    "rel/dry/E/145_589": {
+      "file": "avaPreview_issw_rel_dry_E_145_589.geojson.gz",
+      "features": 86,
+      "bytes": 9837
+    },
+    "rel/dry/E/146_586": {
+      "file": "avaPreview_issw_rel_dry_E_146_586.geojson.gz",
+      "features": 3,
+      "bytes": 646
+    },
+    "rel/dry/E/146_587": {
+      "file": "avaPreview_issw_rel_dry_E_146_587.geojson.gz",
+      "features": 70,
+      "bytes": 6787
+    },
+    "rel/dry/S/138_587": {
+      "file": "avaPreview_issw_rel_dry_S_138_587.geojson.gz",
+      "features": 84,
+      "bytes": 11336
+    },
+    "rel/dry/S/138_588": {
+      "file": "avaPreview_issw_rel_dry_S_138_588.geojson.gz",
+      "features": 34,
+      "bytes": 3473
+    },
+    "rel/dry/S/139_586": {
+      "file": "avaPreview_issw_rel_dry_S_139_586.geojson.gz",
+      "features": 40,
+      "bytes": 4102
+    },
+    "rel/dry/S/139_587": {
+      "file": "avaPreview_issw_rel_dry_S_139_587.geojson.gz",
+      "features": 658,
+      "bytes": 80811
+    },
+    "rel/dry/S/139_588": {
+      "file": "avaPreview_issw_rel_dry_S_139_588.geojson.gz",
+      "features": 432,
+      "bytes": 58496
+    },
+    "rel/dry/S/140_585": {
+      "file": "avaPreview_issw_rel_dry_S_140_585.geojson.gz",
+      "features": 233,
+      "bytes": 28590
+    },
+    "rel/dry/S/140_586": {
+      "file": "avaPreview_issw_rel_dry_S_140_586.geojson.gz",
+      "features": 822,
+      "bytes": 92513
+    },
+    "rel/dry/S/140_587": {
+      "file": "avaPreview_issw_rel_dry_S_140_587.geojson.gz",
+      "features": 583,
+      "bytes": 68190
+    },
+    "rel/dry/S/140_588": {
+      "file": "avaPreview_issw_rel_dry_S_140_588.geojson.gz",
+      "features": 664,
+      "bytes": 74281
+    },
+    "rel/dry/S/140_589": {
+      "file": "avaPreview_issw_rel_dry_S_140_589.geojson.gz",
+      "features": 280,
+      "bytes": 39863
+    },
+    "rel/dry/S/141_585": {
+      "file": "avaPreview_issw_rel_dry_S_141_585.geojson.gz",
+      "features": 295,
+      "bytes": 31887
+    },
+    "rel/dry/S/141_586": {
+      "file": "avaPreview_issw_rel_dry_S_141_586.geojson.gz",
+      "features": 621,
+      "bytes": 71158
+    },
+    "rel/dry/S/141_587": {
+      "file": "avaPreview_issw_rel_dry_S_141_587.geojson.gz",
+      "features": 924,
+      "bytes": 103679
+    },
+    "rel/dry/S/141_588": {
+      "file": "avaPreview_issw_rel_dry_S_141_588.geojson.gz",
+      "features": 553,
+      "bytes": 57649
+    },
+    "rel/dry/S/141_589": {
+      "file": "avaPreview_issw_rel_dry_S_141_589.geojson.gz",
+      "features": 236,
+      "bytes": 24682
+    },
+    "rel/dry/S/142_585": {
+      "file": "avaPreview_issw_rel_dry_S_142_585.geojson.gz",
+      "features": 362,
+      "bytes": 32988
+    },
+    "rel/dry/S/142_586": {
+      "file": "avaPreview_issw_rel_dry_S_142_586.geojson.gz",
+      "features": 297,
+      "bytes": 29135
+    },
+    "rel/dry/S/142_587": {
+      "file": "avaPreview_issw_rel_dry_S_142_587.geojson.gz",
+      "features": 567,
+      "bytes": 63140
+    },
+    "rel/dry/S/142_588": {
+      "file": "avaPreview_issw_rel_dry_S_142_588.geojson.gz",
+      "features": 449,
+      "bytes": 47624
+    },
+    "rel/dry/S/142_589": {
+      "file": "avaPreview_issw_rel_dry_S_142_589.geojson.gz",
+      "features": 33,
+      "bytes": 4214
+    },
+    "rel/dry/S/143_585": {
+      "file": "avaPreview_issw_rel_dry_S_143_585.geojson.gz",
+      "features": 291,
+      "bytes": 25669
+    },
+    "rel/dry/S/143_586": {
+      "file": "avaPreview_issw_rel_dry_S_143_586.geojson.gz",
+      "features": 440,
+      "bytes": 44442
+    },
+    "rel/dry/S/143_587": {
+      "file": "avaPreview_issw_rel_dry_S_143_587.geojson.gz",
+      "features": 460,
+      "bytes": 45785
+    },
+    "rel/dry/S/143_588": {
+      "file": "avaPreview_issw_rel_dry_S_143_588.geojson.gz",
+      "features": 104,
+      "bytes": 8746
+    },
+    "rel/dry/S/143_589": {
+      "file": "avaPreview_issw_rel_dry_S_143_589.geojson.gz",
+      "features": 133,
+      "bytes": 11566
+    },
+    "rel/dry/S/144_585": {
+      "file": "avaPreview_issw_rel_dry_S_144_585.geojson.gz",
+      "features": 425,
+      "bytes": 43598
+    },
+    "rel/dry/S/144_586": {
+      "file": "avaPreview_issw_rel_dry_S_144_586.geojson.gz",
+      "features": 496,
+      "bytes": 61926
+    },
+    "rel/dry/S/144_587": {
+      "file": "avaPreview_issw_rel_dry_S_144_587.geojson.gz",
+      "features": 732,
+      "bytes": 77990
+    },
+    "rel/dry/S/144_588": {
+      "file": "avaPreview_issw_rel_dry_S_144_588.geojson.gz",
+      "features": 707,
+      "bytes": 78566
+    },
+    "rel/dry/S/144_589": {
+      "file": "avaPreview_issw_rel_dry_S_144_589.geojson.gz",
+      "features": 494,
+      "bytes": 53980
+    },
+    "rel/dry/S/145_586": {
+      "file": "avaPreview_issw_rel_dry_S_145_586.geojson.gz",
+      "features": 77,
+      "bytes": 9152
+    },
+    "rel/dry/S/145_587": {
+      "file": "avaPreview_issw_rel_dry_S_145_587.geojson.gz",
+      "features": 604,
+      "bytes": 65869
+    },
+    "rel/dry/S/145_588": {
+      "file": "avaPreview_issw_rel_dry_S_145_588.geojson.gz",
+      "features": 362,
+      "bytes": 46374
+    },
+    "rel/dry/S/145_589": {
+      "file": "avaPreview_issw_rel_dry_S_145_589.geojson.gz",
+      "features": 197,
+      "bytes": 24630
+    },
+    "rel/dry/S/146_586": {
+      "file": "avaPreview_issw_rel_dry_S_146_586.geojson.gz",
+      "features": 2,
+      "bytes": 668
+    },
+    "rel/dry/S/146_587": {
+      "file": "avaPreview_issw_rel_dry_S_146_587.geojson.gz",
+      "features": 283,
+      "bytes": 33141
+    },
+    "rel/dry/W/138_587": {
+      "file": "avaPreview_issw_rel_dry_W_138_587.geojson.gz",
+      "features": 31,
+      "bytes": 3711
+    },
+    "rel/dry/W/138_588": {
+      "file": "avaPreview_issw_rel_dry_W_138_588.geojson.gz",
+      "features": 37,
+      "bytes": 4517
+    },
+    "rel/dry/W/139_586": {
+      "file": "avaPreview_issw_rel_dry_W_139_586.geojson.gz",
+      "features": 13,
+      "bytes": 1557
+    },
+    "rel/dry/W/139_587": {
+      "file": "avaPreview_issw_rel_dry_W_139_587.geojson.gz",
+      "features": 490,
+      "bytes": 57907
+    },
+    "rel/dry/W/139_588": {
+      "file": "avaPreview_issw_rel_dry_W_139_588.geojson.gz",
+      "features": 321,
+      "bytes": 37097
+    },
+    "rel/dry/W/140_585": {
+      "file": "avaPreview_issw_rel_dry_W_140_585.geojson.gz",
+      "features": 125,
+      "bytes": 13121
+    },
+    "rel/dry/W/140_586": {
+      "file": "avaPreview_issw_rel_dry_W_140_586.geojson.gz",
+      "features": 617,
+      "bytes": 65704
+    },
+    "rel/dry/W/140_587": {
+      "file": "avaPreview_issw_rel_dry_W_140_587.geojson.gz",
+      "features": 673,
+      "bytes": 89148
+    },
+    "rel/dry/W/140_588": {
+      "file": "avaPreview_issw_rel_dry_W_140_588.geojson.gz",
+      "features": 563,
+      "bytes": 62229
+    },
+    "rel/dry/W/140_589": {
+      "file": "avaPreview_issw_rel_dry_W_140_589.geojson.gz",
+      "features": 97,
+      "bytes": 13312
+    },
+    "rel/dry/W/141_585": {
+      "file": "avaPreview_issw_rel_dry_W_141_585.geojson.gz",
+      "features": 168,
+      "bytes": 14802
+    },
+    "rel/dry/W/141_586": {
+      "file": "avaPreview_issw_rel_dry_W_141_586.geojson.gz",
+      "features": 599,
+      "bytes": 63257
+    },
+    "rel/dry/W/141_587": {
+      "file": "avaPreview_issw_rel_dry_W_141_587.geojson.gz",
+      "features": 678,
+      "bytes": 77633
+    },
+    "rel/dry/W/141_588": {
+      "file": "avaPreview_issw_rel_dry_W_141_588.geojson.gz",
+      "features": 650,
+      "bytes": 75653
+    },
+    "rel/dry/W/141_589": {
+      "file": "avaPreview_issw_rel_dry_W_141_589.geojson.gz",
+      "features": 51,
+      "bytes": 5864
+    },
+    "rel/dry/W/142_585": {
+      "file": "avaPreview_issw_rel_dry_W_142_585.geojson.gz",
+      "features": 611,
+      "bytes": 73089
+    },
+    "rel/dry/W/142_586": {
+      "file": "avaPreview_issw_rel_dry_W_142_586.geojson.gz",
+      "features": 231,
+      "bytes": 23442
+    },
+    "rel/dry/W/142_587": {
+      "file": "avaPreview_issw_rel_dry_W_142_587.geojson.gz",
+      "features": 437,
+      "bytes": 47390
+    },
+    "rel/dry/W/142_588": {
+      "file": "avaPreview_issw_rel_dry_W_142_588.geojson.gz",
+      "features": 353,
+      "bytes": 37493
+    },
+    "rel/dry/W/142_589": {
+      "file": "avaPreview_issw_rel_dry_W_142_589.geojson.gz",
+      "features": 65,
+      "bytes": 10222
+    },
+    "rel/dry/W/143_585": {
+      "file": "avaPreview_issw_rel_dry_W_143_585.geojson.gz",
+      "features": 285,
+      "bytes": 25420
+    },
+    "rel/dry/W/143_586": {
+      "file": "avaPreview_issw_rel_dry_W_143_586.geojson.gz",
+      "features": 499,
+      "bytes": 46598
+    },
+    "rel/dry/W/143_587": {
+      "file": "avaPreview_issw_rel_dry_W_143_587.geojson.gz",
+      "features": 537,
+      "bytes": 51906
+    },
+    "rel/dry/W/143_588": {
+      "file": "avaPreview_issw_rel_dry_W_143_588.geojson.gz",
+      "features": 156,
+      "bytes": 13533
+    },
+    "rel/dry/W/143_589": {
+      "file": "avaPreview_issw_rel_dry_W_143_589.geojson.gz",
+      "features": 14,
+      "bytes": 1466
+    },
+    "rel/dry/W/144_585": {
+      "file": "avaPreview_issw_rel_dry_W_144_585.geojson.gz",
+      "features": 484,
+      "bytes": 48922
+    },
+    "rel/dry/W/144_586": {
+      "file": "avaPreview_issw_rel_dry_W_144_586.geojson.gz",
+      "features": 756,
+      "bytes": 86025
+    },
+    "rel/dry/W/144_587": {
+      "file": "avaPreview_issw_rel_dry_W_144_587.geojson.gz",
+      "features": 635,
+      "bytes": 66959
+    },
+    "rel/dry/W/144_588": {
+      "file": "avaPreview_issw_rel_dry_W_144_588.geojson.gz",
+      "features": 443,
+      "bytes": 52616
+    },
+    "rel/dry/W/144_589": {
+      "file": "avaPreview_issw_rel_dry_W_144_589.geojson.gz",
+      "features": 291,
+      "bytes": 29772
+    },
+    "rel/dry/W/145_586": {
+      "file": "avaPreview_issw_rel_dry_W_145_586.geojson.gz",
+      "features": 220,
+      "bytes": 25850
+    },
+    "rel/dry/W/145_587": {
+      "file": "avaPreview_issw_rel_dry_W_145_587.geojson.gz",
+      "features": 591,
+      "bytes": 66363
+    },
+    "rel/dry/W/145_588": {
+      "file": "avaPreview_issw_rel_dry_W_145_588.geojson.gz",
+      "features": 661,
+      "bytes": 77630
+    },
+    "rel/dry/W/145_589": {
+      "file": "avaPreview_issw_rel_dry_W_145_589.geojson.gz",
+      "features": 226,
+      "bytes": 27193
+    },
+    "rel/dry/W/146_586": {
+      "file": "avaPreview_issw_rel_dry_W_146_586.geojson.gz",
+      "features": 71,
+      "bytes": 7880
+    },
+    "rel/dry/W/146_587": {
+      "file": "avaPreview_issw_rel_dry_W_146_587.geojson.gz",
+      "features": 233,
+      "bytes": 26484
+    },
+    "rel/wet/N/138_587": {
+      "file": "avaPreview_issw_rel_wet_N_138_587.geojson.gz",
+      "features": 94,
+      "bytes": 11556
+    },
+    "rel/wet/N/138_588": {
+      "file": "avaPreview_issw_rel_wet_N_138_588.geojson.gz",
+      "features": 40,
+      "bytes": 3949
+    },
+    "rel/wet/N/139_586": {
+      "file": "avaPreview_issw_rel_wet_N_139_586.geojson.gz",
+      "features": 52,
+      "bytes": 5009
+    },
+    "rel/wet/N/139_587": {
+      "file": "avaPreview_issw_rel_wet_N_139_587.geojson.gz",
+      "features": 642,
+      "bytes": 78360
+    },
+    "rel/wet/N/139_588": {
+      "file": "avaPreview_issw_rel_wet_N_139_588.geojson.gz",
+      "features": 499,
+      "bytes": 62393
+    },
+    "rel/wet/N/140_585": {
+      "file": "avaPreview_issw_rel_wet_N_140_585.geojson.gz",
+      "features": 317,
+      "bytes": 30735
+    },
+    "rel/wet/N/140_586": {
+      "file": "avaPreview_issw_rel_wet_N_140_586.geojson.gz",
+      "features": 870,
+      "bytes": 88707
+    },
+    "rel/wet/N/140_587": {
+      "file": "avaPreview_issw_rel_wet_N_140_587.geojson.gz",
+      "features": 816,
+      "bytes": 100086
+    },
+    "rel/wet/N/140_588": {
+      "file": "avaPreview_issw_rel_wet_N_140_588.geojson.gz",
+      "features": 645,
+      "bytes": 73783
+    },
+    "rel/wet/N/140_589": {
+      "file": "avaPreview_issw_rel_wet_N_140_589.geojson.gz",
+      "features": 15,
+      "bytes": 1808
+    },
+    "rel/wet/N/141_585": {
+      "file": "avaPreview_issw_rel_wet_N_141_585.geojson.gz",
+      "features": 310,
+      "bytes": 31147
+    },
+    "rel/wet/N/141_586": {
+      "file": "avaPreview_issw_rel_wet_N_141_586.geojson.gz",
+      "features": 582,
+      "bytes": 64000
+    },
+    "rel/wet/N/141_587": {
+      "file": "avaPreview_issw_rel_wet_N_141_587.geojson.gz",
+      "features": 731,
+      "bytes": 85979
+    },
+    "rel/wet/N/141_588": {
+      "file": "avaPreview_issw_rel_wet_N_141_588.geojson.gz",
+      "features": 744,
+      "bytes": 81690
+    },
+    "rel/wet/N/141_589": {
+      "file": "avaPreview_issw_rel_wet_N_141_589.geojson.gz",
+      "features": 82,
+      "bytes": 7986
+    },
+    "rel/wet/N/142_585": {
+      "file": "avaPreview_issw_rel_wet_N_142_585.geojson.gz",
+      "features": 718,
+      "bytes": 71494
+    },
+    "rel/wet/N/142_586": {
+      "file": "avaPreview_issw_rel_wet_N_142_586.geojson.gz",
+      "features": 217,
+      "bytes": 22720
+    },
+    "rel/wet/N/142_587": {
+      "file": "avaPreview_issw_rel_wet_N_142_587.geojson.gz",
+      "features": 511,
+      "bytes": 54292
+    },
+    "rel/wet/N/142_588": {
+      "file": "avaPreview_issw_rel_wet_N_142_588.geojson.gz",
+      "features": 342,
+      "bytes": 35310
+    },
+    "rel/wet/N/142_589": {
+      "file": "avaPreview_issw_rel_wet_N_142_589.geojson.gz",
+      "features": 64,
+      "bytes": 7191
+    },
+    "rel/wet/N/143_585": {
+      "file": "avaPreview_issw_rel_wet_N_143_585.geojson.gz",
+      "features": 452,
+      "bytes": 42476
+    },
+    "rel/wet/N/143_586": {
+      "file": "avaPreview_issw_rel_wet_N_143_586.geojson.gz",
+      "features": 344,
+      "bytes": 36539
+    },
+    "rel/wet/N/143_587": {
+      "file": "avaPreview_issw_rel_wet_N_143_587.geojson.gz",
+      "features": 431,
+      "bytes": 39968
+    },
+    "rel/wet/N/143_588": {
+      "file": "avaPreview_issw_rel_wet_N_143_588.geojson.gz",
+      "features": 207,
+      "bytes": 17734
+    },
+    "rel/wet/N/143_589": {
+      "file": "avaPreview_issw_rel_wet_N_143_589.geojson.gz",
+      "features": 13,
+      "bytes": 1385
+    },
+    "rel/wet/N/144_585": {
+      "file": "avaPreview_issw_rel_wet_N_144_585.geojson.gz",
+      "features": 209,
+      "bytes": 18524
+    },
+    "rel/wet/N/144_586": {
+      "file": "avaPreview_issw_rel_wet_N_144_586.geojson.gz",
+      "features": 690,
+      "bytes": 80286
+    },
+    "rel/wet/N/144_587": {
+      "file": "avaPreview_issw_rel_wet_N_144_587.geojson.gz",
+      "features": 609,
+      "bytes": 67736
+    },
+    "rel/wet/N/144_588": {
+      "file": "avaPreview_issw_rel_wet_N_144_588.geojson.gz",
+      "features": 452,
+      "bytes": 53632
+    },
+    "rel/wet/N/144_589": {
+      "file": "avaPreview_issw_rel_wet_N_144_589.geojson.gz",
+      "features": 231,
+      "bytes": 20528
+    },
+    "rel/wet/N/145_586": {
+      "file": "avaPreview_issw_rel_wet_N_145_586.geojson.gz",
+      "features": 226,
+      "bytes": 29000
+    },
+    "rel/wet/N/145_587": {
+      "file": "avaPreview_issw_rel_wet_N_145_587.geojson.gz",
+      "features": 490,
+      "bytes": 53081
+    },
+    "rel/wet/N/145_588": {
+      "file": "avaPreview_issw_rel_wet_N_145_588.geojson.gz",
+      "features": 428,
+      "bytes": 50927
+    },
+    "rel/wet/N/145_589": {
+      "file": "avaPreview_issw_rel_wet_N_145_589.geojson.gz",
+      "features": 128,
+      "bytes": 14893
+    },
+    "rel/wet/N/146_586": {
+      "file": "avaPreview_issw_rel_wet_N_146_586.geojson.gz",
+      "features": 88,
+      "bytes": 11665
+    },
+    "rel/wet/N/146_587": {
+      "file": "avaPreview_issw_rel_wet_N_146_587.geojson.gz",
+      "features": 138,
+      "bytes": 16994
+    },
+    "rel/wet/E/138_587": {
+      "file": "avaPreview_issw_rel_wet_E_138_587.geojson.gz",
+      "features": 162,
+      "bytes": 18866
+    },
+    "rel/wet/E/138_588": {
+      "file": "avaPreview_issw_rel_wet_E_138_588.geojson.gz",
+      "features": 47,
+      "bytes": 4903
+    },
+    "rel/wet/E/139_586": {
+      "file": "avaPreview_issw_rel_wet_E_139_586.geojson.gz",
+      "features": 92,
+      "bytes": 9376
+    },
+    "rel/wet/E/139_587": {
+      "file": "avaPreview_issw_rel_wet_E_139_587.geojson.gz",
+      "features": 749,
+      "bytes": 88624
+    },
+    "rel/wet/E/139_588": {
+      "file": "avaPreview_issw_rel_wet_E_139_588.geojson.gz",
+      "features": 704,
+      "bytes": 81069
+    },
+    "rel/wet/E/140_585": {
+      "file": "avaPreview_issw_rel_wet_E_140_585.geojson.gz",
+      "features": 340,
+      "bytes": 36408
+    },
+    "rel/wet/E/140_586": {
+      "file": "avaPreview_issw_rel_wet_E_140_586.geojson.gz",
+      "features": 1013,
+      "bytes": 113687
+    },
+    "rel/wet/E/140_587": {
+      "file": "avaPreview_issw_rel_wet_E_140_587.geojson.gz",
+      "features": 833,
+      "bytes": 96925
+    },
+    "rel/wet/E/140_588": {
+      "file": "avaPreview_issw_rel_wet_E_140_588.geojson.gz",
+      "features": 898,
+      "bytes": 98771
+    },
+    "rel/wet/E/140_589": {
+      "file": "avaPreview_issw_rel_wet_E_140_589.geojson.gz",
+      "features": 205,
+      "bytes": 27167
+    },
+    "rel/wet/E/141_585": {
+      "file": "avaPreview_issw_rel_wet_E_141_585.geojson.gz",
+      "features": 243,
+      "bytes": 27507
+    },
+    "rel/wet/E/141_586": {
+      "file": "avaPreview_issw_rel_wet_E_141_586.geojson.gz",
+      "features": 586,
+      "bytes": 64403
+    },
+    "rel/wet/E/141_587": {
+      "file": "avaPreview_issw_rel_wet_E_141_587.geojson.gz",
+      "features": 951,
+      "bytes": 109185
+    },
+    "rel/wet/E/141_588": {
+      "file": "avaPreview_issw_rel_wet_E_141_588.geojson.gz",
+      "features": 713,
+      "bytes": 86275
+    },
+    "rel/wet/E/141_589": {
+      "file": "avaPreview_issw_rel_wet_E_141_589.geojson.gz",
+      "features": 253,
+      "bytes": 27144
+    },
+    "rel/wet/E/142_585": {
+      "file": "avaPreview_issw_rel_wet_E_142_585.geojson.gz",
+      "features": 579,
+      "bytes": 56504
+    },
+    "rel/wet/E/142_586": {
+      "file": "avaPreview_issw_rel_wet_E_142_586.geojson.gz",
+      "features": 158,
+      "bytes": 15566
+    },
+    "rel/wet/E/142_587": {
+      "file": "avaPreview_issw_rel_wet_E_142_587.geojson.gz",
+      "features": 676,
+      "bytes": 79061
+    },
+    "rel/wet/E/142_588": {
+      "file": "avaPreview_issw_rel_wet_E_142_588.geojson.gz",
+      "features": 431,
+      "bytes": 47337
+    },
+    "rel/wet/E/142_589": {
+      "file": "avaPreview_issw_rel_wet_E_142_589.geojson.gz",
+      "features": 17,
+      "bytes": 2070
+    },
+    "rel/wet/E/143_585": {
+      "file": "avaPreview_issw_rel_wet_E_143_585.geojson.gz",
+      "features": 426,
+      "bytes": 38536
+    },
+    "rel/wet/E/143_586": {
+      "file": "avaPreview_issw_rel_wet_E_143_586.geojson.gz",
+      "features": 245,
+      "bytes": 24173
+    },
+    "rel/wet/E/143_587": {
+      "file": "avaPreview_issw_rel_wet_E_143_587.geojson.gz",
+      "features": 441,
+      "bytes": 41201
+    },
+    "rel/wet/E/143_588": {
+      "file": "avaPreview_issw_rel_wet_E_143_588.geojson.gz",
+      "features": 133,
+      "bytes": 10802
+    },
+    "rel/wet/E/143_589": {
+      "file": "avaPreview_issw_rel_wet_E_143_589.geojson.gz",
+      "features": 45,
+      "bytes": 4638
+    },
+    "rel/wet/E/144_585": {
+      "file": "avaPreview_issw_rel_wet_E_144_585.geojson.gz",
+      "features": 167,
+      "bytes": 15012
+    },
+    "rel/wet/E/144_586": {
+      "file": "avaPreview_issw_rel_wet_E_144_586.geojson.gz",
+      "features": 405,
+      "bytes": 41035
+    },
+    "rel/wet/E/144_587": {
+      "file": "avaPreview_issw_rel_wet_E_144_587.geojson.gz",
+      "features": 560,
+      "bytes": 57618
+    },
+    "rel/wet/E/144_588": {
+      "file": "avaPreview_issw_rel_wet_E_144_588.geojson.gz",
+      "features": 567,
+      "bytes": 62700
+    },
+    "rel/wet/E/144_589": {
+      "file": "avaPreview_issw_rel_wet_E_144_589.geojson.gz",
+      "features": 281,
+      "bytes": 30257
+    },
+    "rel/wet/E/145_586": {
+      "file": "avaPreview_issw_rel_wet_E_145_586.geojson.gz",
+      "features": 80,
+      "bytes": 9599
+    },
+    "rel/wet/E/145_587": {
+      "file": "avaPreview_issw_rel_wet_E_145_587.geojson.gz",
+      "features": 277,
+      "bytes": 30406
+    },
+    "rel/wet/E/145_588": {
+      "file": "avaPreview_issw_rel_wet_E_145_588.geojson.gz",
+      "features": 188,
+      "bytes": 19983
+    },
+    "rel/wet/E/145_589": {
+      "file": "avaPreview_issw_rel_wet_E_145_589.geojson.gz",
+      "features": 86,
+      "bytes": 9837
+    },
+    "rel/wet/E/146_586": {
+      "file": "avaPreview_issw_rel_wet_E_146_586.geojson.gz",
+      "features": 3,
+      "bytes": 648
+    },
+    "rel/wet/E/146_587": {
+      "file": "avaPreview_issw_rel_wet_E_146_587.geojson.gz",
+      "features": 70,
+      "bytes": 6791
+    },
+    "rel/wet/S/138_587": {
+      "file": "avaPreview_issw_rel_wet_S_138_587.geojson.gz",
+      "features": 84,
+      "bytes": 11353
+    },
+    "rel/wet/S/138_588": {
+      "file": "avaPreview_issw_rel_wet_S_138_588.geojson.gz",
+      "features": 34,
+      "bytes": 3458
+    },
+    "rel/wet/S/139_586": {
+      "file": "avaPreview_issw_rel_wet_S_139_586.geojson.gz",
+      "features": 40,
+      "bytes": 4088
+    },
+    "rel/wet/S/139_587": {
+      "file": "avaPreview_issw_rel_wet_S_139_587.geojson.gz",
+      "features": 658,
+      "bytes": 80958
+    },
+    "rel/wet/S/139_588": {
+      "file": "avaPreview_issw_rel_wet_S_139_588.geojson.gz",
+      "features": 432,
+      "bytes": 58567
+    },
+    "rel/wet/S/140_585": {
+      "file": "avaPreview_issw_rel_wet_S_140_585.geojson.gz",
+      "features": 233,
+      "bytes": 28766
+    },
+    "rel/wet/S/140_586": {
+      "file": "avaPreview_issw_rel_wet_S_140_586.geojson.gz",
+      "features": 822,
+      "bytes": 92556
+    },
+    "rel/wet/S/140_587": {
+      "file": "avaPreview_issw_rel_wet_S_140_587.geojson.gz",
+      "features": 583,
+      "bytes": 68156
+    },
+    "rel/wet/S/140_588": {
+      "file": "avaPreview_issw_rel_wet_S_140_588.geojson.gz",
+      "features": 664,
+      "bytes": 74334
+    },
+    "rel/wet/S/140_589": {
+      "file": "avaPreview_issw_rel_wet_S_140_589.geojson.gz",
+      "features": 280,
+      "bytes": 39823
+    },
+    "rel/wet/S/141_585": {
+      "file": "avaPreview_issw_rel_wet_S_141_585.geojson.gz",
+      "features": 295,
+      "bytes": 31893
+    },
+    "rel/wet/S/141_586": {
+      "file": "avaPreview_issw_rel_wet_S_141_586.geojson.gz",
+      "features": 621,
+      "bytes": 71171
+    },
+    "rel/wet/S/141_587": {
+      "file": "avaPreview_issw_rel_wet_S_141_587.geojson.gz",
+      "features": 924,
+      "bytes": 103753
+    },
+    "rel/wet/S/141_588": {
+      "file": "avaPreview_issw_rel_wet_S_141_588.geojson.gz",
+      "features": 553,
+      "bytes": 57710
+    },
+    "rel/wet/S/141_589": {
+      "file": "avaPreview_issw_rel_wet_S_141_589.geojson.gz",
+      "features": 236,
+      "bytes": 24763
+    },
+    "rel/wet/S/142_585": {
+      "file": "avaPreview_issw_rel_wet_S_142_585.geojson.gz",
+      "features": 362,
+      "bytes": 32980
+    },
+    "rel/wet/S/142_586": {
+      "file": "avaPreview_issw_rel_wet_S_142_586.geojson.gz",
+      "features": 297,
+      "bytes": 29151
+    },
+    "rel/wet/S/142_587": {
+      "file": "avaPreview_issw_rel_wet_S_142_587.geojson.gz",
+      "features": 567,
+      "bytes": 63242
+    },
+    "rel/wet/S/142_588": {
+      "file": "avaPreview_issw_rel_wet_S_142_588.geojson.gz",
+      "features": 449,
+      "bytes": 47513
+    },
+    "rel/wet/S/142_589": {
+      "file": "avaPreview_issw_rel_wet_S_142_589.geojson.gz",
+      "features": 33,
+      "bytes": 4225
+    },
+    "rel/wet/S/143_585": {
+      "file": "avaPreview_issw_rel_wet_S_143_585.geojson.gz",
+      "features": 291,
+      "bytes": 25698
+    },
+    "rel/wet/S/143_586": {
+      "file": "avaPreview_issw_rel_wet_S_143_586.geojson.gz",
+      "features": 440,
+      "bytes": 44518
+    },
+    "rel/wet/S/143_587": {
+      "file": "avaPreview_issw_rel_wet_S_143_587.geojson.gz",
+      "features": 460,
+      "bytes": 45815
+    },
+    "rel/wet/S/143_588": {
+      "file": "avaPreview_issw_rel_wet_S_143_588.geojson.gz",
+      "features": 104,
+      "bytes": 8719
+    },
+    "rel/wet/S/143_589": {
+      "file": "avaPreview_issw_rel_wet_S_143_589.geojson.gz",
+      "features": 133,
+      "bytes": 11549
+    },
+    "rel/wet/S/144_585": {
+      "file": "avaPreview_issw_rel_wet_S_144_585.geojson.gz",
+      "features": 425,
+      "bytes": 43735
+    },
+    "rel/wet/S/144_586": {
+      "file": "avaPreview_issw_rel_wet_S_144_586.geojson.gz",
+      "features": 496,
+      "bytes": 62026
+    },
+    "rel/wet/S/144_587": {
+      "file": "avaPreview_issw_rel_wet_S_144_587.geojson.gz",
+      "features": 732,
+      "bytes": 78008
+    },
+    "rel/wet/S/144_588": {
+      "file": "avaPreview_issw_rel_wet_S_144_588.geojson.gz",
+      "features": 707,
+      "bytes": 78592
+    },
+    "rel/wet/S/144_589": {
+      "file": "avaPreview_issw_rel_wet_S_144_589.geojson.gz",
+      "features": 494,
+      "bytes": 54035
+    },
+    "rel/wet/S/145_586": {
+      "file": "avaPreview_issw_rel_wet_S_145_586.geojson.gz",
+      "features": 77,
+      "bytes": 9156
+    },
+    "rel/wet/S/145_587": {
+      "file": "avaPreview_issw_rel_wet_S_145_587.geojson.gz",
+      "features": 604,
+      "bytes": 65865
+    },
+    "rel/wet/S/145_588": {
+      "file": "avaPreview_issw_rel_wet_S_145_588.geojson.gz",
+      "features": 362,
+      "bytes": 46438
+    },
+    "rel/wet/S/145_589": {
+      "file": "avaPreview_issw_rel_wet_S_145_589.geojson.gz",
+      "features": 197,
+      "bytes": 24631
+    },
+    "rel/wet/S/146_586": {
+      "file": "avaPreview_issw_rel_wet_S_146_586.geojson.gz",
+      "features": 2,
+      "bytes": 669
+    },
+    "rel/wet/S/146_587": {
+      "file": "avaPreview_issw_rel_wet_S_146_587.geojson.gz",
+      "features": 283,
+      "bytes": 33167
+    },
+    "rel/wet/W/138_587": {
+      "file": "avaPreview_issw_rel_wet_W_138_587.geojson.gz",
+      "features": 31,
+      "bytes": 3699
+    },
+    "rel/wet/W/138_588": {
+      "file": "avaPreview_issw_rel_wet_W_138_588.geojson.gz",
+      "features": 37,
+      "bytes": 4518
+    },
+    "rel/wet/W/139_586": {
+      "file": "avaPreview_issw_rel_wet_W_139_586.geojson.gz",
+      "features": 13,
+      "bytes": 1556
+    },
+    "rel/wet/W/139_587": {
+      "file": "avaPreview_issw_rel_wet_W_139_587.geojson.gz",
+      "features": 490,
+      "bytes": 57970
+    },
+    "rel/wet/W/139_588": {
+      "file": "avaPreview_issw_rel_wet_W_139_588.geojson.gz",
+      "features": 321,
+      "bytes": 37116
+    },
+    "rel/wet/W/140_585": {
+      "file": "avaPreview_issw_rel_wet_W_140_585.geojson.gz",
+      "features": 125,
+      "bytes": 13134
+    },
+    "rel/wet/W/140_586": {
+      "file": "avaPreview_issw_rel_wet_W_140_586.geojson.gz",
+      "features": 617,
+      "bytes": 65746
+    },
+    "rel/wet/W/140_587": {
+      "file": "avaPreview_issw_rel_wet_W_140_587.geojson.gz",
+      "features": 673,
+      "bytes": 88977
+    },
+    "rel/wet/W/140_588": {
+      "file": "avaPreview_issw_rel_wet_W_140_588.geojson.gz",
+      "features": 563,
+      "bytes": 62314
+    },
+    "rel/wet/W/140_589": {
+      "file": "avaPreview_issw_rel_wet_W_140_589.geojson.gz",
+      "features": 97,
+      "bytes": 13339
+    },
+    "rel/wet/W/141_585": {
+      "file": "avaPreview_issw_rel_wet_W_141_585.geojson.gz",
+      "features": 168,
+      "bytes": 14820
+    },
+    "rel/wet/W/141_586": {
+      "file": "avaPreview_issw_rel_wet_W_141_586.geojson.gz",
+      "features": 599,
+      "bytes": 63267
+    },
+    "rel/wet/W/141_587": {
+      "file": "avaPreview_issw_rel_wet_W_141_587.geojson.gz",
+      "features": 678,
+      "bytes": 77688
+    },
+    "rel/wet/W/141_588": {
+      "file": "avaPreview_issw_rel_wet_W_141_588.geojson.gz",
+      "features": 650,
+      "bytes": 75763
+    },
+    "rel/wet/W/141_589": {
+      "file": "avaPreview_issw_rel_wet_W_141_589.geojson.gz",
+      "features": 51,
+      "bytes": 5878
+    },
+    "rel/wet/W/142_585": {
+      "file": "avaPreview_issw_rel_wet_W_142_585.geojson.gz",
+      "features": 611,
+      "bytes": 73010
+    },
+    "rel/wet/W/142_586": {
+      "file": "avaPreview_issw_rel_wet_W_142_586.geojson.gz",
+      "features": 231,
+      "bytes": 23450
+    },
+    "rel/wet/W/142_587": {
+      "file": "avaPreview_issw_rel_wet_W_142_587.geojson.gz",
+      "features": 437,
+      "bytes": 47442
+    },
+    "rel/wet/W/142_588": {
+      "file": "avaPreview_issw_rel_wet_W_142_588.geojson.gz",
+      "features": 353,
+      "bytes": 37517
+    },
+    "rel/wet/W/142_589": {
+      "file": "avaPreview_issw_rel_wet_W_142_589.geojson.gz",
+      "features": 65,
+      "bytes": 10228
+    },
+    "rel/wet/W/143_585": {
+      "file": "avaPreview_issw_rel_wet_W_143_585.geojson.gz",
+      "features": 285,
+      "bytes": 25455
+    },
+    "rel/wet/W/143_586": {
+      "file": "avaPreview_issw_rel_wet_W_143_586.geojson.gz",
+      "features": 499,
+      "bytes": 46654
+    },
+    "rel/wet/W/143_587": {
+      "file": "avaPreview_issw_rel_wet_W_143_587.geojson.gz",
+      "features": 537,
+      "bytes": 52000
+    },
+    "rel/wet/W/143_588": {
+      "file": "avaPreview_issw_rel_wet_W_143_588.geojson.gz",
+      "features": 156,
+      "bytes": 13538
+    },
+    "rel/wet/W/143_589": {
+      "file": "avaPreview_issw_rel_wet_W_143_589.geojson.gz",
+      "features": 14,
+      "bytes": 1455
+    },
+    "rel/wet/W/144_585": {
+      "file": "avaPreview_issw_rel_wet_W_144_585.geojson.gz",
+      "features": 484,
+      "bytes": 48997
+    },
+    "rel/wet/W/144_586": {
+      "file": "avaPreview_issw_rel_wet_W_144_586.geojson.gz",
+      "features": 756,
+      "bytes": 86082
+    },
+    "rel/wet/W/144_587": {
+      "file": "avaPreview_issw_rel_wet_W_144_587.geojson.gz",
+      "features": 635,
+      "bytes": 66980
+    },
+    "rel/wet/W/144_588": {
+      "file": "avaPreview_issw_rel_wet_W_144_588.geojson.gz",
+      "features": 443,
+      "bytes": 52769
+    },
+    "rel/wet/W/144_589": {
+      "file": "avaPreview_issw_rel_wet_W_144_589.geojson.gz",
+      "features": 291,
+      "bytes": 29798
+    },
+    "rel/wet/W/145_586": {
+      "file": "avaPreview_issw_rel_wet_W_145_586.geojson.gz",
+      "features": 220,
+      "bytes": 25859
+    },
+    "rel/wet/W/145_587": {
+      "file": "avaPreview_issw_rel_wet_W_145_587.geojson.gz",
+      "features": 591,
+      "bytes": 66335
+    },
+    "rel/wet/W/145_588": {
+      "file": "avaPreview_issw_rel_wet_W_145_588.geojson.gz",
+      "features": 661,
+      "bytes": 77608
+    },
+    "rel/wet/W/145_589": {
+      "file": "avaPreview_issw_rel_wet_W_145_589.geojson.gz",
+      "features": 226,
+      "bytes": 27233
+    },
+    "rel/wet/W/146_586": {
+      "file": "avaPreview_issw_rel_wet_W_146_586.geojson.gz",
+      "features": 71,
+      "bytes": 7883
+    },
+    "rel/wet/W/146_587": {
+      "file": "avaPreview_issw_rel_wet_W_146_587.geojson.gz",
+      "features": 233,
+      "bytes": 26496
+    },
+    "res/dry/N/138_587": {
+      "file": "avaPreview_issw_res_dry_N_138_587.geojson.gz",
+      "features": 165,
+      "bytes": 34931
+    },
+    "res/dry/N/138_588": {
+      "file": "avaPreview_issw_res_dry_N_138_588.geojson.gz",
+      "features": 55,
+      "bytes": 7024
+    },
+    "res/dry/N/139_586": {
+      "file": "avaPreview_issw_res_dry_N_139_586.geojson.gz",
+      "features": 76,
+      "bytes": 9838
+    },
+    "res/dry/N/139_587": {
+      "file": "avaPreview_issw_res_dry_N_139_587.geojson.gz",
+      "features": 1160,
+      "bytes": 326242
+    },
+    "res/dry/N/139_588": {
+      "file": "avaPreview_issw_res_dry_N_139_588.geojson.gz",
+      "features": 918,
+      "bytes": 216587
+    },
+    "res/dry/N/140_585": {
+      "file": "avaPreview_issw_res_dry_N_140_585.geojson.gz",
+      "features": 481,
+      "bytes": 73250
+    },
+    "res/dry/N/140_586": {
+      "file": "avaPreview_issw_res_dry_N_140_586.geojson.gz",
+      "features": 1437,
+      "bytes": 291879
+    },
+    "res/dry/N/140_587": {
+      "file": "avaPreview_issw_res_dry_N_140_587.geojson.gz",
+      "features": 1378,
+      "bytes": 417244
+    },
+    "res/dry/N/140_588": {
+      "file": "avaPreview_issw_res_dry_N_140_588.geojson.gz",
+      "features": 1124,
+      "bytes": 432219
+    },
+    "res/dry/N/140_589": {
+      "file": "avaPreview_issw_res_dry_N_140_589.geojson.gz",
+      "features": 22,
+      "bytes": 3904
+    },
+    "res/dry/N/141_585": {
+      "file": "avaPreview_issw_res_dry_N_141_585.geojson.gz",
+      "features": 444,
+      "bytes": 72630
+    },
+    "res/dry/N/141_586": {
+      "file": "avaPreview_issw_res_dry_N_141_586.geojson.gz",
+      "features": 948,
+      "bytes": 210261
+    },
+    "res/dry/N/141_587": {
+      "file": "avaPreview_issw_res_dry_N_141_587.geojson.gz",
+      "features": 1310,
+      "bytes": 403210
+    },
+    "res/dry/N/141_588": {
+      "file": "avaPreview_issw_res_dry_N_141_588.geojson.gz",
+      "features": 1193,
+      "bytes": 384096
+    },
+    "res/dry/N/141_589": {
+      "file": "avaPreview_issw_res_dry_N_141_589.geojson.gz",
+      "features": 131,
+      "bytes": 28893
+    },
+    "res/dry/N/142_585": {
+      "file": "avaPreview_issw_res_dry_N_142_585.geojson.gz",
+      "features": 1101,
+      "bytes": 270563
+    },
+    "res/dry/N/142_586": {
+      "file": "avaPreview_issw_res_dry_N_142_586.geojson.gz",
+      "features": 330,
+      "bytes": 79586
+    },
+    "res/dry/N/142_587": {
+      "file": "avaPreview_issw_res_dry_N_142_587.geojson.gz",
+      "features": 803,
+      "bytes": 187464
+    },
+    "res/dry/N/142_588": {
+      "file": "avaPreview_issw_res_dry_N_142_588.geojson.gz",
+      "features": 550,
+      "bytes": 124720
+    },
+    "res/dry/N/142_589": {
+      "file": "avaPreview_issw_res_dry_N_142_589.geojson.gz",
+      "features": 96,
+      "bytes": 21328
+    },
+    "res/dry/N/143_585": {
+      "file": "avaPreview_issw_res_dry_N_143_585.geojson.gz",
+      "features": 655,
+      "bytes": 131825
+    },
+    "res/dry/N/143_586": {
+      "file": "avaPreview_issw_res_dry_N_143_586.geojson.gz",
+      "features": 521,
+      "bytes": 130202
+    },
+    "res/dry/N/143_587": {
+      "file": "avaPreview_issw_res_dry_N_143_587.geojson.gz",
+      "features": 671,
+      "bytes": 132677
+    },
+    "res/dry/N/143_588": {
+      "file": "avaPreview_issw_res_dry_N_143_588.geojson.gz",
+      "features": 264,
+      "bytes": 48679
+    },
+    "res/dry/N/143_589": {
+      "file": "avaPreview_issw_res_dry_N_143_589.geojson.gz",
+      "features": 19,
+      "bytes": 2331
+    },
+    "res/dry/N/144_585": {
+      "file": "avaPreview_issw_res_dry_N_144_585.geojson.gz",
+      "features": 284,
+      "bytes": 54186
+    },
+    "res/dry/N/144_586": {
+      "file": "avaPreview_issw_res_dry_N_144_586.geojson.gz",
+      "features": 1170,
+      "bytes": 355728
+    },
+    "res/dry/N/144_587": {
+      "file": "avaPreview_issw_res_dry_N_144_587.geojson.gz",
+      "features": 1018,
+      "bytes": 261307
+    },
+    "res/dry/N/144_588": {
+      "file": "avaPreview_issw_res_dry_N_144_588.geojson.gz",
+      "features": 764,
+      "bytes": 201827
+    },
+    "res/dry/N/144_589": {
+      "file": "avaPreview_issw_res_dry_N_144_589.geojson.gz",
+      "features": 358,
+      "bytes": 52725
+    },
+    "res/dry/N/145_586": {
+      "file": "avaPreview_issw_res_dry_N_145_586.geojson.gz",
+      "features": 403,
+      "bytes": 98025
+    },
+    "res/dry/N/145_587": {
+      "file": "avaPreview_issw_res_dry_N_145_587.geojson.gz",
+      "features": 791,
+      "bytes": 212603
+    },
+    "res/dry/N/145_588": {
+      "file": "avaPreview_issw_res_dry_N_145_588.geojson.gz",
+      "features": 735,
+      "bytes": 203089
+    },
+    "res/dry/N/145_589": {
+      "file": "avaPreview_issw_res_dry_N_145_589.geojson.gz",
+      "features": 223,
+      "bytes": 46780
+    },
+    "res/dry/N/146_586": {
+      "file": "avaPreview_issw_res_dry_N_146_586.geojson.gz",
+      "features": 165,
+      "bytes": 37940
+    },
+    "res/dry/N/146_587": {
+      "file": "avaPreview_issw_res_dry_N_146_587.geojson.gz",
+      "features": 253,
+      "bytes": 70145
+    },
+    "res/dry/E/138_587": {
+      "file": "avaPreview_issw_res_dry_E_138_587.geojson.gz",
+      "features": 258,
+      "bytes": 49449
+    },
+    "res/dry/E/138_588": {
+      "file": "avaPreview_issw_res_dry_E_138_588.geojson.gz",
+      "features": 61,
+      "bytes": 8409
+    },
+    "res/dry/E/139_586": {
+      "file": "avaPreview_issw_res_dry_E_139_586.geojson.gz",
+      "features": 147,
+      "bytes": 22315
+    },
+    "res/dry/E/139_587": {
+      "file": "avaPreview_issw_res_dry_E_139_587.geojson.gz",
+      "features": 1280,
+      "bytes": 346520
+    },
+    "res/dry/E/139_588": {
+      "file": "avaPreview_issw_res_dry_E_139_588.geojson.gz",
+      "features": 1216,
+      "bytes": 262235
+    },
+    "res/dry/E/140_585": {
+      "file": "avaPreview_issw_res_dry_E_140_585.geojson.gz",
+      "features": 557,
+      "bytes": 115703
+    },
+    "res/dry/E/140_586": {
+      "file": "avaPreview_issw_res_dry_E_140_586.geojson.gz",
+      "features": 1697,
+      "bytes": 421603
+    },
+    "res/dry/E/140_587": {
+      "file": "avaPreview_issw_res_dry_E_140_587.geojson.gz",
+      "features": 1446,
+      "bytes": 408985
+    },
+    "res/dry/E/140_588": {
+      "file": "avaPreview_issw_res_dry_E_140_588.geojson.gz",
+      "features": 1540,
+      "bytes": 540436
+    },
+    "res/dry/E/140_589": {
+      "file": "avaPreview_issw_res_dry_E_140_589.geojson.gz",
+      "features": 346,
+      "bytes": 115785
+    },
+    "res/dry/E/141_585": {
+      "file": "avaPreview_issw_res_dry_E_141_585.geojson.gz",
+      "features": 345,
+      "bytes": 85581
+    },
+    "res/dry/E/141_586": {
+      "file": "avaPreview_issw_res_dry_E_141_586.geojson.gz",
+      "features": 949,
+      "bytes": 215332
+    },
+    "res/dry/E/141_587": {
+      "file": "avaPreview_issw_res_dry_E_141_587.geojson.gz",
+      "features": 1673,
+      "bytes": 502996
+    },
+    "res/dry/E/141_588": {
+      "file": "avaPreview_issw_res_dry_E_141_588.geojson.gz",
+      "features": 1178,
+      "bytes": 388062
+    },
+    "res/dry/E/141_589": {
+      "file": "avaPreview_issw_res_dry_E_141_589.geojson.gz",
+      "features": 381,
+      "bytes": 98034
+    },
+    "res/dry/E/142_585": {
+      "file": "avaPreview_issw_res_dry_E_142_585.geojson.gz",
+      "features": 870,
+      "bytes": 220789
+    },
+    "res/dry/E/142_586": {
+      "file": "avaPreview_issw_res_dry_E_142_586.geojson.gz",
+      "features": 256,
+      "bytes": 59392
+    },
+    "res/dry/E/142_587": {
+      "file": "avaPreview_issw_res_dry_E_142_587.geojson.gz",
+      "features": 1167,
+      "bytes": 340775
+    },
+    "res/dry/E/142_588": {
+      "file": "avaPreview_issw_res_dry_E_142_588.geojson.gz",
+      "features": 728,
+      "bytes": 218646
+    },
+    "res/dry/E/142_589": {
+      "file": "avaPreview_issw_res_dry_E_142_589.geojson.gz",
+      "features": 27,
+      "bytes": 4373
+    },
+    "res/dry/E/143_585": {
+      "file": "avaPreview_issw_res_dry_E_143_585.geojson.gz",
+      "features": 609,
+      "bytes": 113443
+    },
+    "res/dry/E/143_586": {
+      "file": "avaPreview_issw_res_dry_E_143_586.geojson.gz",
+      "features": 338,
+      "bytes": 96233
+    },
+    "res/dry/E/143_587": {
+      "file": "avaPreview_issw_res_dry_E_143_587.geojson.gz",
+      "features": 656,
+      "bytes": 114800
+    },
+    "res/dry/E/143_588": {
+      "file": "avaPreview_issw_res_dry_E_143_588.geojson.gz",
+      "features": 151,
+      "bytes": 19918
+    },
+    "res/dry/E/143_589": {
+      "file": "avaPreview_issw_res_dry_E_143_589.geojson.gz",
+      "features": 64,
+      "bytes": 8039
+    },
+    "res/dry/E/144_585": {
+      "file": "avaPreview_issw_res_dry_E_144_585.geojson.gz",
+      "features": 258,
+      "bytes": 55275
+    },
+    "res/dry/E/144_586": {
+      "file": "avaPreview_issw_res_dry_E_144_586.geojson.gz",
+      "features": 628,
+      "bytes": 159093
+    },
+    "res/dry/E/144_587": {
+      "file": "avaPreview_issw_res_dry_E_144_587.geojson.gz",
+      "features": 880,
+      "bytes": 202132
+    },
+    "res/dry/E/144_588": {
+      "file": "avaPreview_issw_res_dry_E_144_588.geojson.gz",
+      "features": 936,
+      "bytes": 273871
+    },
+    "res/dry/E/144_589": {
+      "file": "avaPreview_issw_res_dry_E_144_589.geojson.gz",
+      "features": 431,
+      "bytes": 75880
+    },
+    "res/dry/E/145_586": {
+      "file": "avaPreview_issw_res_dry_E_145_586.geojson.gz",
+      "features": 124,
+      "bytes": 25181
+    },
+    "res/dry/E/145_587": {
+      "file": "avaPreview_issw_res_dry_E_145_587.geojson.gz",
+      "features": 450,
+      "bytes": 104375
+    },
+    "res/dry/E/145_588": {
+      "file": "avaPreview_issw_res_dry_E_145_588.geojson.gz",
+      "features": 319,
+      "bytes": 76709
+    },
+    "res/dry/E/145_589": {
+      "file": "avaPreview_issw_res_dry_E_145_589.geojson.gz",
+      "features": 146,
+      "bytes": 34180
+    },
+    "res/dry/E/146_586": {
+      "file": "avaPreview_issw_res_dry_E_146_586.geojson.gz",
+      "features": 3,
+      "bytes": 966
+    },
+    "res/dry/E/146_587": {
+      "file": "avaPreview_issw_res_dry_E_146_587.geojson.gz",
+      "features": 103,
+      "bytes": 22701
+    },
+    "res/dry/S/138_587": {
+      "file": "avaPreview_issw_res_dry_S_138_587.geojson.gz",
+      "features": 159,
+      "bytes": 42264
+    },
+    "res/dry/S/138_588": {
+      "file": "avaPreview_issw_res_dry_S_138_588.geojson.gz",
+      "features": 53,
+      "bytes": 8325
+    },
+    "res/dry/S/139_586": {
+      "file": "avaPreview_issw_res_dry_S_139_586.geojson.gz",
+      "features": 53,
+      "bytes": 8285
+    },
+    "res/dry/S/139_587": {
+      "file": "avaPreview_issw_res_dry_S_139_587.geojson.gz",
+      "features": 1195,
+      "bytes": 377449
+    },
+    "res/dry/S/139_588": {
+      "file": "avaPreview_issw_res_dry_S_139_588.geojson.gz",
+      "features": 783,
+      "bytes": 217185
+    },
+    "res/dry/S/140_585": {
+      "file": "avaPreview_issw_res_dry_S_140_585.geojson.gz",
+      "features": 424,
+      "bytes": 140568
+    },
+    "res/dry/S/140_586": {
+      "file": "avaPreview_issw_res_dry_S_140_586.geojson.gz",
+      "features": 1410,
+      "bytes": 378545
+    },
+    "res/dry/S/140_587": {
+      "file": "avaPreview_issw_res_dry_S_140_587.geojson.gz",
+      "features": 995,
+      "bytes": 294876
+    },
+    "res/dry/S/140_588": {
+      "file": "avaPreview_issw_res_dry_S_140_588.geojson.gz",
+      "features": 1168,
+      "bytes": 450517
+    },
+    "res/dry/S/140_589": {
+      "file": "avaPreview_issw_res_dry_S_140_589.geojson.gz",
+      "features": 469,
+      "bytes": 185471
+    },
+    "res/dry/S/141_585": {
+      "file": "avaPreview_issw_res_dry_S_141_585.geojson.gz",
+      "features": 451,
+      "bytes": 148655
+    },
+    "res/dry/S/141_586": {
+      "file": "avaPreview_issw_res_dry_S_141_586.geojson.gz",
+      "features": 1020,
+      "bytes": 377149
+    },
+    "res/dry/S/141_587": {
+      "file": "avaPreview_issw_res_dry_S_141_587.geojson.gz",
+      "features": 1591,
+      "bytes": 469303
+    },
+    "res/dry/S/141_588": {
+      "file": "avaPreview_issw_res_dry_S_141_588.geojson.gz",
+      "features": 842,
+      "bytes": 243137
+    },
+    "res/dry/S/141_589": {
+      "file": "avaPreview_issw_res_dry_S_141_589.geojson.gz",
+      "features": 380,
+      "bytes": 106774
+    },
+    "res/dry/S/142_585": {
+      "file": "avaPreview_issw_res_dry_S_142_585.geojson.gz",
+      "features": 524,
+      "bytes": 114771
+    },
+    "res/dry/S/142_586": {
+      "file": "avaPreview_issw_res_dry_S_142_586.geojson.gz",
+      "features": 525,
+      "bytes": 137764
+    },
+    "res/dry/S/142_587": {
+      "file": "avaPreview_issw_res_dry_S_142_587.geojson.gz",
+      "features": 882,
+      "bytes": 215855
+    },
+    "res/dry/S/142_588": {
+      "file": "avaPreview_issw_res_dry_S_142_588.geojson.gz",
+      "features": 699,
+      "bytes": 174577
+    },
+    "res/dry/S/142_589": {
+      "file": "avaPreview_issw_res_dry_S_142_589.geojson.gz",
+      "features": 49,
+      "bytes": 14815
+    },
+    "res/dry/S/143_585": {
+      "file": "avaPreview_issw_res_dry_S_143_585.geojson.gz",
+      "features": 411,
+      "bytes": 82248
+    },
+    "res/dry/S/143_586": {
+      "file": "avaPreview_issw_res_dry_S_143_586.geojson.gz",
+      "features": 673,
+      "bytes": 175991
+    },
+    "res/dry/S/143_587": {
+      "file": "avaPreview_issw_res_dry_S_143_587.geojson.gz",
+      "features": 684,
+      "bytes": 137198
+    },
+    "res/dry/S/143_588": {
+      "file": "avaPreview_issw_res_dry_S_143_588.geojson.gz",
+      "features": 138,
+      "bytes": 20046
+    },
+    "res/dry/S/143_589": {
+      "file": "avaPreview_issw_res_dry_S_143_589.geojson.gz",
+      "features": 177,
+      "bytes": 21242
+    },
+    "res/dry/S/144_585": {
+      "file": "avaPreview_issw_res_dry_S_144_585.geojson.gz",
+      "features": 693,
+      "bytes": 195623
+    },
+    "res/dry/S/144_586": {
+      "file": "avaPreview_issw_res_dry_S_144_586.geojson.gz",
+      "features": 862,
+      "bytes": 256630
+    },
+    "res/dry/S/144_587": {
+      "file": "avaPreview_issw_res_dry_S_144_587.geojson.gz",
+      "features": 1194,
+      "bytes": 283242
+    },
+    "res/dry/S/144_588": {
+      "file": "avaPreview_issw_res_dry_S_144_588.geojson.gz",
+      "features": 1187,
+      "bytes": 382017
+    },
+    "res/dry/S/144_589": {
+      "file": "avaPreview_issw_res_dry_S_144_589.geojson.gz",
+      "features": 806,
+      "bytes": 160016
+    },
+    "res/dry/S/145_586": {
+      "file": "avaPreview_issw_res_dry_S_145_586.geojson.gz",
+      "features": 135,
+      "bytes": 26777
+    },
+    "res/dry/S/145_587": {
+      "file": "avaPreview_issw_res_dry_S_145_587.geojson.gz",
+      "features": 1041,
+      "bytes": 235263
+    },
+    "res/dry/S/145_588": {
+      "file": "avaPreview_issw_res_dry_S_145_588.geojson.gz",
+      "features": 672,
+      "bytes": 199875
+    },
+    "res/dry/S/145_589": {
+      "file": "avaPreview_issw_res_dry_S_145_589.geojson.gz",
+      "features": 357,
+      "bytes": 79676
+    },
+    "res/dry/S/146_586": {
+      "file": "avaPreview_issw_res_dry_S_146_586.geojson.gz",
+      "features": 11,
+      "bytes": 2631
+    },
+    "res/dry/S/146_587": {
+      "file": "avaPreview_issw_res_dry_S_146_587.geojson.gz",
+      "features": 509,
+      "bytes": 129277
+    },
+    "res/dry/W/138_587": {
+      "file": "avaPreview_issw_res_dry_W_138_587.geojson.gz",
+      "features": 46,
+      "bytes": 7918
+    },
+    "res/dry/W/138_588": {
+      "file": "avaPreview_issw_res_dry_W_138_588.geojson.gz",
+      "features": 62,
+      "bytes": 11831
+    },
+    "res/dry/W/139_586": {
+      "file": "avaPreview_issw_res_dry_W_139_586.geojson.gz",
+      "features": 21,
+      "bytes": 3388
+    },
+    "res/dry/W/139_587": {
+      "file": "avaPreview_issw_res_dry_W_139_587.geojson.gz",
+      "features": 864,
+      "bytes": 258164
+    },
+    "res/dry/W/139_588": {
+      "file": "avaPreview_issw_res_dry_W_139_588.geojson.gz",
+      "features": 564,
+      "bytes": 127807
+    },
+    "res/dry/W/140_585": {
+      "file": "avaPreview_issw_res_dry_W_140_585.geojson.gz",
+      "features": 193,
+      "bytes": 47568
+    },
+    "res/dry/W/140_586": {
+      "file": "avaPreview_issw_res_dry_W_140_586.geojson.gz",
+      "features": 1060,
+      "bytes": 237380
+    },
+    "res/dry/W/140_587": {
+      "file": "avaPreview_issw_res_dry_W_140_587.geojson.gz",
+      "features": 1162,
+      "bytes": 434482
+    },
+    "res/dry/W/140_588": {
+      "file": "avaPreview_issw_res_dry_W_140_588.geojson.gz",
+      "features": 996,
+      "bytes": 386947
+    },
+    "res/dry/W/140_589": {
+      "file": "avaPreview_issw_res_dry_W_140_589.geojson.gz",
+      "features": 158,
+      "bytes": 50121
+    },
+    "res/dry/W/141_585": {
+      "file": "avaPreview_issw_res_dry_W_141_585.geojson.gz",
+      "features": 225,
+      "bytes": 47446
+    },
+    "res/dry/W/141_586": {
+      "file": "avaPreview_issw_res_dry_W_141_586.geojson.gz",
+      "features": 943,
+      "bytes": 252450
+    },
+    "res/dry/W/141_587": {
+      "file": "avaPreview_issw_res_dry_W_141_587.geojson.gz",
+      "features": 1170,
+      "bytes": 397124
+    },
+    "res/dry/W/141_588": {
+      "file": "avaPreview_issw_res_dry_W_141_588.geojson.gz",
+      "features": 1082,
+      "bytes": 402578
+    },
+    "res/dry/W/141_589": {
+      "file": "avaPreview_issw_res_dry_W_141_589.geojson.gz",
+      "features": 108,
+      "bytes": 55703
+    },
+    "res/dry/W/142_585": {
+      "file": "avaPreview_issw_res_dry_W_142_585.geojson.gz",
+      "features": 1029,
+      "bytes": 276246
+    },
+    "res/dry/W/142_586": {
+      "file": "avaPreview_issw_res_dry_W_142_586.geojson.gz",
+      "features": 383,
+      "bytes": 93490
+    },
+    "res/dry/W/142_587": {
+      "file": "avaPreview_issw_res_dry_W_142_587.geojson.gz",
+      "features": 639,
+      "bytes": 156564
+    },
+    "res/dry/W/142_588": {
+      "file": "avaPreview_issw_res_dry_W_142_588.geojson.gz",
+      "features": 526,
+      "bytes": 131356
+    },
+    "res/dry/W/142_589": {
+      "file": "avaPreview_issw_res_dry_W_142_589.geojson.gz",
+      "features": 94,
+      "bytes": 40706
+    },
+    "res/dry/W/143_585": {
+      "file": "avaPreview_issw_res_dry_W_143_585.geojson.gz",
+      "features": 412,
+      "bytes": 87940
+    },
+    "res/dry/W/143_586": {
+      "file": "avaPreview_issw_res_dry_W_143_586.geojson.gz",
+      "features": 726,
+      "bytes": 146812
+    },
+    "res/dry/W/143_587": {
+      "file": "avaPreview_issw_res_dry_W_143_587.geojson.gz",
+      "features": 822,
+      "bytes": 168027
+    },
+    "res/dry/W/143_588": {
+      "file": "avaPreview_issw_res_dry_W_143_588.geojson.gz",
+      "features": 215,
+      "bytes": 37202
+    },
+    "res/dry/W/143_589": {
+      "file": "avaPreview_issw_res_dry_W_143_589.geojson.gz",
+      "features": 18,
+      "bytes": 2379
+    },
+    "res/dry/W/144_585": {
+      "file": "avaPreview_issw_res_dry_W_144_585.geojson.gz",
+      "features": 720,
+      "bytes": 186076
+    },
+    "res/dry/W/144_586": {
+      "file": "avaPreview_issw_res_dry_W_144_586.geojson.gz",
+      "features": 1272,
+      "bytes": 368907
+    },
+    "res/dry/W/144_587": {
+      "file": "avaPreview_issw_res_dry_W_144_587.geojson.gz",
+      "features": 1021,
+      "bytes": 238776
+    },
+    "res/dry/W/144_588": {
+      "file": "avaPreview_issw_res_dry_W_144_588.geojson.gz",
+      "features": 756,
+      "bytes": 218872
+    },
+    "res/dry/W/144_589": {
+      "file": "avaPreview_issw_res_dry_W_144_589.geojson.gz",
+      "features": 468,
+      "bytes": 88816
+    },
+    "res/dry/W/145_586": {
+      "file": "avaPreview_issw_res_dry_W_145_586.geojson.gz",
+      "features": 376,
+      "bytes": 82943
+    },
+    "res/dry/W/145_587": {
+      "file": "avaPreview_issw_res_dry_W_145_587.geojson.gz",
+      "features": 980,
+      "bytes": 248255
+    },
+    "res/dry/W/145_588": {
+      "file": "avaPreview_issw_res_dry_W_145_588.geojson.gz",
+      "features": 1110,
+      "bytes": 301355
+    },
+    "res/dry/W/145_589": {
+      "file": "avaPreview_issw_res_dry_W_145_589.geojson.gz",
+      "features": 405,
+      "bytes": 86863
+    },
+    "res/dry/W/146_586": {
+      "file": "avaPreview_issw_res_dry_W_146_586.geojson.gz",
+      "features": 119,
+      "bytes": 25059
+    },
+    "res/dry/W/146_587": {
+      "file": "avaPreview_issw_res_dry_W_146_587.geojson.gz",
+      "features": 380,
+      "bytes": 96476
+    },
+    "res/wet/N/138_587": {
+      "file": "avaPreview_issw_res_wet_N_138_587.geojson.gz",
+      "features": 163,
+      "bytes": 30104
+    },
+    "res/wet/N/138_588": {
+      "file": "avaPreview_issw_res_wet_N_138_588.geojson.gz",
+      "features": 56,
+      "bytes": 6328
+    },
+    "res/wet/N/139_586": {
+      "file": "avaPreview_issw_res_wet_N_139_586.geojson.gz",
+      "features": 76,
+      "bytes": 8614
+    },
+    "res/wet/N/139_587": {
+      "file": "avaPreview_issw_res_wet_N_139_587.geojson.gz",
+      "features": 1147,
+      "bytes": 277265
+    },
+    "res/wet/N/139_588": {
+      "file": "avaPreview_issw_res_wet_N_139_588.geojson.gz",
+      "features": 907,
+      "bytes": 186324
+    },
+    "res/wet/N/140_585": {
+      "file": "avaPreview_issw_res_wet_N_140_585.geojson.gz",
+      "features": 481,
+      "bytes": 70368
+    },
+    "res/wet/N/140_586": {
+      "file": "avaPreview_issw_res_wet_N_140_586.geojson.gz",
+      "features": 1432,
+      "bytes": 264117
+    },
+    "res/wet/N/140_587": {
+      "file": "avaPreview_issw_res_wet_N_140_587.geojson.gz",
+      "features": 1369,
+      "bytes": 356462
+    },
+    "res/wet/N/140_588": {
+      "file": "avaPreview_issw_res_wet_N_140_588.geojson.gz",
+      "features": 1097,
+      "bytes": 362095
+    },
+    "res/wet/N/140_589": {
+      "file": "avaPreview_issw_res_wet_N_140_589.geojson.gz",
+      "features": 22,
+      "bytes": 3623
+    },
+    "res/wet/N/141_585": {
+      "file": "avaPreview_issw_res_wet_N_141_585.geojson.gz",
+      "features": 460,
+      "bytes": 74480
+    },
+    "res/wet/N/141_586": {
+      "file": "avaPreview_issw_res_wet_N_141_586.geojson.gz",
+      "features": 931,
+      "bytes": 186653
+    },
+    "res/wet/N/141_587": {
+      "file": "avaPreview_issw_res_wet_N_141_587.geojson.gz",
+      "features": 1291,
+      "bytes": 333847
+    },
+    "res/wet/N/141_588": {
+      "file": "avaPreview_issw_res_wet_N_141_588.geojson.gz",
+      "features": 1189,
+      "bytes": 323774
+    },
+    "res/wet/N/141_589": {
+      "file": "avaPreview_issw_res_wet_N_141_589.geojson.gz",
+      "features": 128,
+      "bytes": 21712
+    },
+    "res/wet/N/142_585": {
+      "file": "avaPreview_issw_res_wet_N_142_585.geojson.gz",
+      "features": 1090,
+      "bytes": 234789
+    },
+    "res/wet/N/142_586": {
+      "file": "avaPreview_issw_res_wet_N_142_586.geojson.gz",
+      "features": 331,
+      "bytes": 71011
+    },
+    "res/wet/N/142_587": {
+      "file": "avaPreview_issw_res_wet_N_142_587.geojson.gz",
+      "features": 796,
+      "bytes": 166675
+    },
+    "res/wet/N/142_588": {
+      "file": "avaPreview_issw_res_wet_N_142_588.geojson.gz",
+      "features": 546,
+      "bytes": 109717
+    },
+    "res/wet/N/142_589": {
+      "file": "avaPreview_issw_res_wet_N_142_589.geojson.gz",
+      "features": 96,
+      "bytes": 19034
+    },
+    "res/wet/N/143_585": {
+      "file": "avaPreview_issw_res_wet_N_143_585.geojson.gz",
+      "features": 656,
+      "bytes": 120085
+    },
+    "res/wet/N/143_586": {
+      "file": "avaPreview_issw_res_wet_N_143_586.geojson.gz",
+      "features": 530,
+      "bytes": 117118
+    },
+    "res/wet/N/143_587": {
+      "file": "avaPreview_issw_res_wet_N_143_587.geojson.gz",
+      "features": 656,
+      "bytes": 112244
+    },
+    "res/wet/N/143_588": {
+      "file": "avaPreview_issw_res_wet_N_143_588.geojson.gz",
+      "features": 262,
+      "bytes": 42146
+    },
+    "res/wet/N/143_589": {
+      "file": "avaPreview_issw_res_wet_N_143_589.geojson.gz",
+      "features": 19,
+      "bytes": 2197
+    },
+    "res/wet/N/144_585": {
+      "file": "avaPreview_issw_res_wet_N_144_585.geojson.gz",
+      "features": 284,
+      "bytes": 48422
+    },
+    "res/wet/N/144_586": {
+      "file": "avaPreview_issw_res_wet_N_144_586.geojson.gz",
+      "features": 1157,
+      "bytes": 307213
+    },
+    "res/wet/N/144_587": {
+      "file": "avaPreview_issw_res_wet_N_144_587.geojson.gz",
+      "features": 1008,
+      "bytes": 227957
+    },
+    "res/wet/N/144_588": {
+      "file": "avaPreview_issw_res_wet_N_144_588.geojson.gz",
+      "features": 750,
+      "bytes": 171534
+    },
+    "res/wet/N/144_589": {
+      "file": "avaPreview_issw_res_wet_N_144_589.geojson.gz",
+      "features": 351,
+      "bytes": 44614
+    },
+    "res/wet/N/145_586": {
+      "file": "avaPreview_issw_res_wet_N_145_586.geojson.gz",
+      "features": 403,
+      "bytes": 90793
+    },
+    "res/wet/N/145_587": {
+      "file": "avaPreview_issw_res_wet_N_145_587.geojson.gz",
+      "features": 788,
+      "bytes": 186163
+    },
+    "res/wet/N/145_588": {
+      "file": "avaPreview_issw_res_wet_N_145_588.geojson.gz",
+      "features": 732,
+      "bytes": 174934
+    },
+    "res/wet/N/145_589": {
+      "file": "avaPreview_issw_res_wet_N_145_589.geojson.gz",
+      "features": 217,
+      "bytes": 41296
+    },
+    "res/wet/N/146_586": {
+      "file": "avaPreview_issw_res_wet_N_146_586.geojson.gz",
+      "features": 163,
+      "bytes": 34050
+    },
+    "res/wet/N/146_587": {
+      "file": "avaPreview_issw_res_wet_N_146_587.geojson.gz",
+      "features": 249,
+      "bytes": 57938
+    },
+    "res/wet/E/138_587": {
+      "file": "avaPreview_issw_res_wet_E_138_587.geojson.gz",
+      "features": 257,
+      "bytes": 45414
+    },
+    "res/wet/E/138_588": {
+      "file": "avaPreview_issw_res_wet_E_138_588.geojson.gz",
+      "features": 61,
+      "bytes": 7428
+    },
+    "res/wet/E/139_586": {
+      "file": "avaPreview_issw_res_wet_E_139_586.geojson.gz",
+      "features": 147,
+      "bytes": 20585
+    },
+    "res/wet/E/139_587": {
+      "file": "avaPreview_issw_res_wet_E_139_587.geojson.gz",
+      "features": 1258,
+      "bytes": 290584
+    },
+    "res/wet/E/139_588": {
+      "file": "avaPreview_issw_res_wet_E_139_588.geojson.gz",
+      "features": 1214,
+      "bytes": 234770
+    },
+    "res/wet/E/140_585": {
+      "file": "avaPreview_issw_res_wet_E_140_585.geojson.gz",
+      "features": 556,
+      "bytes": 104892
+    },
+    "res/wet/E/140_586": {
+      "file": "avaPreview_issw_res_wet_E_140_586.geojson.gz",
+      "features": 1693,
+      "bytes": 372492
+    },
+    "res/wet/E/140_587": {
+      "file": "avaPreview_issw_res_wet_E_140_587.geojson.gz",
+      "features": 1431,
+      "bytes": 347343
+    },
+    "res/wet/E/140_588": {
+      "file": "avaPreview_issw_res_wet_E_140_588.geojson.gz",
+      "features": 1518,
+      "bytes": 443393
+    },
+    "res/wet/E/140_589": {
+      "file": "avaPreview_issw_res_wet_E_140_589.geojson.gz",
+      "features": 347,
+      "bytes": 101778
+    },
+    "res/wet/E/141_585": {
+      "file": "avaPreview_issw_res_wet_E_141_585.geojson.gz",
+      "features": 353,
+      "bytes": 82707
+    },
+    "res/wet/E/141_586": {
+      "file": "avaPreview_issw_res_wet_E_141_586.geojson.gz",
+      "features": 944,
+      "bytes": 192279
+    },
+    "res/wet/E/141_587": {
+      "file": "avaPreview_issw_res_wet_E_141_587.geojson.gz",
+      "features": 1648,
+      "bytes": 422521
+    },
+    "res/wet/E/141_588": {
+      "file": "avaPreview_issw_res_wet_E_141_588.geojson.gz",
+      "features": 1180,
+      "bytes": 333248
+    },
+    "res/wet/E/141_589": {
+      "file": "avaPreview_issw_res_wet_E_141_589.geojson.gz",
+      "features": 377,
+      "bytes": 86676
+    },
+    "res/wet/E/142_585": {
+      "file": "avaPreview_issw_res_wet_E_142_585.geojson.gz",
+      "features": 856,
+      "bytes": 188802
+    },
+    "res/wet/E/142_586": {
+      "file": "avaPreview_issw_res_wet_E_142_586.geojson.gz",
+      "features": 251,
+      "bytes": 50502
+    },
+    "res/wet/E/142_587": {
+      "file": "avaPreview_issw_res_wet_E_142_587.geojson.gz",
+      "features": 1151,
+      "bytes": 295994
+    },
+    "res/wet/E/142_588": {
+      "file": "avaPreview_issw_res_wet_E_142_588.geojson.gz",
+      "features": 702,
+      "bytes": 175917
+    },
+    "res/wet/E/142_589": {
+      "file": "avaPreview_issw_res_wet_E_142_589.geojson.gz",
+      "features": 28,
+      "bytes": 3829
+    },
+    "res/wet/E/143_585": {
+      "file": "avaPreview_issw_res_wet_E_143_585.geojson.gz",
+      "features": 608,
+      "bytes": 100296
+    },
+    "res/wet/E/143_586": {
+      "file": "avaPreview_issw_res_wet_E_143_586.geojson.gz",
+      "features": 336,
+      "bytes": 78210
+    },
+    "res/wet/E/143_587": {
+      "file": "avaPreview_issw_res_wet_E_143_587.geojson.gz",
+      "features": 655,
+      "bytes": 109007
+    },
+    "res/wet/E/143_588": {
+      "file": "avaPreview_issw_res_wet_E_143_588.geojson.gz",
+      "features": 151,
+      "bytes": 17653
+    },
+    "res/wet/E/143_589": {
+      "file": "avaPreview_issw_res_wet_E_143_589.geojson.gz",
+      "features": 64,
+      "bytes": 7695
+    },
+    "res/wet/E/144_585": {
+      "file": "avaPreview_issw_res_wet_E_144_585.geojson.gz",
+      "features": 258,
+      "bytes": 47257
+    },
+    "res/wet/E/144_586": {
+      "file": "avaPreview_issw_res_wet_E_144_586.geojson.gz",
+      "features": 622,
+      "bytes": 137995
+    },
+    "res/wet/E/144_587": {
+      "file": "avaPreview_issw_res_wet_E_144_587.geojson.gz",
+      "features": 875,
+      "bytes": 175163
+    },
+    "res/wet/E/144_588": {
+      "file": "avaPreview_issw_res_wet_E_144_588.geojson.gz",
+      "features": 931,
+      "bytes": 237164
+    },
+    "res/wet/E/144_589": {
+      "file": "avaPreview_issw_res_wet_E_144_589.geojson.gz",
+      "features": 427,
+      "bytes": 71020
+    },
+    "res/wet/E/145_586": {
+      "file": "avaPreview_issw_res_wet_E_145_586.geojson.gz",
+      "features": 127,
+      "bytes": 24775
+    },
+    "res/wet/E/145_587": {
+      "file": "avaPreview_issw_res_wet_E_145_587.geojson.gz",
+      "features": 449,
+      "bytes": 94955
+    },
+    "res/wet/E/145_588": {
+      "file": "avaPreview_issw_res_wet_E_145_588.geojson.gz",
+      "features": 310,
+      "bytes": 64556
+    },
+    "res/wet/E/145_589": {
+      "file": "avaPreview_issw_res_wet_E_145_589.geojson.gz",
+      "features": 146,
+      "bytes": 31922
+    },
+    "res/wet/E/146_586": {
+      "file": "avaPreview_issw_res_wet_E_146_586.geojson.gz",
+      "features": 3,
+      "bytes": 820
+    },
+    "res/wet/E/146_587": {
+      "file": "avaPreview_issw_res_wet_E_146_587.geojson.gz",
+      "features": 103,
+      "bytes": 16199
+    },
+    "res/wet/S/138_587": {
+      "file": "avaPreview_issw_res_wet_S_138_587.geojson.gz",
+      "features": 154,
+      "bytes": 33480
+    },
+    "res/wet/S/138_588": {
+      "file": "avaPreview_issw_res_wet_S_138_588.geojson.gz",
+      "features": 53,
+      "bytes": 6688
+    },
+    "res/wet/S/139_586": {
+      "file": "avaPreview_issw_res_wet_S_139_586.geojson.gz",
+      "features": 52,
+      "bytes": 6884
+    },
+    "res/wet/S/139_587": {
+      "file": "avaPreview_issw_res_wet_S_139_587.geojson.gz",
+      "features": 1183,
+      "bytes": 312804
+    },
+    "res/wet/S/139_588": {
+      "file": "avaPreview_issw_res_wet_S_139_588.geojson.gz",
+      "features": 771,
+      "bytes": 181181
+    },
+    "res/wet/S/140_585": {
+      "file": "avaPreview_issw_res_wet_S_140_585.geojson.gz",
+      "features": 416,
+      "bytes": 117817
+    },
+    "res/wet/S/140_586": {
+      "file": "avaPreview_issw_res_wet_S_140_586.geojson.gz",
+      "features": 1401,
+      "bytes": 329760
+    },
+    "res/wet/S/140_587": {
+      "file": "avaPreview_issw_res_wet_S_140_587.geojson.gz",
+      "features": 980,
+      "bytes": 240638
+    },
+    "res/wet/S/140_588": {
+      "file": "avaPreview_issw_res_wet_S_140_588.geojson.gz",
+      "features": 1148,
+      "bytes": 358842
+    },
+    "res/wet/S/140_589": {
+      "file": "avaPreview_issw_res_wet_S_140_589.geojson.gz",
+      "features": 463,
+      "bytes": 148267
+    },
+    "res/wet/S/141_585": {
+      "file": "avaPreview_issw_res_wet_S_141_585.geojson.gz",
+      "features": 452,
+      "bytes": 133365
+    },
+    "res/wet/S/141_586": {
+      "file": "avaPreview_issw_res_wet_S_141_586.geojson.gz",
+      "features": 1005,
+      "bytes": 297742
+    },
+    "res/wet/S/141_587": {
+      "file": "avaPreview_issw_res_wet_S_141_587.geojson.gz",
+      "features": 1576,
+      "bytes": 394863
+    },
+    "res/wet/S/141_588": {
+      "file": "avaPreview_issw_res_wet_S_141_588.geojson.gz",
+      "features": 844,
+      "bytes": 207351
+    },
+    "res/wet/S/141_589": {
+      "file": "avaPreview_issw_res_wet_S_141_589.geojson.gz",
+      "features": 373,
+      "bytes": 92563
+    },
+    "res/wet/S/142_585": {
+      "file": "avaPreview_issw_res_wet_S_142_585.geojson.gz",
+      "features": 520,
+      "bytes": 101572
+    },
+    "res/wet/S/142_586": {
+      "file": "avaPreview_issw_res_wet_S_142_586.geojson.gz",
+      "features": 507,
+      "bytes": 116044
+    },
+    "res/wet/S/142_587": {
+      "file": "avaPreview_issw_res_wet_S_142_587.geojson.gz",
+      "features": 889,
+      "bytes": 196003
+    },
+    "res/wet/S/142_588": {
+      "file": "avaPreview_issw_res_wet_S_142_588.geojson.gz",
+      "features": 692,
+      "bytes": 156197
+    },
+    "res/wet/S/142_589": {
+      "file": "avaPreview_issw_res_wet_S_142_589.geojson.gz",
+      "features": 51,
+      "bytes": 12835
+    },
+    "res/wet/S/143_585": {
+      "file": "avaPreview_issw_res_wet_S_143_585.geojson.gz",
+      "features": 412,
+      "bytes": 73785
+    },
+    "res/wet/S/143_586": {
+      "file": "avaPreview_issw_res_wet_S_143_586.geojson.gz",
+      "features": 669,
+      "bytes": 147775
+    },
+    "res/wet/S/143_587": {
+      "file": "avaPreview_issw_res_wet_S_143_587.geojson.gz",
+      "features": 684,
+      "bytes": 129377
+    },
+    "res/wet/S/143_588": {
+      "file": "avaPreview_issw_res_wet_S_143_588.geojson.gz",
+      "features": 141,
+      "bytes": 18965
+    },
+    "res/wet/S/143_589": {
+      "file": "avaPreview_issw_res_wet_S_143_589.geojson.gz",
+      "features": 175,
+      "bytes": 21188
+    },
+    "res/wet/S/144_585": {
+      "file": "avaPreview_issw_res_wet_S_144_585.geojson.gz",
+      "features": 678,
+      "bytes": 162199
+    },
+    "res/wet/S/144_586": {
+      "file": "avaPreview_issw_res_wet_S_144_586.geojson.gz",
+      "features": 856,
+      "bytes": 220609
+    },
+    "res/wet/S/144_587": {
+      "file": "avaPreview_issw_res_wet_S_144_587.geojson.gz",
+      "features": 1185,
+      "bytes": 250800
+    },
+    "res/wet/S/144_588": {
+      "file": "avaPreview_issw_res_wet_S_144_588.geojson.gz",
+      "features": 1168,
+      "bytes": 316654
+    },
+    "res/wet/S/144_589": {
+      "file": "avaPreview_issw_res_wet_S_144_589.geojson.gz",
+      "features": 804,
+      "bytes": 151385
+    },
+    "res/wet/S/145_586": {
+      "file": "avaPreview_issw_res_wet_S_145_586.geojson.gz",
+      "features": 136,
+      "bytes": 24577
+    },
+    "res/wet/S/145_587": {
+      "file": "avaPreview_issw_res_wet_S_145_587.geojson.gz",
+      "features": 1024,
+      "bytes": 198896
+    },
+    "res/wet/S/145_588": {
+      "file": "avaPreview_issw_res_wet_S_145_588.geojson.gz",
+      "features": 657,
+      "bytes": 172133
+    },
+    "res/wet/S/145_589": {
+      "file": "avaPreview_issw_res_wet_S_145_589.geojson.gz",
+      "features": 350,
+      "bytes": 69912
+    },
+    "res/wet/S/146_586": {
+      "file": "avaPreview_issw_res_wet_S_146_586.geojson.gz",
+      "features": 10,
+      "bytes": 2240
+    },
+    "res/wet/S/146_587": {
+      "file": "avaPreview_issw_res_wet_S_146_587.geojson.gz",
+      "features": 512,
+      "bytes": 115566
+    },
+    "res/wet/W/138_587": {
+      "file": "avaPreview_issw_res_wet_W_138_587.geojson.gz",
+      "features": 46,
+      "bytes": 6893
+    },
+    "res/wet/W/138_588": {
+      "file": "avaPreview_issw_res_wet_W_138_588.geojson.gz",
+      "features": 62,
+      "bytes": 9735
+    },
+    "res/wet/W/139_586": {
+      "file": "avaPreview_issw_res_wet_W_139_586.geojson.gz",
+      "features": 21,
+      "bytes": 2810
+    },
+    "res/wet/W/139_587": {
+      "file": "avaPreview_issw_res_wet_W_139_587.geojson.gz",
+      "features": 856,
+      "bytes": 215681
+    },
+    "res/wet/W/139_588": {
+      "file": "avaPreview_issw_res_wet_W_139_588.geojson.gz",
+      "features": 559,
+      "bytes": 108834
+    },
+    "res/wet/W/140_585": {
+      "file": "avaPreview_issw_res_wet_W_140_585.geojson.gz",
+      "features": 194,
+      "bytes": 42746
+    },
+    "res/wet/W/140_586": {
+      "file": "avaPreview_issw_res_wet_W_140_586.geojson.gz",
+      "features": 1052,
+      "bytes": 216044
+    },
+    "res/wet/W/140_587": {
+      "file": "avaPreview_issw_res_wet_W_140_587.geojson.gz",
+      "features": 1144,
+      "bytes": 352173
+    },
+    "res/wet/W/140_588": {
+      "file": "avaPreview_issw_res_wet_W_140_588.geojson.gz",
+      "features": 965,
+      "bytes": 311537
+    },
+    "res/wet/W/140_589": {
+      "file": "avaPreview_issw_res_wet_W_140_589.geojson.gz",
+      "features": 161,
+      "bytes": 44702
+    },
+    "res/wet/W/141_585": {
+      "file": "avaPreview_issw_res_wet_W_141_585.geojson.gz",
+      "features": 226,
+      "bytes": 40480
+    },
+    "res/wet/W/141_586": {
+      "file": "avaPreview_issw_res_wet_W_141_586.geojson.gz",
+      "features": 944,
+      "bytes": 214588
+    },
+    "res/wet/W/141_587": {
+      "file": "avaPreview_issw_res_wet_W_141_587.geojson.gz",
+      "features": 1163,
+      "bytes": 323682
+    },
+    "res/wet/W/141_588": {
+      "file": "avaPreview_issw_res_wet_W_141_588.geojson.gz",
+      "features": 1072,
+      "bytes": 334946
+    },
+    "res/wet/W/141_589": {
+      "file": "avaPreview_issw_res_wet_W_141_589.geojson.gz",
+      "features": 95,
+      "bytes": 32735
+    },
+    "res/wet/W/142_585": {
+      "file": "avaPreview_issw_res_wet_W_142_585.geojson.gz",
+      "features": 1018,
+      "bytes": 245318
+    },
+    "res/wet/W/142_586": {
+      "file": "avaPreview_issw_res_wet_W_142_586.geojson.gz",
+      "features": 377,
+      "bytes": 81339
+    },
+    "res/wet/W/142_587": {
+      "file": "avaPreview_issw_res_wet_W_142_587.geojson.gz",
+      "features": 641,
+      "bytes": 145218
+    },
+    "res/wet/W/142_588": {
+      "file": "avaPreview_issw_res_wet_W_142_588.geojson.gz",
+      "features": 521,
+      "bytes": 116072
+    },
+    "res/wet/W/142_589": {
+      "file": "avaPreview_issw_res_wet_W_142_589.geojson.gz",
+      "features": 98,
+      "bytes": 36664
+    },
+    "res/wet/W/143_585": {
+      "file": "avaPreview_issw_res_wet_W_143_585.geojson.gz",
+      "features": 406,
+      "bytes": 79416
+    },
+    "res/wet/W/143_586": {
+      "file": "avaPreview_issw_res_wet_W_143_586.geojson.gz",
+      "features": 726,
+      "bytes": 134963
+    },
+    "res/wet/W/143_587": {
+      "file": "avaPreview_issw_res_wet_W_143_587.geojson.gz",
+      "features": 822,
+      "bytes": 158319
+    },
+    "res/wet/W/143_588": {
+      "file": "avaPreview_issw_res_wet_W_143_588.geojson.gz",
+      "features": 212,
+      "bytes": 31056
+    },
+    "res/wet/W/143_589": {
+      "file": "avaPreview_issw_res_wet_W_143_589.geojson.gz",
+      "features": 18,
+      "bytes": 2276
+    },
+    "res/wet/W/144_585": {
+      "file": "avaPreview_issw_res_wet_W_144_585.geojson.gz",
+      "features": 720,
+      "bytes": 165730
+    },
+    "res/wet/W/144_586": {
+      "file": "avaPreview_issw_res_wet_W_144_586.geojson.gz",
+      "features": 1265,
+      "bytes": 317331
+    },
+    "res/wet/W/144_587": {
+      "file": "avaPreview_issw_res_wet_W_144_587.geojson.gz",
+      "features": 1010,
+      "bytes": 207869
+    },
+    "res/wet/W/144_588": {
+      "file": "avaPreview_issw_res_wet_W_144_588.geojson.gz",
+      "features": 747,
+      "bytes": 183791
+    },
+    "res/wet/W/144_589": {
+      "file": "avaPreview_issw_res_wet_W_144_589.geojson.gz",
+      "features": 456,
+      "bytes": 81560
+    },
+    "res/wet/W/145_586": {
+      "file": "avaPreview_issw_res_wet_W_145_586.geojson.gz",
+      "features": 372,
+      "bytes": 75867
+    },
+    "res/wet/W/145_587": {
+      "file": "avaPreview_issw_res_wet_W_145_587.geojson.gz",
+      "features": 975,
+      "bytes": 212505
+    },
+    "res/wet/W/145_588": {
+      "file": "avaPreview_issw_res_wet_W_145_588.geojson.gz",
+      "features": 1100,
+      "bytes": 260019
+    },
+    "res/wet/W/145_589": {
+      "file": "avaPreview_issw_res_wet_W_145_589.geojson.gz",
+      "features": 401,
+      "bytes": 78521
+    },
+    "res/wet/W/146_586": {
+      "file": "avaPreview_issw_res_wet_W_146_586.geojson.gz",
+      "features": 121,
+      "bytes": 22028
+    },
+    "res/wet/W/146_587": {
+      "file": "avaPreview_issw_res_wet_W_146_587.geojson.gz",
+      "features": 377,
+      "bytes": 83082
+    }
+  }
+}

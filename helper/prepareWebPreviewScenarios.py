@@ -4,12 +4,15 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
+import shutil
 from functools import reduce
 from operator import or_
 from pathlib import Path
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 
 DEFAULT_INPUT = Path(r"D:\Cairos\ModelChainResults\Euregio\cairosAvaMaps\13_avaScenMaps\pilotBrenner")
@@ -65,15 +68,36 @@ def prepare_geometry(
     return data.to_crs("EPSG:4326")
 
 
-def write_geojson(data: gpd.GeoDataFrame, path: Path, overwrite: bool) -> None:
-    if path.exists() and not overwrite:
-        raise FileExistsError(f"Output exists (pass --overwrite): {path}")
+def write_geojson_gz(data: gpd.GeoDataFrame, path: Path, overwrite: bool) -> Path:
+    """Write GeoJSON gzip-compressed to <path>.gz; the plain GeoJSON never
+    touches disk as a final artifact, so docs/data only ever holds the
+    compressed shard actually served to the browser."""
+    gz_path = path.with_name(path.name + ".gz")
+    if gz_path.exists() and not overwrite:
+        raise FileExistsError(f"Output exists (pass --overwrite): {gz_path}")
     temp = path.with_name(path.name + ".tmp.geojson")
     try:
-        data.to_file(temp, driver="GeoJSON", index=False, coordinate_precision=6)
-        temp.replace(path)
+        data.to_file(temp, driver="GeoJSON", index=False, coordinate_precision=5)
+        temp_gz = gz_path.with_name(gz_path.name + ".tmp")
+        with open(temp, "rb") as src, gzip.open(temp_gz, "wb", compresslevel=9) as dst:
+            shutil.copyfileobj(src, dst)
+        temp_gz.replace(gz_path)
     finally:
         temp.unlink(missing_ok=True)
+    return gz_path
+
+
+def assign_tiles(data: gpd.GeoDataFrame, tile_size_deg: float) -> gpd.GeoDataFrame:
+    """Tag each feature with the (col, row) of a fixed, origin-(0,0) lon/lat
+    grid cell it falls in, so tile IDs stay stable across regenerations.
+    Uses representative_point (guaranteed inside the geometry, unlike
+    centroid) purely to pick a cell — features aren't clipped to it, so the
+    client pads its viewport query to cover features near a tile edge."""
+    point = data.geometry.representative_point()
+    data = data.copy()
+    data["tileCol"] = np.floor(point.x / tile_size_deg).astype("int32")
+    data["tileRow"] = np.floor(point.y / tile_size_deg).astype("int32")
+    return data
 
 
 def deduplicate_res(data: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -101,6 +125,10 @@ def parse_args() -> argparse.Namespace:
         "--lk-gebiet-ids",
         default=",".join(map(str, DEFAULT_LK_GEBIET_IDS)),
         help="Comma-separated LKGebietID values included in the preview",
+    )
+    parser.add_argument(
+        "--tile-size-deg", type=float, default=0.08,
+        help="Spatial grid cell size (degrees) shards are additionally split by",
     )
     parser.add_argument("--overwrite", action="store_true")
     return parser.parse_args()
@@ -134,21 +162,27 @@ def main() -> None:
     print(f"Deduplicated RES: {sum(source_counts.values()):,} -> {len(res):,} features")
     res = prepare_geometry(res, args.simplify_metres, args.smooth_metres)
 
+    rel = assign_tiles(rel, args.tile_size_deg)
+    res = assign_tiles(res, args.tile_size_deg)
+
     manifest = {
         "source": str(args.input), "simplifyMetres": args.simplify_metres,
         "smoothMetres": args.smooth_metres,
         "crs": "EPSG:4326", "lkGebietIDs": list(lk_gebiet_ids), "relFeatures": len(rel),
         "resSourceFeatures": source_counts, "resUniqueFeatures": len(res),
-        "sizeMask": {str(size): 1 << (size - 1) for size in range(1, 6)}, "shards": {},
+        "sizeMask": {str(size): 1 << (size - 1) for size in range(1, 6)},
+        "grid": {"originLat": 0, "originLon": 0, "cellSizeDeg": args.tile_size_deg},
+        "shards": {},
     }
     for mod_type, dataset in (("rel", rel), ("res", res)):
-        for (flow, sector), shard in dataset.groupby(["flow", "sector"], sort=True):
-            name = f"avaPreview_issw_{mod_type}_{flow}_{sector}.geojson"
+        groups = dataset.groupby(["flow", "sector", "tileCol", "tileRow"], sort=True)
+        for (flow, sector, tile_col, tile_row), shard in groups:
+            name = f"avaPreview_issw_{mod_type}_{flow}_{sector}_{tile_col}_{tile_row}.geojson"
             path = args.output / name
-            print(f"Writing {name}: {len(shard):,} features")
-            write_geojson(shard, path, args.overwrite)
-            manifest["shards"][f"{mod_type}/{flow}/{sector}"] = {
-                "file": name, "features": len(shard), "bytes": path.stat().st_size,
+            print(f"Writing {name}.gz: {len(shard):,} features")
+            gz_path = write_geojson_gz(shard.drop(columns=["tileCol", "tileRow"]), path, args.overwrite)
+            manifest["shards"][f"{mod_type}/{flow}/{sector}/{tile_col}_{tile_row}"] = {
+                "file": gz_path.name, "features": len(shard), "bytes": gz_path.stat().st_size,
             }
     manifest_path = args.output / "avaPreview_issw_manifest.json"
     if manifest_path.exists() and not args.overwrite:

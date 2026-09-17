@@ -4,6 +4,17 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"/>
 <title>Avalanche Scenario Mapper — mobile preview</title>
+<!-- True edge-to-edge (nothing drawn by Safari on top of the page at all)
+     only happens when this is added to the Home Screen and launched from
+     there — a normal Safari tab always keeps its own status bar and URL
+     bar, which a page can't render behind. These make the standalone
+     launch full-screen and let content extend under the notch/home
+     indicator, with safe-area-inset-* (already used below) keeping the
+     actual UI clear of those cutouts. -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#101418"/>
 
 <!-- Leaflet: bundled locally (vendor/), CDN only as fallback -->
 <link rel="stylesheet" href="vendor/leaflet.css"/>
@@ -55,13 +66,16 @@
 }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;height:100%;overscroll-behavior:none}
+/* 100dvh (not 100% / 100vh) so the page actually fills whatever space
+   Safari's auto-hiding URL bar currently isn't using, instead of being
+   sized once for whichever state it was in on load. */
+html,body{margin:0;padding:0;height:100%;height:100dvh;overscroll-behavior:none}
 body{
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   color:var(--ink);background:#dfe4e7;
   font-size:14px;line-height:1.35;
 }
-#map{position:fixed;inset:0;z-index:0}
+#map{position:fixed;inset:0;height:100dvh;z-index:0}
 .leaflet-control-zoom{display:none!important}
 .leaflet-control-attribution{font-size:9px;opacity:.65;margin-bottom:2px}
 .leaflet-control-scale{margin-bottom:6px}
@@ -150,6 +164,7 @@ body{
   color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums
 }
 .hint{font-size:11px;color:var(--ink-3);margin-top:8px}
+.label.section{color:var(--albina-blue-dark);font-size:11px;font-weight:700}
 
 /* segmented control */
 .seg{display:flex;background:var(--surface-2);border-radius:var(--r-md);padding:3px;gap:3px}
@@ -177,6 +192,7 @@ body{
 .rose{width:132px;height:132px;display:block;touch-action:manipulation}
 .rose polygon{cursor:pointer;transition:fill .12s ease}
 .rose text{pointer-events:none;font-family:inherit;font-weight:600}
+#btn-base{display:none}
 
 /* dual range */
 .range{position:relative;height:34px;margin-top:2px}
@@ -184,6 +200,10 @@ body{
   position:absolute;top:15px;left:0;right:0;height:4px;border-radius:2px;background:var(--line)
 }
 .range .fill{position:absolute;top:15px;height:4px;border-radius:2px;background:var(--ink)}
+/* rainbow variant: the track itself carries the size-class colour scale, so a
+   separate legend gradient bar isn't needed — only the thumb position matters */
+.range.rainbow .track{top:12px;height:10px;border-radius:5px;background:linear-gradient(to right,#0096ff,#00ff00,#ffd500,#ff0000,#aa00ff)}
+.range.rainbow .fill{display:none}
 .range input[type=range]{
   position:absolute;top:0;left:0;width:100%;height:34px;margin:0;
   -webkit-appearance:none;appearance:none;background:transparent;pointer-events:none
@@ -210,8 +230,22 @@ body{
 .chip .sw{width:14px;height:14px;border-radius:4px;display:inline-block}
 
 /* size scale */
-.sizebar{height:10px;border-radius:5px;background:linear-gradient(to right,#09a2ff,#66ff31,#fff300,#ff0000,#5b0069)}
-.sizelabels{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-3);margin-top:4px}
+.size-pictograms{display:none;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:8px}
+.size-pictograms.on{display:grid}
+.size-pictograms span{height:30px;display:grid;place-items:center}
+.size-pictograms img{width:28px;height:28px}
+/* value row under a 5-icon grid — same column grid as .size-pictograms so
+   each value lines up under its icon, unlike .ticks' flex space-between */
+.picto-ticks{display:none;grid-template-columns:repeat(5,1fr);margin-top:2px;
+  font-size:9px;color:var(--ink-3);text-align:center;font-variant-numeric:tabular-nums}
+.picto-ticks.on{display:grid}
+/* colour key linking each pictogram to its size-class colour, always shown */
+.picto-ticks.size-key{display:grid;gap:3px;margin-top:0;margin-bottom:4px}
+.picto-ticks.size-key span{border-radius:6px;padding:3px 0;font-weight:700;font-size:9px}
+.runout-arrow{display:none;align-items:center;gap:8px;margin-top:8px;color:#3c5d73;font-size:10px;
+  border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface-2);padding:8px 12px}
+.runout-arrow.on{display:flex}
+.runout-arrow img{flex:1;height:20px}
 
 /* popup */
 .leaflet-popup-content-wrapper{border-radius:var(--r-md);box-shadow:0 6px 24px rgba(16,20,24,.22)}
@@ -221,11 +255,6 @@ body{
 .pop td{padding:2px 0;vertical-align:top}
 .pop td:first-child{color:var(--ink-3);padding-right:10px;white-space:nowrap}
 .pop td:last-child{font-variant-numeric:tabular-nums}
-
-#banner{
-  position:fixed;z-index:400;left:0;right:0;top:0;display:flex;justify-content:center;pointer-events:none
-}
-#banner img{width:100%;max-width:760px;opacity:.9}
 
 @media (min-width:820px){
   #sheet{left:auto;right:14px;bottom:14px;width:400px;height:min(760px,88dvh);border-radius:var(--r-lg)}
@@ -239,7 +268,6 @@ body{
 <body>
 
 <div id="map"></div>
-<div id="banner"><img id="banner-img" alt="" hidden/></div>
 
 <!-- ------------------------------------------------------------- loader -->
 <div id="loader">
@@ -254,7 +282,7 @@ body{
 <div id="topbar">
   <div class="card" id="status">
     <div class="eyebrow" id="st-eyebrow">Scenario</div>
-    <div class="headline" id="st-title">Winter · new snow</div>
+    <div class="headline" id="st-title">Dry Winter</div>
     <div class="sub" id="st-sub">— paths shown</div>
   </div>
   <div class="topstack">
@@ -280,34 +308,26 @@ body{
     <div class="block">
       <div class="label">Preset</div>
       <div class="seg" id="seg-preset">
-        <button data-preset="winter" class="on"><i class="ph ph-snowflake"></i>Winter</button>
-        <button data-preset="spring"><i class="ph ph-drop"></i>Spring</button>
+        <button data-preset="dry" class="on"><i class="ph ph-snowflake"></i>Dry Winter</button>
+        <button data-preset="wet"><i class="ph ph-drop"></i>Wet Spring</button>
         <button data-preset="custom"><i class="ph ph-sliders-horizontal"></i>Custom</button>
       </div>
-      <div class="hint" id="preset-hint">Config scenarios from <code>avaScenMapperCfg.ini</code>. Change anything below to build your own.</div>
     </div>
 
-    <!-- 2 — avalanche problem ------------------------------------------- -->
+    <!-- 2 — spatial constraints ----------------------------------------- -->
     <div class="block">
-      <div class="label">Avalanche problem <span class="val" id="v-problem">New snow</span></div>
-      <div class="problems" id="problems"></div>
-      <div class="problems optional" id="problems-opt"></div>
-      <div class="hint">Problem sets the flow regime used for filtering: dry (new snow, wind slab, PWL, cornices) or wet (wet snow, gliding snow).</div>
-    </div>
-
-    <!-- 3 — release area ------------------------------------------------- -->
-    <div class="block">
-      <div class="label">Release area <span class="val" id="v-release">All aspects</span></div>
+      <div class="label section">Spatial Constraints</div>
+      <div class="label" style="margin-bottom:6px">Release area</div>
       <div class="release">
         <svg class="rose" id="rose" viewBox="0 0 600 600" aria-label="Aspects"></svg>
         <div>
-          <div class="label" style="margin-bottom:2px">Elevation <span class="val" id="v-elev">1800–5000 m</span></div>
+          <div class="label" style="margin-bottom:2px">Mean elevation <span class="val" id="v-elev">800–8848 m</span></div>
           <div class="range" id="elev-range">
             <div class="track"></div><div class="fill" id="elev-fill"></div>
-            <input type="range" id="elev-lo" min="1400" max="3200" step="100" value="1800"/>
-            <input type="range" id="elev-hi" min="1400" max="3200" step="100" value="3200"/>
+            <input type="range" id="elev-lo" min="800" max="3500" step="100" value="800"/>
+            <input type="range" id="elev-hi" min="800" max="3500" step="100" value="3500"/>
           </div>
-          <div class="ticks"><span>1400</span><span>2300</span><span>3200 m</span></div>
+          <div class="ticks"><span>800</span><span>2200</span><span>3500 m</span></div>
           <div class="row" style="margin-top:6px">
             <button class="chip" id="chip-treeline"><i class="ph ph-tree-evergreen"></i>Above treeline</button>
           </div>
@@ -315,41 +335,103 @@ body{
       </div>
     </div>
 
-    <!-- 4 — expected size ------------------------------------------------ -->
+    <!-- 3 — avalanche constraints --------------------------------------- -->
     <div class="block">
-      <div class="label">Max. expected size (PEM) <span class="val" id="v-size">4 — very large</span></div>
-      <div class="range single" id="size-range">
+      <div class="label section">Avalanche Constraints</div>
+      <div class="label">Flow regime <span class="val" id="v-flow">Dry</span></div>
+      <div class="seg" id="seg-flow">
+        <button data-flow="dry" class="on">Cold</button>
+        <button data-flow="wet">Warm</button>
+      </div>
+      <div class="label" style="margin:14px 0 2px">Avalanche size scenario <span class="val" id="v-size">4 — very large</span></div>
+      <div class="range single rainbow" id="size-range">
         <div class="track"></div><div class="fill" id="size-fill"></div>
         <input type="range" id="size" min="1" max="5" step="1" value="5"/>
       </div>
       <div class="ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
-      <div class="hint">EAWS avalanche size. Shows all modelled events up to the selected size.</div>
+      <div class="hint">Size 1 shows release areas only. Sizes 2–5 use the mapper's very-high-potential size matrix.</div>
     </div>
 
-    <!-- 5 — display ------------------------------------------------------ -->
+    <!-- 4 — display ------------------------------------------------------ -->
     <div class="block">
       <div class="label">Display</div>
       <div class="row">
         <button class="chip on" id="chip-rel"><span class="sw" style="background:var(--rel)"></span>Release</button>
         <button class="chip" id="chip-res"><span class="sw" style="background:var(--res)"></span>Runout</button>
-        <button class="chip" id="chip-size"><i class="ph ph-palette"></i>Size colour</button>
       </div>
-      <div class="label" style="margin:14px 0 2px">Transparency <span class="val" id="v-alpha">30 %</span></div>
+      <div class="label" style="margin:14px 0 2px">Set avalanche transparency <span class="val" id="v-alpha">30 %</span></div>
       <div class="range single" id="alpha-range">
         <div class="track"></div><div class="fill" id="alpha-fill"></div>
         <input type="range" id="alpha" min="5" max="85" step="5" value="30"/>
       </div>
       <div class="row" style="margin-top:10px">
-        <button class="chip on" id="chip-micro"><i class="ph ph-polygon"></i>Warning regions</button>
-        <button class="chip" id="chip-hill"><i class="ph ph-mountains"></i>Hillshade</button>
+        <button class="chip on" id="chip-hill"><i class="ph ph-mountains"></i>Hillshade</button>
+      </div>
+      <div class="label" style="margin:14px 0 2px">Set basemap transparency <span class="val" id="v-base-alpha">50 %</span></div>
+      <div class="range single" id="base-alpha-range">
+        <div class="track"></div><div class="fill" id="base-alpha-fill"></div>
+        <input type="range" id="base-alpha" min="10" max="100" step="5" value="50"/>
       </div>
     </div>
 
-    <!-- 6 — legend -------------------------------------------------------- -->
+    <!-- 5 — single size mapping ----------------------------------------- -->
     <div class="block">
-      <div class="label">Release volume size class</div>
-      <div class="sizebar"></div>
-      <div class="sizelabels"><span>1 · ~1 truck</span><span>3 · ~100</span><span>5 · ~10 000</span></div>
+      <div class="label">Single Size Mapping</div>
+      <button class="chip" id="chip-release-dimension"><i class="ph ph-palette"></i>Release Dimension</button>
+      <div class="hint">Shows release areas only, coloured by release dimension.</div>
+    </div>
+
+    <!-- 6 — spatial size mapping ---------------------------------------- -->
+    <div class="block">
+      <div class="label">Spatial Size Mapping</div>
+      <div class="row">
+        <button class="chip" id="chip-destructive"><i class="ph ph-warning"></i>Destructive</button>
+        <button class="chip" id="chip-runout-raster"><i class="ph ph-arrows-left-right"></i>Runout</button>
+      </div>
+      <div class="hint">Only available for the Dry Winter and Wet Spring scenarios within the pilot-region extent.</div>
+    </div>
+
+    <!-- 7 — legend -------------------------------------------------------- -->
+    <div class="block">
+      <div class="label section">Avalanche Size Criteria</div>
+      <div class="picto-ticks size-key" aria-hidden="true">
+        <span style="background:#09a2ff;color:#fff">Size 1</span>
+        <span style="background:#66ff31;color:#101418">Size 2</span>
+        <span style="background:#fff300;color:#101418">Size 3</span>
+        <span style="background:#ff0000;color:#fff">Size 4</span>
+        <span style="background:#5b0069;color:#fff">Size 5</span>
+      </div>
+
+      <div class="label" style="margin-top:12px">Dimension Size <span class="val">Volume [m³]</span></div>
+      <div class="size-pictograms" id="volume-pictograms" aria-label="Relative release volume by size class">
+        <span><img src="assets/size/truck-badge.svg" alt="1×"/></span>
+        <span><img src="assets/size/truck-badge.svg" alt="10×"/></span>
+        <span><img src="assets/size/truck-badge.svg" alt="100×"/></span>
+        <span><img src="assets/size/truck-badge.svg" alt="1,000×"/></span>
+        <span><img src="assets/size/truck-badge.svg" alt="10,000×"/></span>
+      </div>
+      <div class="picto-ticks" id="volume-ticks">
+        <span>1×</span><span>10×</span><span>100×</span><span>1,000×</span><span>10,000×</span>
+      </div>
+
+      <div class="label" style="margin-top:12px">Runout Size <span class="val">Runout Length [m]</span></div>
+      <div class="runout-arrow" id="runout-arrow"><img src="assets/size/runout-arrow.svg" alt="short to long runout"/></div>
+      <div class="picto-ticks" id="runout-ticks">
+        <span>0 m</span><span>50 m</span><span>250 m</span><span>900 m</span><span>2000 m</span>
+      </div>
+
+      <div class="label" style="margin-top:12px">Destructive Size <span class="val">Impact Pressure [kPa]</span></div>
+      <div class="size-pictograms" id="destructive-pictograms" aria-label="Destructive size consequences">
+        <span title="Size 1 · small slide"><img src="assets/size/size1.svg" alt="Size 1"/></span>
+        <span title="Size 2 · person"><img src="assets/size/size2.svg" alt="Size 2"/></span>
+        <span title="Size 3 · vehicle"><img src="assets/size/size3.svg" alt="Size 3"/></span>
+        <span title="Size 4 · railway"><img src="assets/size/size4.svg" alt="Size 4"/></span>
+        <span title="Size 5 · buildings and forest"><img src="assets/size/size5.svg" alt="Size 5"/></span>
+      </div>
+      <div class="picto-ticks" id="destructive-ticks">
+        <span>0 kPa</span><span>20 kPa</span><span>50 kPa</span><span>200 kPa</span><span>500 kPa</span>
+      </div>
+
       <div class="hint" id="src-note">
         Step 16 of the Avalanche Scenario Model Chain · CAIROS / BFW.
         Colours &amp; icons follow EAWS + albina-admin-gui conventions.
@@ -393,7 +475,7 @@ window.addEventListener("error",e=>{
 window.addEventListener("unhandledrejection",e=>{
   showError("Unhandled: "+((e.reason&&e.reason.message)||e.reason));
 });
-/* if loading is not finished after 60 s, stop hiding the map behind the splash */
+/* The full local preview is large; surface a timeout without hiding progress forever. */
 setTimeout(()=>{
   const l=document.getElementById("loader");
   if(l && !l.classList.contains("hide")){
@@ -401,47 +483,24 @@ setTimeout(()=>{
     showError("Loading did not finish within 60 s — last step was: "+
       (document.getElementById("loader-sub")||{textContent:"?"}).textContent);
   }
-},60000);
+},180000);
 
 /* ------------------------------------------------------------------ config */
 const CFG = {
-  center:[46.9914, 11.416055], zoom:13, minZoom:11, maxZoom:16,
+  center:[46.9914, 11.416055], zoom:13, minZoom:9, maxZoom:13,
   data:{
-    dry:  "data/avaScen_Winter_mobile_hex.geojson",
-    wet:  "data/avaScen_Spring_mobile_hex.geojson",
-    micro:"data/avaScenMaster_avaReportMicroRegionsPilotBrenner_wgs84.geojson",
-    hill: "data/HS10m_pilotBrenner_wgs84.png"
+    shard:"data/avaPreview_issw_{type}_{flow}_{sector}_{tile}.geojson",
+    manifest:"data/avaPreview_issw_manifest.json",
+    extent:  "data/pilotBrennerExtentMerge.geojson",
+    hill:    "data/10HS_isswAll.png",
+    sizeManifest:"data/avaSize_rasters.json"
   },
-  banners:{ winter:"data/avaScenWinter.png", spring:"data/avaScenSpring.png" },
-  hillBounds:[[46.91571776781058,11.239491625878523],[47.080879561592,11.593290591056762]],
-  REL:"#ff00ff", RES:"#1e00ff",
-  /* EAWS problem icons (colour + greyscale), as used by albina-admin-gui.
-     First hit wins; each <img> falls through the list on error. */
-  iconBases:[
-    "assets/img/",                                             /* shipped next to this file */
-    "../../../albina-admin-gui-master/src/assets/img/",         /* Downloads/albina-admin-gui-master */
-    "../../albina-admin-gui-master/src/assets/img/",
-    "../albina-admin-gui-master/src/assets/img/",
-    "https://cdn.jsdelivr.net/gh/albina-euregio/albina-admin-gui@master/src/assets/img/"
-  ]
+  hillBounds:[[46.79292940616387,11.08313943136693],[47.183221440588866,11.757729610455556]],
+  REL:"#ff00ff", RES:"#1e00ff"
 };
 
-/* EAWS avalanche problems. flow = which modelled regime the problem maps to.
-   This mapping is a working assumption — expose it in the INI later. */
-const PROBLEMS = [
-  {id:"new_snow",               file:"New_snow",               label:"New snow",   flow:"dry"},
-  {id:"wind_slab",              file:"Wind_slab",              label:"Wind slab",  flow:"dry"},
-  {id:"persistent_weak_layers", file:"Persistent_weak_layers", label:"Persist. WL",flow:"dry"},
-  {id:"wet_snow",               file:"Wet_snow",               label:"Wet snow",   flow:"wet"},
-  {id:"gliding_snow",           file:"Gliding_snow",           label:"Gliding",    flow:"wet"}
-];
-const PROBLEMS_OPT = [
-  {id:"cornices",                     file:"Cornices",                     label:"Cornices", flow:"dry"},
-  {id:"no_distinct_avalanche_problem",file:"No_distinct_avalanche_problem",label:"No distinct problem", flow:"both"}
-];
-const ALL_PROBLEMS = PROBLEMS.concat(PROBLEMS_OPT);
-
-const SIZE_LABEL = {1:"small",2:"medium",3:"large",4:"very large",5:"extreme"};
+const SIZE_LABEL = {1:"small",2:"medium",3:"large",4:"very large",5:"extremely large"};
+const SIZE_HEX = {1:"#09a2ff",2:"#66ff31",3:"#fff300",4:"#ff0000",5:"#5b0069"};
 
 /* Aspect rose geometry copied 1:1 from albina-admin-gui aspects.component.html
    so the control is visually identical to the bulletin GUI. */
@@ -455,26 +514,31 @@ const ROSE = {
   W :"300,300 100,200 0,300 100,400",
   NW:"300,300 100,200 100,100 200,100"
 };
-/* pilot dataset only carries 4 sectors → map the 8-way rose onto them */
-const SECTOR_MAP = {N:["N"],NE:["N","E"],E:["E"],SE:["S","E"],S:["S"],SW:["S","W"],W:["W"],NW:["N","W"]};
+/* The pilot dataset only carries 4 real release-aspect sectors (N/E/S/W) —
+   there's no actual NE/SE/SW/NW data. So only the 4 cardinal wedges are
+   clickable and drive S.aspects (which therefore only ever holds N/E/S/W);
+   the 4 diagonal wedges are display-only, shaded from their two cardinal
+   neighbours' state so the rose still reads as an 8-way compass. */
+const CARDINALS = ["N","E","S","W"];
+const ADJACENT_CARDINALS = {NE:["N","E"], SE:["S","E"], SW:["S","W"], NW:["N","W"]};
 
 const PRESETS = {
-  winter:{label:"Winter · new snow", problems:["new_snow"],
-          aspects:["N","NE","E","SE","S","SW","W","NW"], elev:[1800,3200], size:5, banner:"winter"},
-  spring:{label:"Spring · wet snow", problems:["wet_snow"],
-          aspects:["E","SE","S","SW","W"], elev:[1800,2200], size:3, banner:"spring"}
+  dry:{label:"Dry Winter", flows:["dry"], aspects:["SW","W","NW","N","NE"], elev:[2000,3500], size:4},
+  wet:{label:"Wet Spring", flows:["wet"], aspects:["NE","E","SE","S","SW"], elev:[1400,2500], size:2}
 };
 
 /* ------------------------------------------------------------------- state */
 const S = {
-  preset:"winter",
-  problems:new Set(["new_snow"]),
-  aspects:new Set(["N","NE","E","SE","S","SW","W","NW"]),
-  elev:[1800,3200],
-  size:5,
+  preset:"dry",
+  flows:new Set(["dry"]),
+  aspects:new Set(["W","N"]),
+  elev:[2000,3500],
+  size:4,
   showRel:true, showRes:false, sizeColour:false,
+  sizeRaster:null,
   alpha:0.30,
-  base:"bergfex", hillshade:false, micro:true,
+  baseAlpha:0.50,
+  base:"osm", hillshade:true,
   demo:false
 };
 
@@ -486,15 +550,26 @@ const map = L.map("map",{center:CFG.center,zoom:CFG.zoom,minZoom:CFG.minZoom,
   maxZoom:CFG.maxZoom,zoomControl:false,preferCanvas:true,attributionControl:true});
 L.control.scale({metric:true,imperial:false,position:"bottomleft"}).addTo(map);
 
-const baseBergfex = L.tileLayer("https://tiles.bergfex.at/styles/bergfex-osm/{z}/{x}/{y}.jpg",
-  {maxZoom:18,maxNativeZoom:17,attribution:"© Bergfex OSM"});
-const baseLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-  {maxZoom:20,maxNativeZoom:17,subdomains:"abcd",
-   attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>'});
-baseBergfex.addTo(map);
+/* #map growing via 100dvh (e.g. Safari's URL bar auto-collapsing on
+   scroll) resizes the CSS box, but Leaflet still needs telling — otherwise
+   the newly revealed strip stays blank until the next pan/zoom. */
+if(window.visualViewport) visualViewport.addEventListener("resize",()=>map.invalidateSize());
+window.addEventListener("orientationchange",()=>setTimeout(()=>map.invalidateSize(),300));
+
+const baseOSM = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
+  maxZoom:19,maxNativeZoom:19,opacity:.5,
+  attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+});
+baseOSM.addTo(map);
 
 const hill = L.imageOverlay(CFG.data.hill, L.latLngBounds(CFG.hillBounds),
   {opacity:.5, interactive:false, errorOverlayUrl:""});
+if(S.hillshade) hill.addTo(map);
+map.createPane("sizeRasterPane");
+map.getPane("sizeRasterPane").style.zIndex=405;   /* raster > hillshade (overlayPane, 400) > basemap (tilePane, 200) */
+map.getPane("sizeRasterPane").style.pointerEvents="none";
+let sizeRasterManifest=null;
+const sizeRasterLayers=new Map();
 
 let microLayer=null;
 const featLayers=[];              // {layer, p}  every rel/res polygon
@@ -504,83 +579,48 @@ const gAva = L.layerGroup().addTo(map);
    bindings declared further down, and const is not hoisted. */
 
 /* ---------------------------------------------------------------- UI build */
-let ICON_BASE_IDX = 0;                     // index of the first base that worked
-function iconFile(p,on){ return p.file + (on?"_c":"_bw") + ".svg"; }
-function setIcon(img,p,on){
-  img.dataset.file = iconFile(p,on);
-  img.dataset.idx  = ICON_BASE_IDX;
-  img.style.visibility = "visible";
-  img.src = CFG.iconBases[ICON_BASE_IDX] + img.dataset.file;
-}
-function onIconError(ev){
-  const img = ev.currentTarget;
-  const next = (+img.dataset.idx) + 1;
-  if(next < CFG.iconBases.length){
-    img.dataset.idx = next;
-    img.src = CFG.iconBases[next] + img.dataset.file;
-  } else {
-    img.style.visibility = "hidden";       // labels still carry the meaning
-  }
-}
-function onIconLoad(ev){
-  const i = +ev.currentTarget.dataset.idx;
-  if(i < ICON_BASE_IDX || ICON_BASE_IDX === 0) ICON_BASE_IDX = i;
-}
-
-function buildProblems(){
-  const mk = (list,host)=>{
-    host.innerHTML = list.map(p=>`
-      <button class="prob" data-problem="${p.id}">
-        <img alt="${p.label}"/><span>${p.label}</span>
-      </button>`).join("");
-    list.forEach(p=>{
-      const img = host.querySelector(`[data-problem="${p.id}"] img`);
-      img.addEventListener("error",onIconError);
-      img.addEventListener("load",onIconLoad);
-      setIcon(img,p,false);
-    });
-  };
-  mk(PROBLEMS, $("#problems"));
-  mk(PROBLEMS_OPT, $("#problems-opt"));
-  $$("[data-problem]").forEach(b=>b.addEventListener("click",()=>{
-    const id=b.dataset.problem;
-    if(S.problems.has(id)) S.problems.delete(id); else S.problems.add(id);
-    if(!S.problems.size) S.problems.add(id);           // never empty
-    markCustom(); syncProblems(); refresh();
-  }));
-}
-function syncProblems(){
-  $$("[data-problem]").forEach(b=>{
-    const p = ALL_PROBLEMS.find(x=>x.id===b.dataset.problem);
-    const on = S.problems.has(p.id);
-    b.classList.toggle("on",on);
-    setIcon(b.querySelector("img"),p,on);
-  });
-  const names=[...S.problems].map(id=>ALL_PROBLEMS.find(p=>p.id===id).label);
-  $("#v-problem").textContent = names.length>2 ? names.length+" selected" : names.join(" + ");
-}
-
 function buildRose(){
   const svg=$("#rose"); let h="";
-  for(const k in ROSE) h+=`<polygon data-aspect="${k}" points="${ROSE[k]}" fill="#fff" stroke="#999" stroke-width="5"/>`;
-  h+=`<text x="300" y="140" text-anchor="middle" fill="#999" font-size="86">N</text>
-      <text x="300" y="530" text-anchor="middle" fill="#999" font-size="86">S</text>
-      <text x="118" y="330" text-anchor="middle" fill="#999" font-size="86">W</text>
-      <text x="482" y="330" text-anchor="middle" fill="#999" font-size="86">E</text>`;
+  for(const k in ROSE) h+=`<polygon data-aspect="${k}" points="${ROSE[k]}" fill="#e8edef" stroke="#3c5d73" stroke-width="5"/>`;
+  h+=`<text x="300" y="128" text-anchor="middle" fill="#3c5d73" font-size="62">N</text>
+      <text x="300" y="525" text-anchor="middle" fill="#3c5d73" font-size="62">S</text>`;
   svg.innerHTML=h;
-  svg.querySelectorAll("polygon").forEach(el=>el.addEventListener("click",()=>{
+  svg.querySelectorAll("polygon").forEach(el=>{
     const a=el.dataset.aspect;
-    if(S.aspects.has(a)) S.aspects.delete(a); else S.aspects.add(a);
-    if(!S.aspects.size) S.aspects.add(a);
-    markCustom(); syncRose(); refresh();
-  }));
+    if(!CARDINALS.includes(a)){ el.style.cursor="default"; return; }
+    el.addEventListener("click",()=>{
+      if(S.aspects.has(a)) S.aspects.delete(a); else S.aspects.add(a);
+      applyAlphaStaffel();
+      markCustom(); syncRose(); refresh();
+    });
+  });
+}
+
+/* More active sectors ≈ more overlapping polygons on screen, which is what
+   makes the fill look oversaturated — so step the fill opacity down as
+   more aspects are selected. Only 3 tiers (not one per aspect count): 3 and
+   4 aspects look the same amount of "busy" on screen, so they share the
+   lowest value. Only runs when the aspect selection itself changes, so a
+   manual slider tweak afterward still sticks until the next aspect change. */
+function applyAlphaStaffel(){
+  const n=S.aspects.size;
+  if(n<=0) return;
+  let a = n<=1 ? 0.30 : n===2 ? 0.20 : 0.10;
+  if(S.showRel && !S.showRes) a += 0.20;   // rel-only has far less overlap than with res shown too
+  S.alpha = Math.min(0.85, a);
+  $("#alpha").value=Math.round(S.alpha*100);
+  syncAlpha();
 }
 function syncRose(){
   $("#rose").querySelectorAll("polygon").forEach(el=>{
-    el.setAttribute("fill", S.aspects.has(el.dataset.aspect)?"#000":"#fff");
+    const a=el.dataset.aspect;
+    if(CARDINALS.includes(a)){
+      el.setAttribute("fill", S.aspects.has(a)?"#09a2ff":"#e8edef");
+      return;
+    }
+    const on=ADJACENT_CARDINALS[a].filter(c=>S.aspects.has(c)).length;
+    el.setAttribute("fill", on===2?"#09a2ff":on===1?"#bdddf1":"#e8edef");
   });
-  const n=S.aspects.size;
-  $("#v-release").textContent = n===8 ? "All aspects" : [...S.aspects].join(" ");
 }
 
 /* --------------------------------------------------------------- sheet UX */
@@ -624,7 +664,11 @@ function bindSheet(){
 /* ------------------------------------------------------------- controls */
 function bindControls(){
   $$("#seg-preset button").forEach(b=>b.addEventListener("click",()=>applyPreset(b.dataset.preset)));
-  $("#btn-reset").addEventListener("click",()=>applyPreset(S.preset==="custom"?"winter":S.preset));
+  $$("#seg-flow button").forEach(b=>b.addEventListener("click",()=>{
+    S.flows=new Set([b.dataset.flow]);
+    markCustom(); syncFlow(); refresh();
+  }));
+  $("#btn-reset").addEventListener("click",()=>applyPreset(S.preset==="custom"?"dry":S.preset));
 
   /* elevation dual range */
   const lo=$("#elev-lo"), hi=$("#elev-hi");
@@ -638,36 +682,56 @@ function bindControls(){
   $("#chip-treeline").addEventListener("click",e=>{
     const on=!e.currentTarget.classList.contains("on");
     e.currentTarget.classList.toggle("on",on);
-    if(on){ lo.value=2000; hi.value=3200; }            // treeline ≈ 2000 m in the pilot area
-    else  { lo.value=1400; hi.value=3200; }
+    if(on){ lo.value=2000; hi.value=3500; }            // treeline ≈ 2000 m in the pilot area
+    else  { lo.value=800; hi.value=3500; }
     onElev();
   });
 
   $("#size").addEventListener("input",e=>{S.size=+e.target.value;markCustom();syncSize();refresh();});
   $("#alpha").addEventListener("input",e=>{S.alpha=(+e.target.value)/100;syncAlpha();restyle();});
+  $("#base-alpha").addEventListener("input",e=>{
+    S.baseAlpha=(+e.target.value)/100; syncBaseAlpha(); baseOSM.setOpacity(S.baseAlpha);
+  });
 
   const tog=(sel,key,fn)=>$(sel).addEventListener("click",e=>{
     S[key]=!S[key]; e.currentTarget.classList.toggle("on",S[key]); (fn||restyle)();
   });
-  tog("#chip-rel","showRel",refresh);
-  $("#chip-res").addEventListener("click",async e=>{
+  tog("#chip-rel","showRel",()=>{ applyAlphaStaffel(); refresh(); });
+  $("#chip-res").addEventListener("click",e=>{
     S.showRes=!S.showRes; e.currentTarget.classList.toggle("on",S.showRes);
-    if(S.showRes) await ensureRunout();
+    if(S.showRes){
+      S.sizeColour=false;
+      $("#chip-release-dimension").classList.remove("on");
+      syncVolumePictograms();
+    }
+    applyAlphaStaffel();
     refresh();
   });
-  tog("#chip-size","sizeColour",restyle);
-  tog("#chip-micro","micro",()=>{ if(microLayer){ S.micro?microLayer.addTo(map):map.removeLayer(microLayer);} });
   tog("#chip-hill","hillshade",()=>{ S.hillshade?hill.addTo(map):map.removeLayer(hill); });
-
-  $("#btn-base").addEventListener("click",e=>{
-    S.base = S.base==="bergfex" ? "light" : "bergfex";
-    if(S.base==="light"){ map.removeLayer(baseBergfex); baseLight.addTo(map); }
-    else { map.removeLayer(baseLight); baseBergfex.addTo(map); }
-    e.currentTarget.classList.toggle("on",S.base==="light");
+  $("#chip-release-dimension").addEventListener("click",e=>{
+    S.sizeColour=!S.sizeColour;
+    if(S.sizeColour){
+      S.showRel=true; S.showRes=false;
+      $("#chip-rel").classList.add("on"); $("#chip-res").classList.remove("on");
+    }
+    e.currentTarget.classList.toggle("on",S.sizeColour);
+    syncVolumePictograms();
+    applyAlphaStaffel();
+    refresh();
   });
+  const selectSizeRaster=kind=>{
+    if(S.preset==="custom"){
+      showError("Detailed size rasters are available only for the Dry Winter and Wet Spring presets.");
+      return;
+    }
+    S.sizeRaster=S.sizeRaster===kind?null:kind;
+    syncSizeRaster(); updateSizeRasters();
+  };
+  $("#chip-destructive").addEventListener("click",()=>selectSizeRaster("destructive"));
+  $("#chip-runout-raster").addEventListener("click",()=>selectSizeRaster("runout"));
 
   $("#btn-locate").addEventListener("click",()=>{
-    map.locate({setView:true,maxZoom:15});
+    map.locate({setView:true,maxZoom:CFG.maxZoom});
   });
   map.on("locationfound",e=>{
     L.circleMarker(e.latlng,{radius:7,color:"#fff",weight:3,fillColor:"#19abff",fillOpacity:1})
@@ -677,44 +741,56 @@ function bindControls(){
 
 function applyPreset(name,opt){
   opt=opt||{};
-  $$("#seg-preset button").forEach(b=>b.classList.toggle("on",b.dataset.preset===name));
   S.preset=name;
+  if(name==="custom") S.sizeRaster=null;
   if(name!=="custom"){
     const p=PRESETS[name];
-    S.problems=new Set(p.problems);
-    S.aspects=new Set(p.aspects);
+    S.flows=new Set(p.flows);
+    S.aspects=new Set(p.aspects.filter(a=>CARDINALS.includes(a)));
+    applyAlphaStaffel();
     S.elev=p.elev.slice();
     S.size=p.size;
     $("#elev-lo").value=p.elev[0]; $("#elev-hi").value=p.elev[1];
     $("#size").value=p.size;
-    $("#chip-treeline").classList.remove("on");
-    setBanner(p.banner);
-  } else {
-    setBanner(null);
   }
+  $("#chip-treeline").classList.remove("on");
   syncAll();
   if(!opt.silent) refresh();
 }
 function markCustom(){
   if(S.preset==="custom") return;
   S.preset="custom";
-  $$("#seg-preset button").forEach(b=>b.classList.toggle("on",b.dataset.preset==="custom"));
-  setBanner(null);
+  S.sizeRaster=null; syncSizeRaster(); updateSizeRasters();
+  syncPreset();
 }
-function setBanner(key){
-  const img=$("#banner-img");
-  if(!key){ img.hidden=true; return; }
-  img.src=CFG.banners[key]; img.hidden=false;
-  img.onerror=()=>{img.hidden=true;};
+function syncSizeRaster(){
+  $("#chip-destructive").classList.toggle("on",S.sizeRaster==="destructive");
+  $("#chip-runout-raster").classList.toggle("on",S.sizeRaster==="runout");
+  $("#destructive-pictograms").classList.toggle("on",S.sizeRaster==="destructive");
+  $("#destructive-ticks").classList.toggle("on",S.sizeRaster==="destructive");
+  $("#runout-arrow").classList.toggle("on",S.sizeRaster==="runout");
+  $("#runout-ticks").classList.toggle("on",S.sizeRaster==="runout");
+}
+function syncVolumePictograms(){
+  $("#volume-pictograms").classList.toggle("on",S.sizeColour);
+  $("#volume-ticks").classList.toggle("on",S.sizeColour);
+}
+function syncPreset(){
+  $$("#seg-preset button").forEach(b=>b.classList.toggle("on",b.dataset.preset===S.preset));
+}
+function syncFlow(){
+  const key=[...S.flows][0];
+  $$("#seg-flow button").forEach(b=>b.classList.toggle("on",b.dataset.flow===key));
+  $("#v-flow").textContent=key==="dry"?"Cold":"Warm";
 }
 
 function syncElev(){
-  const lo=+$("#elev-lo").value, hi=+$("#elev-hi").value, min=1400, max=3200;
+  const lo=+$("#elev-lo").value, hi=+$("#elev-hi").value, min=800, max=3500;
   const f=$("#elev-fill");
   f.style.left=((lo-min)/(max-min)*100)+"%";
   f.style.width=((hi-lo)/(max-min)*100)+"%";
   $("#v-elev")
-    .textContent = (hi>=3200 ? lo+"–5000 m" : lo+"–"+hi+" m");
+    .textContent = (hi>=3500 ? lo+"–8848 m" : lo+"–"+hi+" m");
 }
 function syncSize(){
   const f=$("#size-fill"); f.style.left="0"; f.style.width=((S.size-1)/4*100)+"%";
@@ -725,65 +801,90 @@ function syncAlpha(){
   f.style.left="0"; f.style.width=((v-5)/80*100)+"%";
   $("#v-alpha").textContent = v+" %";
 }
-function syncAll(){ syncProblems(); syncRose(); syncElev(); syncSize(); syncAlpha(); }
+function syncBaseAlpha(){
+  const v=+$("#base-alpha").value, f=$("#base-alpha-fill");
+  f.style.left="0"; f.style.width=((v-10)/90*100)+"%";
+  $("#v-base-alpha").textContent=v+" %";
+}
+function syncAll(){ syncPreset(); syncFlow(); syncRose(); syncElev(); syncSize(); syncAlpha(); syncBaseAlpha(); syncSizeRaster(); updateSizeRasters(); }
 
 /* --------------------------------------------------------------- filtering */
-function activeFlows(){
-  const f=new Set();
-  [...S.problems].forEach(id=>{
-    const p=ALL_PROBLEMS.find(x=>x.id===id);
-    if(p.flow==="both"){f.add("dry");f.add("wet");} else f.add(p.flow);
-  });
-  return f;
-}
 function activeSectors(){
-  const s=new Set();
-  [...S.aspects].forEach(a=>SECTOR_MAP[a].forEach(x=>s.add(x)));
-  return s;
+  return new Set(S.aspects);
 }
-function matches(p,flows,sectors){
-  if(!flows.has(p.flow)) return false;
+function matches(p,sectors){
+  if(!S.flows.has(p.flow)) return false;
   if(!sectors.has(p.sector)) return false;
   const e = (p.praElevMean!=null) ? p.praElevMean : (p.praElevMin+p.praElevMax)/2;
-  const hi = S.elev[1]>=3200 ? 9999 : S.elev[1];
+  const hi = S.elev[1]>=3500 ? 9999 : S.elev[1];
   if(e < S.elev[0] || e > hi) return false;
-  if((p.PEM||0) > S.size) return false;
+  if(p.modType==="res" && !(Number(p.sizeMask||0) & (1 << (S.size-1)))) return false;
   return true;
 }
 function styleFor(p,visible){
   if(!visible) return {opacity:0,fillOpacity:0,weight:0};
-  const hex = S.sizeColour ? (p.hex_size||"#808080")
+  const hex = S.sizeColour && p.modType==="rel" ? (p.hex_size||SIZE_HEX[p.PPM]||SIZE_HEX[p.PEM]||"#808080")
                            : (p.hex_relRes || (p.modType==="rel"?CFG.REL:CFG.RES));
   return {color:hex,fillColor:hex,weight:0,opacity:1,fillOpacity:S.alpha};
 }
 
-let raf=null;
-function refresh(){ if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(doRefresh); }
+let raf=null, refreshVersion=0;
+function refresh(){
+  const version=++refreshVersion;
+  if(raf) cancelAnimationFrame(raf);
+  raf=requestAnimationFrame(async()=>{
+    raf=null;
+    try{
+      await ensureActiveShards();
+      if(version===refreshVersion) doRefresh();
+    }catch(err){ showError(err && err.message ? err.message : String(err)); }
+  });
+}
 function doRefresh(){
-  const flows=activeFlows(), sectors=activeSectors();
+  const sectors=activeSectors();
   /* per-feature colour only depends on sizeColour, so one key covers all
      visible features — lets us skip setStyle for anything that did not change */
-  const shownKey = S.alpha.toFixed(2) + (S.sizeColour ? "|size" : "|type");
+  const shownKey = S.alpha.toFixed(2) + (S.sizeColour ? "|release-size" : "|type");
   let n=0;
   for(let i=0;i<featLayers.length;i++){
     const it=featLayers[i], p=it.p;
     const typeOn = (p.modType==="rel"&&S.showRel)||(p.modType==="res"&&S.showRes);
-    const ok = typeOn && matches(p,flows,sectors);
+    const ok = typeOn && matches(p,sectors);
     if(ok && p.modType==="rel") n++;
     const key = ok ? shownKey : "hidden";
     if(it.key!==key){ it.key=key; it.visible=ok; it.layer.setStyle(styleFor(p,ok)); }
   }
   $("#count").textContent = n.toLocaleString();
-  const names=[...S.problems].map(id=>ALL_PROBLEMS.find(p=>p.id===id).label);
-  $("#st-title").textContent = S.preset==="custom" ? "Custom scenario" : PRESETS[S.preset].label;
+  $("#st-title").textContent = S.preset==="custom"?"Custom scenario":PRESETS[S.preset].label;
   $("#st-eyebrow").textContent = S.demo ? "Scenario · demo data" : "Scenario";
-  $("#st-sub").innerHTML = `<b>${n.toLocaleString()}</b> release areas · ${names[0]||"—"}${names.length>1?" +"+(names.length-1):""} · ≤ size ${S.size}`;
+  const flow=S.flows.size===2?"dry + wet":[...S.flows][0];
+  $("#st-sub").innerHTML = `<b>${n.toLocaleString()}</b> release areas · ${flow} · ${S.elev[0]}–${S.elev[1]>=3500?"8848":S.elev[1]} m · size scenario ${S.size}`;
 }
 function restyle(){ refresh(); }
 
+/* Size rasters are a single full-region image, not thousands of overlapping
+   vector polygons, so the aspect-count opacity staffel (tuned for fill
+   density) doesn't apply — they always show at a fixed, more opaque level. */
+const RASTER_ALPHA=0.6;
+function updateSizeRasters(){
+  sizeRasterLayers.forEach(layer=>{ if(map.hasLayer(layer)) map.removeLayer(layer); });
+  if(!S.sizeRaster || !sizeRasterManifest || S.preset==="custom") return;
+  const key=S.preset+"/"+S.sizeRaster;
+  const item=sizeRasterManifest.rasters && sizeRasterManifest.rasters[key];
+  if(!item) return;
+  let layer=sizeRasterLayers.get(key);
+  if(!layer){
+    layer=L.imageOverlay("data/"+item.file,L.latLngBounds(item.bounds),{
+      opacity:RASTER_ALPHA,interactive:false,pane:"sizeRasterPane",errorOverlayUrl:""
+    });
+    layer.on("error",()=>showError("Could not load detailed size raster: "+item.file));
+    sizeRasterLayers.set(key,layer);
+  }
+  layer.addTo(map);
+}
+
 /* ------------------------------------------------------------------- data */
-const RAW = {dry:null, wet:null};      // kept so runout polygons can be built later
-let resBuilt = false;
+const loadedShards=new Map();         // key -> in-flight promise or true
 
 const nextFrame = ()=>new Promise(r=>requestAnimationFrame(()=>r()));
 
@@ -800,7 +901,8 @@ async function addFeatures(geo, want, onProgress){
       onEachFeature:(f,l)=>{
         const item={layer:l, p:f.properties||{}, visible:false, key:"hidden"};
         featLayers.push(item);
-        l.on("click",()=>{ if(item.visible) openPopup(l,item.p); });
+        l.on("click",()=>{ if(item.visible){ highlightFeature(item); openPopup(l,item.p); } });
+        l.on("popupclose",()=>{ if(highlighted===item){ restoreHighlight(item); highlighted=null; } });
       }
     }).addTo(gAva);
     if(onProgress) onProgress(Math.min(i+CHUNK, feats.length), feats.length);
@@ -809,34 +911,126 @@ async function addFeatures(geo, want, onProgress){
   return feats.length;
 }
 
-/* runout polygons are off by default — build them the first time they are asked for */
-async function ensureRunout(){
-  if(resBuilt) return;
-  resBuilt = true;
-  if(!RAW.dry && !RAW.wet) return;                 // demo mode already has both
-  setBusy("Building runout areas …");
-  if(RAW.dry) await addFeatures(RAW.dry,"res");
-  if(RAW.wet) await addFeatures(RAW.wet,"res");
-  RAW.dry = RAW.wet = null;                        // free the parsed GeoJSON
-  setBusy(null);
-  doRefresh();
+function shardUrl(flow,type,sector,tileCol,tileRow){
+  return CFG.data.shard.replace("{flow}",flow).replace("{type}",type).replace("{sector}",sector)
+    .replace("{tile}",tileCol+"_"+tileRow)+".gz";
 }
 
+/* Spatial tiling: each shard is additionally split into a fixed-origin
+   lon/lat grid (helper/prepareWebPreviewScenarios.py), so only the tiles
+   near the current viewport need to be fetched/rendered. Grid params +
+   which tile keys actually exist come from the manifest. */
+let grid=null;                    // {originLat, originLon, cellSizeDeg}
+const knownTiles=new Set();       // "modType/flow/sector/tileCol_tileRow"
+function tilesForBounds(bounds){
+  const b=bounds.pad(0.3);
+  const c0=Math.floor((b.getWest() -grid.originLon)/grid.cellSizeDeg);
+  const c1=Math.floor((b.getEast() -grid.originLon)/grid.cellSizeDeg);
+  const r0=Math.floor((b.getSouth()-grid.originLat)/grid.cellSizeDeg);
+  const r1=Math.floor((b.getNorth()-grid.originLat)/grid.cellSizeDeg);
+  const tiles=[];
+  for(let c=c0;c<=c1;c++) for(let r=r0;r<=r1;r++) tiles.push([c,r]);
+  return tiles;
+}
+
+/* Shard fetch + JSON.parse happen in a worker so a 30-40 MB response never
+   blocks the UI thread. One shared worker, requests correlated by id. */
+let dataWorker=null, dataWorkerReqID=0;
+const dataWorkerPending=new Map();
+function getShardJSON(url){
+  if(!dataWorker){
+    dataWorker=new Worker("data-worker.js");
+    dataWorker.onmessage=ev=>{
+      const {id,data,error}=ev.data;
+      const p=dataWorkerPending.get(id);
+      if(!p) return;
+      dataWorkerPending.delete(id);
+      error ? p.reject(new Error(error)) : p.resolve(data);
+    };
+    dataWorker.onerror=e=>{
+      for(const p of dataWorkerPending.values()) p.reject(new Error("Worker error: "+e.message));
+      dataWorkerPending.clear();
+    };
+  }
+  const id=++dataWorkerReqID;
+  return new Promise((resolve,reject)=>{
+    dataWorkerPending.set(id,{resolve,reject});
+    dataWorker.postMessage({id,url});
+  });
+}
+async function loadShard(flow,type,sector,tileCol,tileRow){
+  const key=flow+"/"+type+"/"+sector+"/"+tileCol+"_"+tileRow;
+  if(loadedShards.has(key)) return loadedShards.get(key);
+  const task=(async()=>{
+    setBusy("Loading "+flow+" "+type+" "+sector+" …");
+    const geo=await getShardJSON(shardUrl(flow,type,sector,tileCol,tileRow));
+    await addFeatures(geo,null);
+    loadedShards.set(key,true);
+    setBusy(null);
+    return true;
+  })().catch(err=>{ loadedShards.delete(key); setBusy(null); throw err; });
+  loadedShards.set(key,task);
+  return task;
+}
+async function ensureActiveShards(){
+  if(location.protocol==="file:" || S.demo) return;
+  const sectors=activeSectors();
+  const types=[];
+  if(S.showRel) types.push("rel");
+  if(S.showRes && S.size>1) types.push("res");
+  const tiles=tilesForBounds(map.getBounds());
+  /* Fire every needed tile request concurrently — sequentially awaiting
+     each one (as this used to) turns a viewport spanning ~100+ tiles into
+     that many serialized round trips instead of one overlapped batch. */
+  const jobs=[];
+  for(const flow of S.flows){
+    for(const type of types){
+      for(const sector of sectors){
+        for(const [tileCol,tileRow] of tiles){
+          if(!knownTiles.has(type+"/"+flow+"/"+sector+"/"+tileCol+"_"+tileRow)) continue;
+          jobs.push(loadShard(flow,type,sector,tileCol,tileRow));
+        }
+      }
+    }
+  }
+  await Promise.all(jobs);
+}
+
+/* Tapping a feature draws a visible outline on it (features otherwise have
+   weight:0 by design — see styleFor) so it's clear which avalanche the open
+   popup belongs to. Only the stroke props are touched; setStyle merges into
+   the existing options, so fillColor/fillOpacity are untouched. */
+let highlighted=null;
+function highlightFeature(item){
+  if(highlighted && highlighted!==item) restoreHighlight(highlighted);
+  highlighted=item;
+  item.layer.setStyle({weight:3,color:"#111418",opacity:1});
+  item.layer.bringToFront();
+}
+function restoreHighlight(item){
+  item.layer.setStyle(styleFor(item.p,item.visible));
+}
 function openPopup(l,p){
   const rows=[["Region",p.LKGebiet],["Warning region",p.LWDGebietID],["Aspect",p.sector],
     ["Flow",p.flow],["Elevation",Math.round(p.praElevMin)+"–"+Math.round(p.praElevMax)+" m"],
     ["Release area",p.praAreaM?Math.round(p.praAreaM).toLocaleString()+" m²":null],
     ["PPM / PEM",(p.PPM??"–")+" / "+(p.PEM??"–")],["rSize",p.rSize],
-    ["Potential",p.avaPotential],["praID",p.praID],["resultID",p.resultID]]
+    ["Potential",p.AvaDistributionPotential??p.avaPotential],["praID",p.praID],["resultID",p.resultID]]
     .filter(r=>r[1]!=null&&r[1]!=="")
     .map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");
   l.bindPopup(`<div class="pop"><h4>${p.modType==="rel"?"Release area":"Avalanche outline"}</h4>
     <table>${rows}</table></div>`,{maxWidth:280,autoPan:true}).openPopup();
 }
 
+/* Draws the pilot-region outline only. Deliberately does not fitBounds to
+   it: the extent is bigger than a screen's worth of tiles, so auto-fitting
+   here would force-load every tile in the region on startup. */
 function addMicro(geo){
-  microLayer=L.geoJSON(geo,{style:{color:"#5b6670",weight:1.2,opacity:.9,fillOpacity:0},interactive:false});
-  if(S.micro) microLayer.addTo(map);
+  map.createPane("extentPane");
+  map.getPane("extentPane").style.zIndex=460;
+  map.getPane("extentPane").style.pointerEvents="none";
+  microLayer=L.geoJSON(geo,{pane:"extentPane",style:{color:"#103b5c",weight:3.2,opacity:1,fillOpacity:0},interactive:false});
+  microLayer.addTo(map);
 }
 function loadScript(src){
   return new Promise(res=>{
@@ -846,59 +1040,36 @@ function loadScript(src){
   });
 }
 
-/* fetch with a visible byte counter — a 15 MB file over localhost should be
-   instant, so a stalled counter tells us the server is the problem */
+/* Let the browser parse the response directly. Building an extra byte buffer
+   would duplicate the 200+ MB scenario file in memory. */
 async function getJSON(url,label){
   const r = await fetch(url,{cache:"no-store"});
   if(!r.ok) throw new Error(url+" → HTTP "+r.status);
   const total = +(r.headers.get("content-length")||0);
-  if(!r.body || !total){ setLoaderText("Downloading "+label+" …"); return r.json(); }
-  const reader=r.body.getReader(); const parts=[]; let got=0;
-  for(;;){
-    const {done,value}=await reader.read();
-    if(done) break;
-    parts.push(value); got+=value.length;
-    setLoaderText("Downloading "+label+" — "+(got/1048576).toFixed(1)+" / "+(total/1048576).toFixed(1)+" MB");
-  }
-  setLoaderText("Reading "+label+" …");
+  setLoaderText("Downloading "+label+(total?" — "+(total/1048576).toFixed(1)+" MB":"")+" …");
   await nextFrame();
-  const buf=new Uint8Array(got); let o=0;
-  for(const part of parts){ buf.set(part,o); o+=part.length; }
-  return JSON.parse(new TextDecoder("utf-8").decode(buf));
+  return r.json();
 }
 
 async function loadAll(){
   const fileMode = (location.protocol === "file:");
-  let got=false;
   try{
     if(fileMode){
-      setLoaderText("Loading offline data …");
-      const ok = (await loadScript(CFG.data.dry+".js")) && (await loadScript(CFG.data.wet+".js"));
-      if(ok && window.AVA_DRY && window.AVA_WET){
-        RAW.dry=window.AVA_DRY; RAW.wet=window.AVA_WET; got=true;
-      }
-      if(await loadScript(CFG.data.micro+".js")){ if(window.AVA_MICRO) addMicro(window.AVA_MICRO); }
-    } else {
-      RAW.dry = await getJSON(CFG.data.dry,"winter scenario");
-      RAW.wet = await getJSON(CFG.data.wet,"spring scenario");
-      got = true;
-      try{ addMicro(await getJSON(CFG.data.micro,"warning regions")); }catch(e){ console.warn("micro regions",e); }
-    }
-
-    if(got){
-      let done=0;
-      const total = countMod(RAW.dry,"rel") + countMod(RAW.wet,"rel");
-      const prog=(i,n)=>setLoaderText("Building shapes — "+(done+i).toLocaleString()+" / "+total.toLocaleString());
-      done += await addFeatures(RAW.dry,"rel",prog);
-      await addFeatures(RAW.wet,"rel",prog);
-    } else {
+      setLoaderText("Local web server required …");
       S.demo=true;
       await addFeatures(demoData(),null);
-      $("#src-note").innerHTML = fileMode
-        ? "<b>Demo data.</b> Opened straight from disk and <code>data/*.geojson.js</code> is missing. Run <code>make_offline_data.bat</code> once, then reload."
-        : "<b>Demo data.</b> <code>data/avaScen_*_mobile_hex.geojson</code> was not found next to this file.";
-      if(fileMode) showFileWarning();
-      resBuilt = true;
+      $("#src-note").innerHTML = "<b>Demo data.</b> Start the local web server and open <code>http://localhost:8000/index.html</code>.";
+      showFileWarning();
+    } else {
+      try{ addMicro(await getJSON(CFG.data.extent,"pilot extent")); }catch(e){ console.warn("pilot extent",e); }
+      try{ sizeRasterManifest=await getJSON(CFG.data.sizeManifest,"size raster manifest"); }
+      catch(e){ console.warn("size raster manifest",e); }
+      const manifest=await getJSON(CFG.data.manifest,"tile manifest");
+      grid=manifest.grid;
+      for(const key in manifest.shards) knownTiles.add(key);
+      setLoaderText("Loading Dry Winter shards …");
+      await ensureActiveShards();
+      map.on("moveend zoomend",refresh);
     }
     doRefresh();
   }catch(err){
@@ -931,9 +1102,9 @@ function showFileWarning(){
     "background:#fff;border-radius:14px;padding:18px 18px 16px;box-shadow:0 10px 40px rgba(0,0,0,.3);max-width:430px;margin:0 auto";
   d.innerHTML='<div style="font-weight:700;font-size:15px;margin-bottom:6px">One-time step needed</div>'+
     '<div style="font-size:13px;color:#5b6670;line-height:1.45">Opened directly from disk, the browser is not allowed to read '+
-    '<code>data\\*.geojson</code>. Two ways out:<br><br>'+
-    '<b>1</b> &nbsp;Double-click <b>make_offline_data.bat</b> once, then reload this page. No install needed.<br><br>'+
-    '<b>2</b> &nbsp;Or run <b>start_mapper.bat</b> if you have Python — it serves the folder on localhost:8000.<br><br>'+
+    '<code>data\\*.geojson</code>. Start a local web server from the project folder:<br><br>'+
+    '<code>pixi run python -m http.server 8000 --directory docs</code><br><br>'+
+    'Then open <code>http://localhost:8000/index.html</code>.<br><br>'+
     'Until then you are looking at demo geometry.</div>'+
     '<button style="margin-top:14px;width:100%;border:0;background:#101418;color:#fff;padding:11px;border-radius:10px;font-size:14px;font-weight:600">Continue with demo data</button>';
   d.querySelector("button").onclick=()=>d.remove();
@@ -969,8 +1140,8 @@ function demoData(){
 }
 
 /* ------------------------------------------------------------------- boot */
-buildProblems(); buildRose(); bindSheet(); bindControls();
-applyPreset("winter",{silent:true});
+buildRose(); bindSheet(); bindControls();
+applyPreset("dry",{silent:true});
 loadAll();
 
 })();

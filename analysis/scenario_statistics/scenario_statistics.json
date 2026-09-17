@@ -1,0 +1,91 @@
+{
+  "method": {
+    "analysisCRS": "EPSG:25832",
+    "affectedArea": "Dissolved RES polygons clipped to the study extent",
+    "selectedPRAs": "Unique praID among REL features divided by unique REL praID in the pilot master",
+    "roadExposure": "Length after clipping OSM lines to the dissolved RES footprint; motor roads exclude paths, tracks, cycleways, footways and pedestrian ways",
+    "destructiveSizeRoadExposure": "Road lines clipped to pathZdelta_sized raster-cell polygons in fixed value bands",
+    "classArea": "Dissolved footprint within each PPM/PEM class; classes may overlap each other"
+  },
+  "inputs": {
+    "master": "D:\\Cairos\\ModelChainResults\\Euregio\\cairosAvaMaps\\12_avaDirectory\\pilotBrenner\\avaDirectoryResults.parquet",
+    "extent": "D:\\Cairos\\ModelChainResults\\_gis\\issw\\pilotBrennerExtentMerge.gpkg",
+    "roads": "D:\\Cairos\\ModelChainResults\\_gis\\issw\\omsRoadLine.gpkg"
+  },
+  "studyAreaKm2": 208.83037133667193,
+  "allPilotPRAs": 8236,
+  "scenarios": {
+    "dry_winter": {
+      "scenario": "dry_winter",
+      "selectedPRAs": 1981,
+      "allPilotPRAs": 8236,
+      "selectedPRAPercent": 24.052938319572608,
+      "affectedAreaKm2": 45.12115701035077,
+      "studyAreaKm2": 208.83037133667193,
+      "affectedStudyAreaPercent": 21.606606702627268,
+      "exposedAllHighwaysKm": 10.59395031592008,
+      "exposedMotorRoadKm": 9.927023396153585,
+      "intersectingRoadFeatures": 81,
+      "rasters": {
+        "zDeltaSized": {
+          "file": "D:\\Cairos\\ModelChainResults\\Euregio\\cairosAvaMaps\\13_avaScenMaps\\issw\\avaScen_ISSW-North2000\\avaScen_ISSW-North2000_pathZdelta_sized.tif",
+          "unit": null,
+          "positiveCells": 440938,
+          "coverageKm2": 44.0938,
+          "minimum": 1.5592960119247437,
+          "mean": 2.969691038131714,
+          "median": 2.9746358394622803,
+          "p95": 4.0,
+          "maximum": 4.0
+        },
+        "travelLengthSized": {
+          "file": "D:\\Cairos\\ModelChainResults\\Euregio\\cairosAvaMaps\\13_avaScenMaps\\issw\\avaScen_ISSW-North2000\\avaScen_ISSW-North2000_pathTravellengthmax_sized.tif",
+          "unit": null,
+          "positiveCells": 440938,
+          "coverageKm2": 44.0938,
+          "minimum": 1.2209471464157104,
+          "mean": 2.898969888687134,
+          "median": 2.8865814208984375,
+          "p95": 4.192910194396973,
+          "maximum": 4.724322319030762
+        }
+      }
+    },
+    "wet_spring": {
+      "scenario": "wet_spring",
+      "selectedPRAs": 3655,
+      "allPilotPRAs": 8236,
+      "selectedPRAPercent": 44.37833899951433,
+      "affectedAreaKm2": 34.92626596420293,
+      "studyAreaKm2": 208.83037133667193,
+      "affectedStudyAreaPercent": 16.724706152964476,
+      "exposedAllHighwaysKm": 0.46347447149050414,
+      "exposedMotorRoadKm": 0.46347447149050414,
+      "intersectingRoadFeatures": 6,
+      "rasters": {
+        "zDeltaSized": {
+          "file": "D:\\Cairos\\ModelChainResults\\Euregio\\cairosAvaMaps\\13_avaScenMaps\\issw\\avaScen_ISSW-South2500\\avaScen_ISSW-South2500_pathZdelta_sized.tif",
+          "unit": null,
+          "positiveCells": 326467,
+          "coverageKm2": 32.6467,
+          "minimum": 1.5567492246627808,
+          "mean": 1.8198422193527222,
+          "median": 1.8333333730697632,
+          "p95": 1.8333333730697632,
+          "maximum": 1.8333333730697632
+        },
+        "travelLengthSized": {
+          "file": "D:\\Cairos\\ModelChainResults\\Euregio\\cairosAvaMaps\\13_avaScenMaps\\issw\\avaScen_ISSW-South2500\\avaScen_ISSW-South2500_pathTravellengthmax_sized.tif",
+          "unit": null,
+          "positiveCells": 326467,
+          "coverageKm2": 32.6467,
+          "minimum": 1.2209471464157104,
+          "mean": 2.227947235107422,
+          "median": 2.2148189544677734,
+          "p95": 3.1435086727142334,
+          "maximum": 3.900073528289795
+        }
+      }
+    }
+  }
+}
