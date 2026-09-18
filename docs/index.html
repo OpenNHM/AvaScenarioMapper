@@ -725,7 +725,14 @@ function bindControls(){
       return;
     }
     S.sizeRaster=S.sizeRaster===kind?null:kind;
+    if(S.sizeRaster){
+      // the raster is the whole point once it's on — hide the vector layers
+      // so they don't clutter/compete with it
+      S.showRel=false; S.showRes=false;
+      $("#chip-rel").classList.remove("on"); $("#chip-res").classList.remove("on");
+    }
     syncSizeRaster(); updateSizeRasters();
+    refresh();
   };
   $("#chip-destructive").addEventListener("click",()=>selectSizeRaster("destructive"));
   $("#chip-runout-raster").addEventListener("click",()=>selectSizeRaster("runout"));
@@ -865,7 +872,7 @@ function restyle(){ refresh(); }
 /* Size rasters are a single full-region image, not thousands of overlapping
    vector polygons, so the aspect-count opacity staffel (tuned for fill
    density) doesn't apply — they always show at a fixed, more opaque level. */
-const RASTER_ALPHA=0.6;
+const RASTER_ALPHA=0.7;
 function updateSizeRasters(){
   sizeRasterLayers.forEach(layer=>{ if(map.hasLayer(layer)) map.removeLayer(layer); });
   if(!S.sizeRaster || !sizeRasterManifest || S.preset==="custom") return;
