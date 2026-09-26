@@ -111,6 +111,22 @@ body{
 }
 #status .sub{font-size:11px;color:var(--ink-2);margin-top:2px}
 #status .sub b{color:var(--ink);font-variant-numeric:tabular-nums}
+#st-legend{margin-top:7px}
+#st-legend .lrow{display:flex;align-items:center;gap:8px;margin-top:6px}
+#st-legend .lrow:first-child{margin-top:0}
+#st-legend .lbl{font-size:9px;font-weight:600;letter-spacing:.03em;color:var(--ink-3);white-space:nowrap;flex:0 0 auto}
+#st-legend .bar{flex:1;min-width:0;height:8px;border-radius:4px}
+#st-legend .bar.outline{background:none;border:1.5px solid #ff00e5;box-sizing:border-box;height:8px}
+#st-legend .bar.gradient{background:linear-gradient(to right,rgba(30,0,255,.12),rgba(30,0,255,.85))}
+/* size row: a real grid so each label line aligns to its own row's actual
+   height (bar row / ticks row) instead of guessing matching line-heights */
+#st-legend .sizegrid{display:grid;grid-template-columns:auto 1fr;column-gap:8px;row-gap:2px;align-items:center}
+#st-legend .sizegrid .lbl{white-space:normal}
+#st-legend .sizegrid .bar.sizekey{background:linear-gradient(to right,#0096ff,#00ff00,#ffd500,#ff0000,#aa00ff)}
+#st-legend .sizegrid .ticks{
+  display:flex;justify-content:space-between;
+  font-size:9px;font-weight:600;letter-spacing:.03em;color:var(--ink-3)
+}
 .iconbtn{
   width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;
   border:0;background:var(--surface);color:var(--ink);font-size:20px;cursor:pointer;
@@ -308,6 +324,7 @@ body{
     <div class="eyebrow" id="st-eyebrow">Scenario</div>
     <div class="headline" id="st-title">Dry Winter</div>
     <div class="sub" id="st-sub">— paths shown</div>
+    <div id="st-legend"></div>
   </div>
   <div class="topstack">
     <button class="iconbtn" id="btn-base" title="Switch base map" aria-label="Switch base map"><i class="ph ph-stack"></i></button>
@@ -761,7 +778,13 @@ function bindControls(){
     S.mode=b.dataset.mode;
     syncMode();
     syncSizeModeDisplay();
-    refresh();
+    // default to showing Runout (travel length) the first time you open
+    // Avalanche Size, rather than just the plain rel+res view
+    if(S.mode==="size" && !S.sizeRaster && !S.sizeColour){
+      selectSizeRaster("runout");
+    } else {
+      refresh();
+    }
   }));
   $$("#seg-flow button").forEach(b=>b.addEventListener("click",()=>{
     S.flows=new Set([b.dataset.flow]);
@@ -908,6 +931,21 @@ function syncMode(){
   // Custom has no meaning in Size Analysis (rasters/depSize only exist for
   // the two named presets), so don't offer it as a choice while in that mode
   $('#seg-preset button[data-preset="custom"]').classList.toggle("hidden",S.mode==="size");
+  syncTopLegend();
+}
+function syncTopLegend(){
+  const el=$("#st-legend");
+  if(S.mode==="size"){
+    el.innerHTML = `
+      <div class="lrow sizegrid">
+        <div class="lbl">Avalanche</div><div class="bar sizekey"></div>
+        <div class="lbl">Size</div><div class="ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div class="lrow"><div class="lbl">Potential Release Areas</div><div class="bar outline"></div></div>
+      <div class="lrow"><div class="lbl">Overlapping Avalanches</div><div class="bar gradient"></div></div>`;
+  }
 }
 function syncSizeModeDisplay(){
   // with no criterion picked, default to showing rel+res exactly like Explore
@@ -989,7 +1027,7 @@ function styleFor(p,visible){
   if(p.modType==="rel"){
     if(S.showRes){
       // res is also on screen — rel steps back to an outline only, like the QGIS style
-      return {color:REL_OUTLINE,weight:1.5,opacity:1,fillOpacity:0};
+      return {color:REL_OUTLINE,weight:1,opacity:1,fillOpacity:0};
     }
     const hex = S.sizeColour ? (p.hex_size||SIZE_HEX[p.PPM]||SIZE_HEX[p.PEM]||"#808080") : REL_OUTLINE;
     return {color:hex,fillColor:hex,weight:0,opacity:1,fillOpacity:S.alpha};
