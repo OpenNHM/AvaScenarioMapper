@@ -103,7 +103,7 @@ body{
 }
 #status{padding:8px 12px;flex:1;min-width:0}
 #status .eyebrow{
-  font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--albina-blue-dark)
 }
 #status .headline{
   font-size:15px;font-weight:700;margin-top:1px;
@@ -146,6 +146,9 @@ body{
   border:0;background:transparent;color:var(--albina-blue-dark);
   font-size:12px;font-weight:600;padding:4px 2px;cursor:pointer
 }
+.sheet-pinned{
+  flex:0 0 auto;padding:2px 14px 0;border-bottom:1px solid var(--line-2)
+}
 .sheet-body{
   flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;
   touch-action:pan-y;
@@ -157,14 +160,29 @@ body{
 .block:first-child{border-top:0;padding-top:6px}
 .label{
   font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--ink-3);margin-bottom:8px;display:flex;align-items:center;gap:6px
+  color:var(--ink-2);margin-bottom:8px;display:flex;align-items:center;gap:6px
 }
 .label .val{
   margin-left:auto;text-transform:none;letter-spacing:0;font-size:12px;
   color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums
 }
 .hint{font-size:11px;color:var(--ink-3);margin-top:8px}
+.hint a{color:inherit;text-decoration:underline}
+.hint.ref-heading{
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--ink-2);margin-top:14px;margin-bottom:0
+}
+.hint + .hint.ref-heading{margin-top:14px}
+.ref-heading + .hint{margin-top:2px}
 .label.section{color:var(--albina-blue-dark);font-size:11px;font-weight:700}
+.label-btn{
+  border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r-md);
+  padding:9px 12px;width:100%;font-family:inherit;text-align:left;cursor:pointer;
+  transition:background .12s ease,border-color .12s ease,color .12s ease
+}
+.label-btn:active{background:var(--surface)}
+.label-btn.on{background:var(--albina-blue-pale);border-color:var(--albina-blue);color:var(--albina-blue-dark)}
+.label-btn.on .val{color:var(--albina-blue-dark)}
 
 /* segmented control */
 .seg{display:flex;background:var(--surface-2);border-radius:var(--r-md);padding:3px;gap:3px}
@@ -174,6 +192,12 @@ body{
   display:flex;align-items:center;justify-content:center;gap:6px
 }
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(16,20,24,.16)}
+.seg button.disabled{opacity:.4}
+.seg button.hidden{display:none}
+
+/* mode panels — only one of "Explore" / "Size Analysis" shown at a time */
+.mode-panel{display:none}
+.mode-panel.on{display:block}
 
 /* EAWS avalanche problem icons */
 .problems{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
@@ -219,21 +243,22 @@ body{
 .single input[type=range]{pointer-events:auto}
 .ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-3);margin-top:-2px}
 
-.row{display:flex;align-items:center;gap:8px}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .row + .row{margin-top:8px}
 .chip{
   border:1px solid var(--line);background:var(--surface);border-radius:var(--r-pill);
   padding:7px 12px;font-size:12px;font-weight:600;color:var(--ink-2);cursor:pointer;
   display:inline-flex;align-items:center;gap:6px
 }
-.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
-.chip .sw{width:14px;height:14px;border-radius:4px;display:inline-block}
+.chip.on{background:var(--albina-blue-pale);border-color:var(--albina-blue);color:var(--albina-blue-dark)}
+.dim-submenu{display:none}
+.dim-submenu.on{display:flex;margin-top:8px}
 
 /* size scale */
 .size-pictograms{display:none;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:8px}
 .size-pictograms.on{display:grid}
-.size-pictograms span{height:30px;display:grid;place-items:center}
-.size-pictograms img{width:28px;height:28px}
+.size-pictograms span{height:38px;display:grid;place-items:center}
+.size-pictograms img{width:34px;height:34px}
 /* value row under a 5-icon grid — same column grid as .size-pictograms so
    each value lines up under its icon, unlike .ticks' flex space-between */
 .picto-ticks{display:none;grid-template-columns:repeat(5,1fr);margin-top:2px;
@@ -242,10 +267,9 @@ body{
 /* colour key linking each pictogram to its size-class colour, always shown */
 .picto-ticks.size-key{display:grid;gap:3px;margin-top:0;margin-bottom:4px}
 .picto-ticks.size-key span{border-radius:6px;padding:3px 0;font-weight:700;font-size:9px}
-.runout-arrow{display:none;align-items:center;gap:8px;margin-top:8px;color:#3c5d73;font-size:10px;
-  border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface-2);padding:8px 12px}
+.runout-arrow{display:none;margin-top:8px;justify-content:center}
 .runout-arrow.on{display:flex}
-.runout-arrow img{flex:1;height:20px}
+.runout-arrow img{width:85%;height:auto;display:block}
 
 /* popup */
 .leaflet-popup-content-wrapper{border-radius:var(--r-md);box-shadow:0 6px 24px rgba(16,20,24,.22)}
@@ -296,15 +320,20 @@ body{
   <div class="grab" id="grab">
     <div class="bar"></div>
     <div class="grab-row">
-      <h1 id="sheet-title">Scenario</h1>
+      <h1 id="sheet-title">Avalanche Scenario Mapper</h1>
       <span class="badge" id="count">0</span>
       <button class="linkbtn" id="btn-reset">Reset</button>
     </div>
   </div>
 
-  <div class="sheet-body">
-
-    <!-- 1 — preset ------------------------------------------------------ -->
+  <!-- pinned — always visible, doesn't scroll away with the body below -->
+  <div class="sheet-pinned">
+    <div class="block">
+      <div class="seg" id="seg-mode">
+        <button data-mode="explore" class="on"><i class="ph ph-map-trifold"></i>Explore</button>
+        <button data-mode="size" id="seg-mode-size"><i class="ph ph-chart-bar"></i>Avalanche Size</button>
+      </div>
+    </div>
     <div class="block">
       <div class="label">Preset</div>
       <div class="seg" id="seg-preset">
@@ -313,6 +342,11 @@ body{
         <button data-preset="custom"><i class="ph ph-sliders-horizontal"></i>Custom</button>
       </div>
     </div>
+  </div>
+
+  <div class="sheet-body">
+
+    <div class="mode-panel on" id="mode-explore">
 
     <!-- 2 — spatial constraints ----------------------------------------- -->
     <div class="block">
@@ -343,7 +377,7 @@ body{
         <button data-flow="dry" class="on">Cold</button>
         <button data-flow="wet">Warm</button>
       </div>
-      <div class="label" style="margin:14px 0 2px">Avalanche size scenario <span class="val" id="v-size">4 — very large</span></div>
+      <div class="label" style="margin:14px 0 2px">Expected Size | Event Size <span class="val" id="v-size">4 — very large</span></div>
       <div class="range single rainbow" id="size-range">
         <div class="track"></div><div class="fill" id="size-fill"></div>
         <input type="range" id="size" min="1" max="5" step="1" value="5"/>
@@ -356,13 +390,13 @@ body{
     <div class="block">
       <div class="label">Display</div>
       <div class="row">
-        <button class="chip on" id="chip-rel"><span class="sw" style="background:var(--rel)"></span>Release</button>
-        <button class="chip" id="chip-res"><span class="sw" style="background:var(--res)"></span>Runout</button>
+        <button class="chip on" id="chip-rel">Release</button>
+        <button class="chip on" id="chip-res">Runout</button>
       </div>
-      <div class="label" style="margin:14px 0 2px">Set avalanche transparency <span class="val" id="v-alpha">30 %</span></div>
+      <div class="label" style="margin:14px 0 2px">Set avalanche transparency <span class="val" id="v-alpha">20 %</span></div>
       <div class="range single" id="alpha-range">
         <div class="track"></div><div class="fill" id="alpha-fill"></div>
-        <input type="range" id="alpha" min="5" max="85" step="5" value="30"/>
+        <input type="range" id="alpha" min="5" max="85" step="5" value="20"/>
       </div>
       <div class="row" style="margin-top:10px">
         <button class="chip on" id="chip-hill"><i class="ph ph-mountains"></i>Hillshade</button>
@@ -374,26 +408,33 @@ body{
       </div>
     </div>
 
-    <!-- 5 — single size mapping ----------------------------------------- -->
     <div class="block">
-      <div class="label">Single Size Mapping</div>
-      <button class="chip" id="chip-release-dimension"><i class="ph ph-palette"></i>Release Dimension</button>
-      <div class="hint">Shows release areas only, coloured by release dimension.</div>
+      <div class="label section">References</div>
+      <div class="hint" id="src-note" style="margin-top:0">The size interface builds on the established EAWS, CAA and AAA classifications. Continuous size relationships retain compatibility with these five-class operational schemes while allowing model inputs and outputs to be expressed on the same scale. Simulation results can therefore be translated back into spatially mapped dimension, runout and destructive size.</div>
+
+      <div class="hint ref-heading">Mapping Concept · Avalanche Scenario Maps</div>
+      <div class="hint">Hesselbach, C., Schwarz, J., Spannring, P., Wirbel, A., Huber, A., Winkler, M., Mitterer, C., Riedl, H., &amp; Fischer, J.-T. (2026). Avalanche scenario maps: from terrain identification to decision support tool. Proceedings of the International Snow Science Workshop. Whistler, Canada.</div>
+
+      <div class="hint ref-heading">Size Interface · Avalanche Size Classification</div> 
+      <div class="hint">Fischer, J.-T., Spannring, P., Hesselbach, C., Huber, A., Wirbel, A., Koehler, A., Sovilla, B., Gauer, P., &amp; Thumlert, S. (2026). Towards a Technical Scheme for Classification. Proceedings of the International Snow Science Workshop. Whistler, Canada.</div>
+
+      <div class="hint ref-heading">Software · Avalanche Scenario Mapper</div>
+      <div class="hint">Hesselbach, C., Spannring, P., Huber, A., Schwarz, J., &amp; Fischer, J.-T. (2025). OpenNHM/AvaScenarioMapper: Avalanche Scenario Mapper v1.0 [Computer software]. Zenodo. <a href="https://doi.org/10.5281/zenodo.17662779" target="_blank" rel="noopener">doi.org/10.5281/zenodo.17662779</a></div>
+
+      <div class="hint ref-heading">Software · Avalanche Terrain Identification</div>
+      <div class="hint">Hesselbach, C., Spannring, P., Huber, A., &amp; Fischer, J.-T. (2026). OpenNHM/AvalancheTerrainIdentification: Avalanche Terrain Identification v1.1 [Computer software]. Zenodo. <a href="https://doi.org/10.5281/zenodo.22049056" target="_blank" rel="noopener">doi.org/10.5281/zenodo.22049056</a></div>
+
+      <div class="hint">Cockpit UI (colours, aspect rose, icons) adapted from <a href="https://github.com/albina-euregio/albina-admin-gui" target="_blank" rel="noopener">albina-admin-gui</a> (AGPL-3.0).</div>
     </div>
 
-    <!-- 6 — spatial size mapping ---------------------------------------- -->
-    <div class="block">
-      <div class="label">Spatial Size Mapping</div>
-      <div class="row">
-        <button class="chip" id="chip-destructive"><i class="ph ph-warning"></i>Destructive</button>
-        <button class="chip" id="chip-runout-raster"><i class="ph ph-arrows-left-right"></i>Runout</button>
-      </div>
-      <div class="hint">Only available for the Dry Winter and Wet Spring scenarios within the pilot-region extent.</div>
-    </div>
+    </div><!-- /mode-explore -->
 
-    <!-- 7 — legend -------------------------------------------------------- -->
+    <div class="mode-panel" id="mode-size">
+
+    <!-- 5 — legend --------------------------------------------------------- -->
     <div class="block">
-      <div class="label section">Avalanche Size Criteria</div>
+      <div class="label section">Avalanche Size</div>
+      <div class="label" style="margin-top:2px">Classification</div>
       <div class="picto-ticks size-key" aria-hidden="true">
         <span style="background:#09a2ff;color:#fff">Size 1</span>
         <span style="background:#66ff31;color:#101418">Size 2</span>
@@ -402,25 +443,33 @@ body{
         <span style="background:#5b0069;color:#fff">Size 5</span>
       </div>
 
-      <div class="label" style="margin-top:12px">Dimension Size <span class="val">Volume [m³]</span></div>
-      <div class="size-pictograms" id="volume-pictograms" aria-label="Relative release volume by size class">
+      <div class="hint" style="margin:2px 0 0">Tap a criterion below to show it spatially on the map — only available for the Dry Winter and Wet Spring presets, within the pilot-region extent.</div>
+
+      <div class="label" style="margin-top:12px">Criterion <span class="val" style="text-transform:uppercase;letter-spacing:.08em;font-size:10px;font-weight:600;color:var(--ink-2)">Characteristic</span></div>
+
+      <button class="label label-btn" id="btn-dimension-size">Dimension Size <span class="val">Release &amp; Deposition Volume [m³]</span></button>
+      <div class="row dim-submenu" id="dimension-submenu">
+        <button class="chip" id="chip-dim-release">Release</button>
+        <button class="chip" id="chip-dim-deposition">Deposition</button>
+      </div>
+      <div class="size-pictograms" id="depsize-pictograms" aria-label="Relative deposition volume by size class">
+        <span><img src="assets/size/truck-badge.svg" alt="&gt;0"/></span>
         <span><img src="assets/size/truck-badge.svg" alt="1×"/></span>
         <span><img src="assets/size/truck-badge.svg" alt="10×"/></span>
         <span><img src="assets/size/truck-badge.svg" alt="100×"/></span>
         <span><img src="assets/size/truck-badge.svg" alt="1,000×"/></span>
-        <span><img src="assets/size/truck-badge.svg" alt="10,000×"/></span>
       </div>
-      <div class="picto-ticks" id="volume-ticks">
-        <span>1×</span><span>10×</span><span>100×</span><span>1,000×</span><span>10,000×</span>
+      <div class="picto-ticks" id="depsize-ticks">
+        <span>&gt;0</span><span>1×</span><span>10×</span><span>100×</span><span>1,000×</span>
       </div>
 
-      <div class="label" style="margin-top:12px">Runout Size <span class="val">Runout Length [m]</span></div>
-      <div class="runout-arrow" id="runout-arrow"><img src="assets/size/runout-arrow.svg" alt="short to long runout"/></div>
+      <button class="label label-btn" id="btn-runout-size" style="margin-top:12px">Runout Size <span class="val">Runout Length [m]</span></button>
+      <div class="runout-arrow" id="runout-arrow"><img src="assets/size/travelLengthArrows.svg" alt="short to long runout, five increasing size classes"/></div>
       <div class="picto-ticks" id="runout-ticks">
-        <span>0 m</span><span>50 m</span><span>250 m</span><span>900 m</span><span>2000 m</span>
+        <span>&gt;0 m</span><span>50 m</span><span>250 m</span><span>900 m</span><span>2000 m</span>
       </div>
 
-      <div class="label" style="margin-top:12px">Destructive Size <span class="val">Impact Pressure [kPa]</span></div>
+      <button class="label label-btn" id="btn-destructive-size" style="margin-top:12px">Destructive Size <span class="val">Impact Pressure [kPa]</span></button>
       <div class="size-pictograms" id="destructive-pictograms" aria-label="Destructive size consequences">
         <span title="Size 1 · small slide"><img src="assets/size/size1.svg" alt="Size 1"/></span>
         <span title="Size 2 · person"><img src="assets/size/size2.svg" alt="Size 2"/></span>
@@ -429,14 +478,30 @@ body{
         <span title="Size 5 · buildings and forest"><img src="assets/size/size5.svg" alt="Size 5"/></span>
       </div>
       <div class="picto-ticks" id="destructive-ticks">
-        <span>0 kPa</span><span>20 kPa</span><span>50 kPa</span><span>200 kPa</span><span>500 kPa</span>
-      </div>
-
-      <div class="hint" id="src-note">
-        Step 16 of the Avalanche Scenario Model Chain · CAIROS / BFW.
-        Colours &amp; icons follow EAWS + albina-admin-gui conventions.
+        <span>&gt;0 kPa</span><span>20 kPa</span><span>50 kPa</span><span>200 kPa</span><span>500 kPa</span>
       </div>
     </div>
+
+    <div class="block">
+      <div class="label section">References</div>
+      <div class="hint" id="src-note-size" style="margin-top:0">The size interface builds on the established EAWS, CAA and AAA classifications. Continuous size relationships retain compatibility with these five-class operational schemes while allowing model inputs and outputs to be expressed on the same scale. Simulation results can therefore be translated back into spatially mapped dimension, runout and destructive size.</div>
+
+      <div class="hint ref-heading">Mapping Concept · Avalanche Scenario Maps</div>
+      <div class="hint">Hesselbach, C., Schwarz, J., Spannring, P., Wirbel, A., Huber, A., Winkler, M., Mitterer, C., Riedl, H., &amp; Fischer, J.-T. (2026). Avalanche scenario maps: from terrain identification to decision support tool. Proceedings of the International Snow Science Workshop. Whistler, Canada.</div>
+
+      <div class="hint ref-heading">Size Interface · Avalanche Size Classification</div>
+      <div class="hint">Fischer, J.-T., Spannring, P., Hesselbach, C., Huber, A., Wirbel, A., Koehler, A., Sovilla, B., Gauer, P., &amp; Thumlert, S. (2026). Towards a Technical Scheme for Avalanche Size Classification. Proceedings of the International Snow Science Workshop. Whistler, Canada.</div>
+
+      <div class="hint ref-heading">Software · Avalanche Scenario Mapper</div>
+      <div class="hint">Hesselbach, C., Spannring, P., Huber, A., Schwarz, J., &amp; Fischer, J.-T. (2025). OpenNHM/AvaScenarioMapper: Avalanche Scenario Mapper v1.0 [Computer software]. Zenodo. <a href="https://doi.org/10.5281/zenodo.17662779" target="_blank" rel="noopener">doi.org/10.5281/zenodo.17662779</a></div>
+
+      <div class="hint ref-heading">Software · Avalanche Terrain Identification</div>
+      <div class="hint">Hesselbach, C., Spannring, P., Huber, A., &amp; Fischer, J.-T. (2026). OpenNHM/AvalancheTerrainIdentification: Avalanche Terrain Identification v1.1 [Computer software]. Zenodo. <a href="https://doi.org/10.5281/zenodo.22049056" target="_blank" rel="noopener">doi.org/10.5281/zenodo.22049056</a></div>
+
+      <div class="hint">Cockpit UI (colours, aspect rose, icons) adapted from <a href="https://github.com/albina-euregio/albina-admin-gui" target="_blank" rel="noopener">albina-admin-gui</a> (AGPL-3.0).</div>
+    </div>
+
+    </div><!-- /mode-size -->
 
   </div>
 </section>
@@ -490,6 +555,7 @@ const CFG = {
   center:[46.9914, 11.416055], zoom:13, minZoom:9, maxZoom:13,
   data:{
     shard:"data/avaPreview_issw_{type}_{flow}_{sector}_{tile}.geojson",
+    depSizeShard:"data/avaPreview_issw_depsize_{preset}_{tile}.geojson",
     manifest:"data/avaPreview_issw_manifest.json",
     extent:  "data/pilotBrennerExtentMerge.geojson",
     hill:    "data/10HS_isswAll.png",
@@ -530,13 +596,14 @@ const PRESETS = {
 /* ------------------------------------------------------------------- state */
 const S = {
   preset:"dry",
+  mode:"explore",
   flows:new Set(["dry"]),
   aspects:new Set(["W","N"]),
   elev:[2000,3500],
   size:4,
-  showRel:true, showRes:false, sizeColour:false,
+  showRel:true, showRes:true, sizeColour:false,
   sizeRaster:null,
-  alpha:0.30,
+  alpha:0.20,
   baseAlpha:0.50,
   base:"osm", hillshade:true,
   demo:false
@@ -574,6 +641,21 @@ const sizeRasterLayers=new Map();
 let microLayer=null;
 const featLayers=[];              // {layer, p}  every rel/res polygon
 const gAva = L.layerGroup().addTo(map);
+/* Separate Canvas renderers per layer: Leaflet's Canvas renderer redraws
+   every registered path (visible or not) whenever ANY of them changes, so
+   sharing one canvas across rel+res+depSize meant switching a single size
+   criterion repainted the whole loaded dataset. Splitting them means
+   toggling one only ever repaints its own (much smaller) canvas. */
+const relRenderer = L.canvas();
+const resRenderer = L.canvas();
+const depSizeRenderer = L.canvas();
+
+/* "Deposition Size" — a fixed single-scenario snapshot (unlike rel/res it
+   doesn't respond to aspect/elevation/size filters), so features are styled
+   once at load time and just shown/hidden as a whole group. */
+const depSizeGroups = new Map();  // preset -> L.layerGroup(), only the active preset's group is ever on the map
+const loadedDepSizeShards=new Map();
+const knownDepSizeTiles=new Set();  // "preset/tileCol_tileRow"
 
 /* Boot happens at the very bottom of this file: loadAll() touches const
    bindings declared further down, and const is not hoisted. */
@@ -603,11 +685,7 @@ function buildRose(){
    lowest value. Only runs when the aspect selection itself changes, so a
    manual slider tweak afterward still sticks until the next aspect change. */
 function applyAlphaStaffel(){
-  const n=S.aspects.size;
-  if(n<=0) return;
-  let a = n<=1 ? 0.30 : n===2 ? 0.20 : 0.10;
-  if(S.showRel && !S.showRes) a += 0.20;   // rel-only has far less overlap than with res shown too
-  S.alpha = Math.min(0.85, a);
+  S.alpha = (S.showRel && !S.showRes) ? 0.50 : 0.20;   // rel-only has far less overlap than with res shown too
   $("#alpha").value=Math.round(S.alpha*100);
   syncAlpha();
 }
@@ -639,7 +717,12 @@ function bindSheet(){
   window.addEventListener("resize",()=>setSnap(snapName));
 
   let startY=0,startT=0,drag=false,moved=false;
-  const down=e=>{drag=true;moved=false;startY=e.clientY;startT=sheetY;sheet.classList.add("dragging");grab.setPointerCapture(e.pointerId);};
+  const down=e=>{
+    // let taps on real controls in the grab row (Reset) behave as normal
+    // clicks instead of being captured as part of the sheet-drag gesture
+    if(e.target.closest("button,a")) return;
+    drag=true;moved=false;startY=e.clientY;startT=sheetY;sheet.classList.add("dragging");grab.setPointerCapture(e.pointerId);
+  };
   const move=e=>{
     if(!drag)return;
     const p=snapPoints(), d=e.clientY-startY;
@@ -664,11 +747,27 @@ function bindSheet(){
 /* ------------------------------------------------------------- controls */
 function bindControls(){
   $$("#seg-preset button").forEach(b=>b.addEventListener("click",()=>applyPreset(b.dataset.preset)));
+  $$("#seg-mode button").forEach(b=>b.addEventListener("click",()=>{
+    if(b.dataset.mode==="size" && S.preset==="custom"){
+      showError("Avalanche Size is only available for the Dry Winter and Wet Spring presets.");
+      return;
+    }
+    // coming back from Avalanche Size to Explore doubles as a reset to
+    // Dry Winter, so you're never stuck on a stale size-mode selection
+    if(b.dataset.mode==="explore" && S.mode==="size"){
+      resetToDefaults();
+      return;
+    }
+    S.mode=b.dataset.mode;
+    syncMode();
+    syncSizeModeDisplay();
+    refresh();
+  }));
   $$("#seg-flow button").forEach(b=>b.addEventListener("click",()=>{
     S.flows=new Set([b.dataset.flow]);
     markCustom(); syncFlow(); refresh();
   }));
-  $("#btn-reset").addEventListener("click",()=>applyPreset(S.preset==="custom"?"dry":S.preset));
+  $("#btn-reset").addEventListener("click",resetToDefaults);
 
   /* elevation dual range */
   const lo=$("#elev-lo"), hi=$("#elev-hi");
@@ -701,21 +800,34 @@ function bindControls(){
     S.showRes=!S.showRes; e.currentTarget.classList.toggle("on",S.showRes);
     if(S.showRes){
       S.sizeColour=false;
-      $("#chip-release-dimension").classList.remove("on");
-      syncVolumePictograms();
+      syncSizeRaster();
     }
     applyAlphaStaffel();
     refresh();
   });
   tog("#chip-hill","hillshade",()=>{ S.hillshade?hill.addTo(map):map.removeLayer(hill); });
-  $("#chip-release-dimension").addEventListener("click",e=>{
+  // "Dimension Size" is a disclosure — tapping it reveals the Release/
+  // Deposition choice underneath, defaulting to Deposition on first open
+  $("#btn-dimension-size").addEventListener("click",()=>{
+    const wasOpen = $("#dimension-submenu").classList.contains("on");
+    $("#dimension-submenu").classList.toggle("on");
+    // opening it fresh with nothing picked yet defaults to Deposition,
+    // so the first tap shows something instead of just an empty picker
+    if(!wasOpen && !S.sizeColour && S.sizeRaster!=="depsize"){
+      selectSizeRaster("depsize");
+    }
+  });
+  $("#chip-dim-release").addEventListener("click",()=>{
     S.sizeColour=!S.sizeColour;
     if(S.sizeColour){
       S.showRel=true; S.showRes=false;
       $("#chip-rel").classList.add("on"); $("#chip-res").classList.remove("on");
+      // mutually exclusive with "Deposition" — they share the legend row below
+      S.sizeRaster=null; updateSizeRasters(); updateDepSizeLayer();
+    } else {
+      syncSizeModeDisplay();
     }
-    e.currentTarget.classList.toggle("on",S.sizeColour);
-    syncVolumePictograms();
+    syncSizeRaster();
     applyAlphaStaffel();
     refresh();
   });
@@ -730,12 +842,17 @@ function bindControls(){
       // so they don't clutter/compete with it
       S.showRel=false; S.showRes=false;
       $("#chip-rel").classList.remove("on"); $("#chip-res").classList.remove("on");
+      // mutually exclusive with "Release" — they share the legend row below
+      S.sizeColour=false;
+    } else {
+      syncSizeModeDisplay();
     }
-    syncSizeRaster(); updateSizeRasters();
+    syncSizeRaster(); updateSizeRasters(); updateDepSizeLayer();
     refresh();
   };
-  $("#chip-destructive").addEventListener("click",()=>selectSizeRaster("destructive"));
-  $("#chip-runout-raster").addEventListener("click",()=>selectSizeRaster("runout"));
+  $("#btn-destructive-size").addEventListener("click",()=>selectSizeRaster("destructive"));
+  $("#chip-dim-deposition").addEventListener("click",()=>selectSizeRaster("depsize"));
+  $("#btn-runout-size").addEventListener("click",()=>selectSizeRaster("runout"));
 
   $("#btn-locate").addEventListener("click",()=>{
     map.locate({setView:true,maxZoom:CFG.maxZoom});
@@ -746,6 +863,17 @@ function bindControls(){
   });
 }
 
+function resetToDefaults(){
+  // full reset to the app's starting state, not just "reapply current preset"
+  S.mode="explore";
+  S.showRel=true; S.showRes=true;
+  $("#chip-rel").classList.add("on"); $("#chip-res").classList.add("on");
+  S.sizeColour=false; S.sizeRaster=null;
+  $("#dimension-submenu").classList.remove("on");
+  S.hillshade=true; $("#chip-hill").classList.add("on"); if(!map.hasLayer(hill)) hill.addTo(map);
+  S.baseAlpha=0.50; $("#base-alpha").value=50; baseOSM.setOpacity(S.baseAlpha);
+  applyPreset("dry");
+}
 function applyPreset(name,opt){
   opt=opt||{};
   S.preset=name;
@@ -767,20 +895,47 @@ function applyPreset(name,opt){
 function markCustom(){
   if(S.preset==="custom") return;
   S.preset="custom";
-  S.sizeRaster=null; syncSizeRaster(); updateSizeRasters();
-  syncPreset();
+  S.sizeRaster=null; syncSizeRaster(); updateSizeRasters(); updateDepSizeLayer();
+  syncPreset(); syncMode();
+}
+function syncMode(){
+  const sizeDisabled = S.preset==="custom";
+  if(sizeDisabled && S.mode==="size") S.mode="explore";
+  $("#seg-mode-size").classList.toggle("disabled",sizeDisabled);
+  $$("#seg-mode button").forEach(b=>b.classList.toggle("on",b.dataset.mode===S.mode));
+  $("#mode-explore").classList.toggle("on",S.mode==="explore");
+  $("#mode-size").classList.toggle("on",S.mode==="size");
+  // Custom has no meaning in Size Analysis (rasters/depSize only exist for
+  // the two named presets), so don't offer it as a choice while in that mode
+  $('#seg-preset button[data-preset="custom"]').classList.toggle("hidden",S.mode==="size");
+}
+function syncSizeModeDisplay(){
+  // with no criterion picked, default to showing rel+res exactly like Explore
+  if(S.mode!=="size" || S.sizeRaster || S.sizeColour) return;
+  S.showRel=true; S.showRes=true;
+  $("#chip-rel").classList.add("on"); $("#chip-res").classList.add("on");
+  applyAlphaStaffel();
+}
+function syncDimensionButtons(){
+  const on = S.sizeColour || S.sizeRaster==="depsize";
+  $("#btn-dimension-size").classList.toggle("on",on);
+  $("#chip-dim-release").classList.toggle("on",S.sizeColour);
+  $("#chip-dim-deposition").classList.toggle("on",S.sizeRaster==="depsize");
 }
 function syncSizeRaster(){
-  $("#chip-destructive").classList.toggle("on",S.sizeRaster==="destructive");
-  $("#chip-runout-raster").classList.toggle("on",S.sizeRaster==="runout");
+  $("#btn-destructive-size").classList.toggle("on",S.sizeRaster==="destructive");
+  $("#btn-runout-size").classList.toggle("on",S.sizeRaster==="runout");
   $("#destructive-pictograms").classList.toggle("on",S.sizeRaster==="destructive");
   $("#destructive-ticks").classList.toggle("on",S.sizeRaster==="destructive");
   $("#runout-arrow").classList.toggle("on",S.sizeRaster==="runout");
   $("#runout-ticks").classList.toggle("on",S.sizeRaster==="runout");
+  syncDimensionButtons();
+  syncVolumePictograms();
 }
 function syncVolumePictograms(){
-  $("#volume-pictograms").classList.toggle("on",S.sizeColour);
-  $("#volume-ticks").classList.toggle("on",S.sizeColour);
+  const on = S.sizeColour || S.sizeRaster==="depsize";
+  $("#depsize-pictograms").classList.toggle("on",on);
+  $("#depsize-ticks").classList.toggle("on",on);
 }
 function syncPreset(){
   $$("#seg-preset button").forEach(b=>b.classList.toggle("on",b.dataset.preset===S.preset));
@@ -813,7 +968,7 @@ function syncBaseAlpha(){
   f.style.left="0"; f.style.width=((v-10)/90*100)+"%";
   $("#v-base-alpha").textContent=v+" %";
 }
-function syncAll(){ syncPreset(); syncFlow(); syncRose(); syncElev(); syncSize(); syncAlpha(); syncBaseAlpha(); syncSizeRaster(); updateSizeRasters(); }
+function syncAll(){ syncPreset(); syncMode(); syncSizeModeDisplay(); syncFlow(); syncRose(); syncElev(); syncSize(); syncAlpha(); syncBaseAlpha(); syncSizeRaster(); updateSizeRasters(); updateDepSizeLayer(); }
 
 /* --------------------------------------------------------------- filtering */
 function activeSectors(){
@@ -828,10 +983,18 @@ function matches(p,sectors){
   if(p.modType==="res" && !(Number(p.sizeMask||0) & (1 << (S.size-1)))) return false;
   return true;
 }
+const REL_OUTLINE="#ff00e5";   // matches the QGIS project's rel symbol (255,0,229)
 function styleFor(p,visible){
   if(!visible) return {opacity:0,fillOpacity:0,weight:0};
-  const hex = S.sizeColour && p.modType==="rel" ? (p.hex_size||SIZE_HEX[p.PPM]||SIZE_HEX[p.PEM]||"#808080")
-                           : (p.hex_relRes || (p.modType==="rel"?CFG.REL:CFG.RES));
+  if(p.modType==="rel"){
+    if(S.showRes){
+      // res is also on screen — rel steps back to an outline only, like the QGIS style
+      return {color:REL_OUTLINE,weight:1.5,opacity:1,fillOpacity:0};
+    }
+    const hex = S.sizeColour ? (p.hex_size||SIZE_HEX[p.PPM]||SIZE_HEX[p.PEM]||"#808080") : REL_OUTLINE;
+    return {color:hex,fillColor:hex,weight:0,opacity:1,fillOpacity:S.alpha};
+  }
+  const hex = p.hex_relRes || CFG.RES;
   return {color:hex,fillColor:hex,weight:0,opacity:1,fillOpacity:S.alpha};
 }
 
@@ -843,6 +1006,7 @@ function refresh(){
     raf=null;
     try{
       await ensureActiveShards();
+      updateDepSizeLayer();   // no-op unless "Deposition Size" is active; loads tiles as the viewport moves
       if(version===refreshVersion) doRefresh();
     }catch(err){ showError(err && err.message ? err.message : String(err)); }
   });
@@ -865,7 +1029,7 @@ function doRefresh(){
   $("#st-title").textContent = S.preset==="custom"?"Custom scenario":PRESETS[S.preset].label;
   $("#st-eyebrow").textContent = S.demo ? "Scenario · demo data" : "Scenario";
   const flow=S.flows.size===2?"dry + wet":[...S.flows][0];
-  $("#st-sub").innerHTML = `<b>${n.toLocaleString()}</b> release areas · ${flow} · ${S.elev[0]}–${S.elev[1]>=3500?"8848":S.elev[1]} m · size scenario ${S.size}`;
+  $("#st-sub").innerHTML = `<b>${n.toLocaleString()}</b> release areas · ${flow} · ${S.elev[0]}–${S.elev[1]>=3500?"8848":S.elev[1]} m · event size ${S.size}`;
 }
 function restyle(){ refresh(); }
 
@@ -890,6 +1054,69 @@ function updateSizeRasters(){
   layer.addTo(map);
 }
 
+/* "Deposition Size" — one fixed vector snapshot per preset (the same
+   North2000/South2500 scenario runs the size rasters above come from),
+   coloured by each feature's own precomputed depSize rather than the
+   rel/res filter system. Loaded tile-by-tile like rel/res, but features are
+   styled once and never restyled by doRefresh(). */
+function depSizeShardUrl(preset,tileCol,tileRow){
+  return CFG.data.depSizeShard.replace("{preset}",preset).replace("{tile}",tileCol+"_"+tileRow)+".gz";
+}
+const DEPSIZE_ALPHA=0.5;   // Dimension Size stays a bit more transparent than the image rasters
+function depSizeStyle(p){
+  const hex=SIZE_HEX[Math.min(5,Math.max(1,Math.floor(p.depSize)))]||"#808080";
+  return {color:hex,fillColor:hex,weight:0,opacity:DEPSIZE_ALPHA,fillOpacity:DEPSIZE_ALPHA};
+}
+function depSizeGroupFor(preset){
+  let group=depSizeGroups.get(preset);
+  if(!group){ group=L.layerGroup(); depSizeGroups.set(preset,group); }
+  return group;
+}
+async function loadDepSizeShard(preset,tileCol,tileRow){
+  const key=preset+"/"+tileCol+"_"+tileRow;
+  if(loadedDepSizeShards.has(key)) return loadedDepSizeShards.get(key);
+  const group=depSizeGroupFor(preset);
+  const task=(async()=>{
+    const geo=await getShardJSON(depSizeShardUrl(preset,tileCol,tileRow));
+    const feats=(geo&&geo.features)||[];
+    const CHUNK=1200;
+    for(let i=0;i<feats.length;i+=CHUNK){
+      const slice=feats.slice(i,i+CHUNK);
+      L.geoJSON({type:"FeatureCollection",features:slice},{
+        renderer:depSizeRenderer,
+        style:f=>depSizeStyle(f.properties||{}),
+        onEachFeature:(f,l)=>{
+          const p=f.properties||{};
+          const item={layer:l,p,visible:true,baseStyle:depSizeStyle(p)};
+          l.on("click",()=>{ highlightFeature(item); openPopup(l,p); });
+        }
+      }).addTo(group);
+      await nextFrame();
+    }
+    loadedDepSizeShards.set(key,true);
+  })().catch(err=>{ loadedDepSizeShards.delete(key); throw err; });
+  loadedDepSizeShards.set(key,task);
+  return task;
+}
+async function updateDepSizeLayer(){
+  // exactly mirrors updateSizeRasters(): hide every preset's group first,
+  // then only show/populate the one matching the currently active preset.
+  depSizeGroups.forEach((group,preset)=>{
+    if(map.hasLayer(group) && !(S.sizeRaster==="depsize" && S.preset===preset)) map.removeLayer(group);
+  });
+  if(S.sizeRaster!=="depsize" || S.preset==="custom") return;
+  const preset=S.preset;
+  const group=depSizeGroupFor(preset);
+  if(!map.hasLayer(group)) group.addTo(map);
+  const tiles=tilesForBounds(map.getBounds());
+  const jobs=[];
+  for(const [tileCol,tileRow] of tiles){
+    if(!knownDepSizeTiles.has(preset+"/"+tileCol+"_"+tileRow)) continue;
+    jobs.push(loadDepSizeShard(preset,tileCol,tileRow));
+  }
+  await Promise.all(jobs);
+}
+
 /* ------------------------------------------------------------------- data */
 const loadedShards=new Map();         // key -> in-flight promise or true
 
@@ -897,13 +1124,14 @@ const nextFrame = ()=>new Promise(r=>requestAnimationFrame(()=>r()));
 
 /* Build in chunks and yield between them: the browser keeps painting, so a
    slow machine shows progress instead of a frozen splash screen. */
-async function addFeatures(geo, want, onProgress){
+async function addFeatures(geo, want, onProgress, renderer){
   const src = (geo && geo.features) || [];
   const feats = want ? src.filter(f=>f.properties && f.properties.modType===want) : src;
   const CHUNK = 1200;
   for(let i=0;i<feats.length;i+=CHUNK){
     const slice = feats.slice(i, i+CHUNK);
     L.geoJSON({type:"FeatureCollection", features:slice},{
+      renderer,
       style:()=>({weight:0,opacity:0,fillOpacity:0}),
       onEachFeature:(f,l)=>{
         const item={layer:l, p:f.properties||{}, visible:false, key:"hidden"};
@@ -971,7 +1199,7 @@ async function loadShard(flow,type,sector,tileCol,tileRow){
   const task=(async()=>{
     setBusy("Loading "+flow+" "+type+" "+sector+" …");
     const geo=await getShardJSON(shardUrl(flow,type,sector,tileCol,tileRow));
-    await addFeatures(geo,null);
+    await addFeatures(geo,null,undefined,type==="rel"?relRenderer:resRenderer);
     loadedShards.set(key,true);
     setBusy(null);
     return true;
@@ -1015,13 +1243,16 @@ function highlightFeature(item){
   item.layer.bringToFront();
 }
 function restoreHighlight(item){
-  item.layer.setStyle(styleFor(item.p,item.visible));
+  // depSize features carry their own frozen colour (baseStyle) since they
+  // don't participate in the rel/res filter system styleFor() computes from
+  item.layer.setStyle(item.baseStyle || styleFor(item.p,item.visible));
 }
 function openPopup(l,p){
   const rows=[["Region",p.LKGebiet],["Warning region",p.LWDGebietID],["Aspect",p.sector],
     ["Flow",p.flow],["Elevation",Math.round(p.praElevMin)+"–"+Math.round(p.praElevMax)+" m"],
     ["Release area",p.praAreaM?Math.round(p.praAreaM).toLocaleString()+" m²":null],
     ["PPM / PEM",(p.PPM??"–")+" / "+(p.PEM??"–")],["rSize",p.rSize],
+    ["Dimension size",p.depSize!=null?p.depSize.toFixed(2):null],
     ["Potential",p.AvaDistributionPotential??p.avaPotential],["praID",p.praID],["resultID",p.resultID]]
     .filter(r=>r[1]!=null&&r[1]!=="")
     .map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");
@@ -1074,7 +1305,8 @@ async function loadAll(){
       const manifest=await getJSON(CFG.data.manifest,"tile manifest");
       grid=manifest.grid;
       for(const key in manifest.shards) knownTiles.add(key);
-      setLoaderText("Loading Dry Winter shards …");
+      for(const key in manifest.depSizeShards||{}) knownDepSizeTiles.add(key);
+      setLoaderText("Loading Dry Winter Avalanches …");
       await ensureActiveShards();
       map.on("moveend zoomend",refresh);
     }

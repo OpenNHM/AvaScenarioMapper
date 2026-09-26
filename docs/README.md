@@ -39,3 +39,8 @@ The **Avalanche Scenario Mapper Preview** is an interactive, map-based visualiza
   Click any avalanche outline to reveal model attributes (e.g., sector, flow type, size class, potential).
 
 ---
+
+### Credits
+Cockpit UI (colour palette, aspect-rose geometry, [Phosphor Icons](https://phosphoricons.com/)) is adapted from [albina-admin-gui](https://github.com/albina-euregio/albina-admin-gui) (AGPL-3.0). Avalanche-size icons and graphics are original.
+
+---
