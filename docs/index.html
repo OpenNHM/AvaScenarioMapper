@@ -172,17 +172,17 @@ body{
 }
 
 /* ---------------------------------------------------------------- blocks */
-.block{padding:14px 0;border-top:1px solid var(--line-2)}
-.block:first-child{border-top:0;padding-top:6px}
+.block{padding:10px 0;border-top:1px solid var(--line-2)}
+.block:first-child{border-top:0;padding-top:4px}
 .label{
   font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--ink-2);margin-bottom:8px;display:flex;align-items:center;gap:6px
+  color:var(--ink-2);margin-bottom:6px;display:flex;align-items:center;gap:6px
 }
 .label .val{
   margin-left:auto;text-transform:none;letter-spacing:0;font-size:12px;
   color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums
 }
-.hint{font-size:11px;color:var(--ink-3);margin-top:8px}
+.hint{font-size:11px;color:var(--ink-3);margin-top:6px}
 .hint a{color:inherit;text-decoration:underline}
 .hint.ref-heading{
   font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
@@ -230,8 +230,8 @@ body{
 .prob.on span{color:var(--ink);font-weight:600}
 
 /* aspect rose + elevation side by side */
-.release{display:grid;grid-template-columns:132px 1fr;gap:14px;align-items:start}
-.rose{width:132px;height:132px;display:block;touch-action:manipulation}
+.release{display:grid;grid-template-columns:104px 1fr;gap:10px;align-items:start}
+.rose{width:104px;height:104px;display:block;touch-action:manipulation}
 .rose polygon{cursor:pointer;transition:fill .12s ease}
 .rose text{pointer-events:none;font-family:inherit;font-weight:600}
 #btn-base{display:none}
@@ -391,18 +391,18 @@ body{
     <!-- 3 — avalanche constraints --------------------------------------- -->
     <div class="block">
       <div class="label section">Avalanche Constraints</div>
-      <div class="label">Flow regime <span class="val" id="v-flow">Dry</span></div>
-      <div class="seg compact" id="seg-flow">
-        <button data-flow="dry" class="on">Cold</button>
-        <button data-flow="wet">Warm</button>
-      </div>
-      <div class="label" style="margin:14px 0 2px">Expected Size | Event Size <span class="val" id="v-size">4 — very large</span></div>
+      <div class="label">Expected Size | Event Size <span class="val" id="v-size">4 — very large</span></div>
       <div class="range single rainbow" id="size-range">
         <div class="track"></div><div class="fill" id="size-fill"></div>
         <input type="range" id="size" min="1" max="5" step="1" value="5"/>
       </div>
       <div class="ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
       <div class="hint">Size 1 shows release areas only. Sizes 2–5 use the mapper's very-high-potential size matrix.</div>
+      <div class="label" style="margin-top:10px">Flow regime <span class="val" id="v-flow">Dry</span></div>
+      <div class="seg compact" id="seg-flow">
+        <button data-flow="dry" class="on">Cold</button>
+        <button data-flow="wet">Warm</button>
+      </div>
     </div>
 
     <!-- 4 — display ------------------------------------------------------ -->
@@ -412,7 +412,7 @@ body{
         <button class="chip on" id="chip-rel">Release</button>
         <button class="chip on" id="chip-res">Runout</button>
       </div>
-      <div class="label" style="margin:14px 0 2px">Set avalanche transparency <span class="val" id="v-alpha">20 %</span></div>
+      <div class="label" style="margin:10px 0 2px">Set avalanche transparency <span class="val" id="v-alpha">20 %</span></div>
       <div class="range single" id="alpha-range">
         <div class="track"></div><div class="fill" id="alpha-fill"></div>
         <input type="range" id="alpha" min="5" max="85" step="5" value="20"/>
@@ -420,7 +420,7 @@ body{
       <div class="row" style="margin-top:10px">
         <button class="chip on" id="chip-hill"><i class="ph ph-mountains"></i>Hillshade</button>
       </div>
-      <div class="label" style="margin:14px 0 2px">Set basemap transparency <span class="val" id="v-base-alpha">50 %</span></div>
+      <div class="label" style="margin:10px 0 2px">Set basemap transparency <span class="val" id="v-base-alpha">50 %</span></div>
       <div class="range single" id="base-alpha-range">
         <div class="track"></div><div class="fill" id="base-alpha-fill"></div>
         <input type="range" id="base-alpha" min="10" max="100" step="5" value="50"/>
@@ -726,7 +726,7 @@ function syncRose(){
 /* --------------------------------------------------------------- sheet UX */
 function snapPoints(){
   const h=window.innerHeight, sh=document.getElementById("sheet").offsetHeight;
-  return {full:0, half:Math.max(0,sh-Math.round(h*0.66)), peek:Math.max(0,sh-118)};
+  return {full:0, half:Math.max(0,sh-Math.round(h*0.685)), peek:Math.max(0,sh-118)};
 }
 let sheetY=null, snapName="peek";
 function setSnap(name){
