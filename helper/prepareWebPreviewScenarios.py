@@ -184,6 +184,32 @@ def main() -> None:
             manifest["shards"][f"{mod_type}/{flow}/{sector}/{tile_col}_{tile_row}"] = {
                 "file": gz_path.name, "features": len(shard), "bytes": gz_path.stat().st_size,
             }
+    # Per-preset rel/res totals, filtered exactly like the client's own
+    # PRESETS + matches() (flow, cardinal aspects, mean-elevation range) —
+    # lets the client show a real feature count even when nothing is
+    # rendered as vectors (e.g. the size rasters, which force rel/res
+    # display off and would otherwise report a count of 0). A naive
+    # per-flow sum of every shard is NOT equivalent: it ignores the
+    # aspect/elevation filter that is what actually distinguishes the two
+    # presets, so it silently overcounts (and can look identical across
+    # presets when the underlying rel geometry happens to be flow-invariant).
+    CARDINALS = {"N", "E", "S", "W"}
+    PRESET_FILTERS = {
+        "dry": {"flow": "dry", "aspects": {"SW", "W", "NW", "N", "NE"} & CARDINALS, "elev": (2000, 9999)},
+        "wet": {"flow": "wet", "aspects": {"NE", "E", "SE", "S", "SW"} & CARDINALS, "elev": (1400, 2500)},
+    }
+    preset_totals: dict[str, dict[str, int]] = {}
+    for preset, cfg in PRESET_FILTERS.items():
+        counts = {}
+        for mod_type, dataset in (("rel", rel), ("res", res)):
+            subset = dataset[dataset["flow"] == cfg["flow"]]
+            elev_mean = subset["praElevMean"].fillna((subset["praElevMin"] + subset["praElevMax"]) / 2)
+            lo, hi = cfg["elev"]
+            mask = subset["sector"].isin(cfg["aspects"]) & elev_mean.between(lo, hi)
+            counts[mod_type] = int(mask.sum())
+        preset_totals[preset] = counts
+    manifest["presetTotals"] = preset_totals
+
     manifest_path = args.output / "avaPreview_issw_manifest.json"
     if manifest_path.exists() and not args.overwrite:
         raise FileExistsError(f"Output exists (pass --overwrite): {manifest_path}")

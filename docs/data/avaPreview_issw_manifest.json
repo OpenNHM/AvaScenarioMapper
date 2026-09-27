@@ -2987,5 +2987,15 @@
       "features": 27,
       "bytes": 3679
     }
+  },
+  "presetTotals": {
+    "dry": {
+      "rel": 15024,
+      "res": 26659
+    },
+    "wet": {
+      "rel": 20796,
+      "res": 33965
+    }
   }
 }

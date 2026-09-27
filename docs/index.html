@@ -653,6 +653,9 @@ map.createPane("sizeRasterPane");
 map.getPane("sizeRasterPane").style.zIndex=405;   /* raster > hillshade (overlayPane, 400) > basemap (tilePane, 200) */
 map.getPane("sizeRasterPane").style.pointerEvents="none";
 let sizeRasterManifest=null;
+let presetTotals={};    // {preset:{rel,res}} — pilot-region totals already filtered by
+                        // that preset's own aspects+elevation range (see PRESETS), used
+                        // when a size raster is active and nothing is rendered as vectors
 const sizeRasterLayers=new Map();
 
 let microLayer=null;
@@ -936,9 +939,14 @@ function syncMode(){
 function syncTopLegend(){
   const el=$("#st-legend");
   if(S.mode==="size"){
+    // matches whichever criterion is actually active, not a generic label
+    const word = S.sizeRaster==="runout" ? "Runout"
+               : S.sizeRaster==="destructive" ? "Destructive"
+               : (S.sizeRaster==="depsize" || S.sizeColour) ? "Dimension"
+               : "Avalanche";
     el.innerHTML = `
       <div class="lrow sizegrid">
-        <div class="lbl">Avalanche</div><div class="bar sizekey"></div>
+        <div class="lbl">${word}</div><div class="bar sizekey"></div>
         <div class="lbl">Size</div><div class="ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
       </div>`;
   } else {
@@ -969,6 +977,7 @@ function syncSizeRaster(){
   $("#runout-ticks").classList.toggle("on",S.sizeRaster==="runout");
   syncDimensionButtons();
   syncVolumePictograms();
+  syncTopLegend();
 }
 function syncVolumePictograms(){
   const on = S.sizeColour || S.sizeRaster==="depsize";
@@ -1063,11 +1072,17 @@ function doRefresh(){
     const key = ok ? shownKey : "hidden";
     if(it.key!==key){ it.key=key; it.visible=ok; it.layer.setStyle(styleFor(p,ok)); }
   }
-  $("#count").textContent = n.toLocaleString();
+  // Destructive/Runout are TIF-derived image overlays — no vectors get
+  // rendered while they're active, so the live loop above always counts 0.
+  // Show the precomputed pilot-region res total for the current preset instead.
+  const rasterActive = S.sizeRaster==="destructive" || S.sizeRaster==="runout";
+  const shownN = rasterActive ? ((presetTotals[S.preset] && presetTotals[S.preset].res) || 0) : n;
+  const countLabel = rasterActive ? "avalanche paths" : "release areas";
+  $("#count").textContent = shownN.toLocaleString();
   $("#st-title").textContent = S.preset==="custom"?"Custom scenario":PRESETS[S.preset].label;
   $("#st-eyebrow").textContent = S.demo ? "Scenario · demo data" : "Scenario";
   const flow=S.flows.size===2?"dry + wet":[...S.flows][0];
-  $("#st-sub").innerHTML = `<b>${n.toLocaleString()}</b> release areas · ${flow} · ${S.elev[0]}–${S.elev[1]>=3500?"8848":S.elev[1]} m · event size ${S.size}`;
+  $("#st-sub").innerHTML = `<b>${shownN.toLocaleString()}</b> ${countLabel} · ${flow} · ${S.elev[0]}–${S.elev[1]>=3500?"8848":S.elev[1]} m · event size ${S.size}`;
 }
 function restyle(){ refresh(); }
 
@@ -1342,6 +1357,7 @@ async function loadAll(){
       catch(e){ console.warn("size raster manifest",e); }
       const manifest=await getJSON(CFG.data.manifest,"tile manifest");
       grid=manifest.grid;
+      presetTotals=manifest.presetTotals||{};
       for(const key in manifest.shards) knownTiles.add(key);
       for(const key in manifest.depSizeShards||{}) knownDepSizeTiles.add(key);
       setLoaderText("Loading Dry Winter Avalanches …");
