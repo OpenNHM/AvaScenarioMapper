@@ -208,7 +208,9 @@ body{
   display:flex;align-items:center;justify-content:center;gap:6px
 }
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(16,20,24,.16)}
-.seg button.disabled{opacity:.4}
+.seg.compact{padding:2px}
+.seg.compact button{padding:5px 6px;font-size:12px}
+.seg button.disabled{opacity:.4;pointer-events:none}
 .seg button.hidden{display:none}
 
 /* mode panels — only one of "Explore" / "Size Analysis" shown at a time */
@@ -346,14 +348,14 @@ body{
   <!-- pinned — always visible, doesn't scroll away with the body below -->
   <div class="sheet-pinned">
     <div class="block">
-      <div class="seg" id="seg-mode">
+      <div class="seg compact" id="seg-mode">
         <button data-mode="explore" class="on"><i class="ph ph-map-trifold"></i>Explore</button>
         <button data-mode="size" id="seg-mode-size"><i class="ph ph-chart-bar"></i>Avalanche Size</button>
       </div>
     </div>
     <div class="block">
       <div class="label">Preset</div>
-      <div class="seg" id="seg-preset">
+      <div class="seg compact" id="seg-preset">
         <button data-preset="dry" class="on"><i class="ph ph-snowflake"></i>Dry Winter</button>
         <button data-preset="wet"><i class="ph ph-drop"></i>Wet Spring</button>
         <button data-preset="custom"><i class="ph ph-sliders-horizontal"></i>Custom</button>
@@ -390,7 +392,7 @@ body{
     <div class="block">
       <div class="label section">Avalanche Constraints</div>
       <div class="label">Flow regime <span class="val" id="v-flow">Dry</span></div>
-      <div class="seg" id="seg-flow">
+      <div class="seg compact" id="seg-flow">
         <button data-flow="dry" class="on">Cold</button>
         <button data-flow="wet">Warm</button>
       </div>
@@ -724,7 +726,7 @@ function syncRose(){
 /* --------------------------------------------------------------- sheet UX */
 function snapPoints(){
   const h=window.innerHeight, sh=document.getElementById("sheet").offsetHeight;
-  return {full:0, half:Math.max(0,sh-Math.round(h*0.52)), peek:Math.max(0,sh-118)};
+  return {full:0, half:Math.max(0,sh-Math.round(h*0.66)), peek:Math.max(0,sh-118)};
 }
 let sheetY=null, snapName="peek";
 function setSnap(name){
@@ -768,16 +770,15 @@ function bindSheet(){
 function bindControls(){
   $$("#seg-preset button").forEach(b=>b.addEventListener("click",()=>applyPreset(b.dataset.preset)));
   $$("#seg-mode button").forEach(b=>b.addEventListener("click",()=>{
-    if(b.dataset.mode==="size" && S.preset==="custom"){
-      showError("Avalanche Size is only available for the Dry Winter and Wet Spring presets.");
-      return;
-    }
     // coming back from Avalanche Size to Explore doubles as a reset to
     // Dry Winter, so you're never stuck on a stale size-mode selection
     if(b.dataset.mode==="explore" && S.mode==="size"){
       resetToDefaults();
       return;
     }
+    // rasters only exist for the two named presets — the tab itself is
+    // greyed out (disabled) for Custom, so a click there is simply a no-op
+    if(b.dataset.mode==="size" && S.preset==="custom") return;
     S.mode=b.dataset.mode;
     syncMode();
     syncSizeModeDisplay();
