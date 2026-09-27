@@ -349,8 +349,8 @@ body{
   <div class="sheet-pinned">
     <div class="block">
       <div class="seg compact" id="seg-mode">
-        <button data-mode="explore" class="on"><i class="ph ph-map-trifold"></i>Explore</button>
-        <button data-mode="size" id="seg-mode-size"><i class="ph ph-chart-bar"></i>Avalanche Size</button>
+        <button data-mode="explore" class="on"><i class="ph ph-map-trifold"></i>Explore Scenario</button>
+        <button data-mode="size" id="seg-mode-size"><i class="ph ph-chart-bar"></i>Explore Size</button>
       </div>
     </div>
     <div class="block">
@@ -915,7 +915,9 @@ function applyPreset(name,opt){
     $("#elev-lo").value=p.elev[0]; $("#elev-hi").value=p.elev[1];
     $("#size").value=p.size;
   }
-  $("#chip-treeline").classList.remove("on");
+  // Dry Winter's own elevation floor (2000 m) is exactly what "Above
+  // treeline" sets, so show it as already active rather than off
+  $("#chip-treeline").classList.toggle("on", name==="dry");
   syncAll();
   if(!opt.silent) refresh();
 }
