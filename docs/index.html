@@ -105,10 +105,6 @@ body{
 #status .eyebrow{
   font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--albina-blue-dark)
 }
-#status .headline{
-  font-size:15px;font-weight:700;margin-top:1px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
 #status .sub{font-size:11px;color:var(--ink-2);margin-top:2px}
 #status .sub b{color:var(--ink);font-variant-numeric:tabular-nums}
 #st-legend{margin-top:7px}
@@ -118,6 +114,9 @@ body{
 #st-legend .bar{flex:1;min-width:0;height:8px;border-radius:4px}
 #st-legend .bar.outline{background:none;border:1.5px solid #ff00e5;box-sizing:border-box;height:8px}
 #st-legend .bar.gradient{background:linear-gradient(to right,rgba(30,0,255,.12),rgba(30,0,255,.85))}
+#st-legend .lrow.oneline{gap:25px}
+#st-legend .oneline .pair{display:flex;align-items:center;gap:5px}
+#st-legend .bar.mini{flex:0 0 auto;width:36px}
 /* size row: a real grid so each label line aligns to its own row's actual
    height (bar row / ticks row) instead of guessing matching line-heights */
 #st-legend .sizegrid{display:grid;grid-template-columns:auto 1fr;column-gap:8px;row-gap:2px;align-items:center}
@@ -324,7 +323,11 @@ body{
 <div id="topbar">
   <div class="card" id="status">
     <div class="eyebrow" id="st-eyebrow">Scenario</div>
-    <div class="headline" id="st-title">Dry Winter</div>
+    <div class="seg compact" id="seg-preset" style="margin-top:4px">
+      <button data-preset="dry" class="on"><i class="ph ph-snowflake"></i>Dry Winter</button>
+      <button data-preset="wet"><i class="ph ph-drop"></i>Wet Spring</button>
+      <button data-preset="custom"><i class="ph ph-sliders-horizontal"></i>Custom</button>
+    </div>
     <div class="sub" id="st-sub">— paths shown</div>
     <div id="st-legend"></div>
   </div>
@@ -351,14 +354,6 @@ body{
       <div class="seg compact" id="seg-mode">
         <button data-mode="explore" class="on"><i class="ph ph-map-trifold"></i>Explore Scenario</button>
         <button data-mode="size" id="seg-mode-size"><i class="ph ph-chart-bar"></i>Explore Size</button>
-      </div>
-    </div>
-    <div class="block">
-      <div class="label">Preset</div>
-      <div class="seg compact" id="seg-preset">
-        <button data-preset="dry" class="on"><i class="ph ph-snowflake"></i>Dry Winter</button>
-        <button data-preset="wet"><i class="ph ph-drop"></i>Wet Spring</button>
-        <button data-preset="custom"><i class="ph ph-sliders-horizontal"></i>Custom</button>
       </div>
     </div>
   </div>
@@ -954,8 +949,10 @@ function syncTopLegend(){
       </div>`;
   } else {
     el.innerHTML = `
-      <div class="lrow"><div class="lbl">Potential Release Areas</div><div class="bar outline"></div></div>
-      <div class="lrow"><div class="lbl">Overlapping Avalanches</div><div class="bar gradient"></div></div>`;
+      <div class="lrow oneline">
+        <div class="pair"><div class="bar outline mini"></div><div class="lbl">Release Areas</div></div>
+        <div class="pair"><div class="bar gradient mini"></div><div class="lbl">Overlapping Avalanches</div></div>
+      </div>`;
   }
 }
 function syncSizeModeDisplay(){
@@ -1082,7 +1079,6 @@ function doRefresh(){
   const shownN = rasterActive ? ((presetTotals[S.preset] && presetTotals[S.preset].res) || 0) : n;
   const countLabel = rasterActive ? "avalanche paths" : "release areas";
   $("#count").textContent = shownN.toLocaleString();
-  $("#st-title").textContent = S.preset==="custom"?"Custom scenario":PRESETS[S.preset].label;
   $("#st-eyebrow").textContent = S.demo ? "Scenario · demo data" : "Scenario";
   const flow=S.flows.size===2?"dry + wet":[...S.flows][0];
   $("#st-sub").innerHTML = `<b>${shownN.toLocaleString()}</b> ${countLabel} · ${flow} · ${S.elev[0]}–${S.elev[1]>=3500?"8848":S.elev[1]} m · event size ${S.size}`;
