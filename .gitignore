@@ -37,6 +37,7 @@ Thumbs.db
 _archiv/
 _archivDocs/
 avaScenMapperCfgs/
+analysis/scenario_statistics/
 
 
 # --- Generated outputs (optional to exclude) ---
