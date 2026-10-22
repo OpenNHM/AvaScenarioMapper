@@ -35,7 +35,9 @@ Thumbs.db
 
 # --- Internal or heavy data ---
 _archiv/
+_archivDocs/
 avaScenMapperCfgs/
+analysis/scenario_statistics/
 
 
 # --- Generated outputs (optional to exclude) ---
@@ -44,9 +46,9 @@ avaScenMapperCfgs/
 *_plots/
 *_cache/
 
+
 # --- Documentation / assets ---
 *.pdf
-#*.png
 *.zip
 
 # --- Large media (avoid committing videos) ---

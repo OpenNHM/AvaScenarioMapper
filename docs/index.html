@@ -1,663 +1,1509 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
-    
-            <meta name="viewport" content="width=device-width,
-                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-            <style>
-                #map_e81022b33cd5faee81b57c37b37a3542 {
-                    position: relative;
-                    width: 100.0%;
-                    height: 100.0%;
-                    left: 0.0%;
-                    top: 0.0%;
-                }
-                .leaflet-container { font-size: 1rem; }
-            </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"/>
+<title>Avalanche Scenario Mapper — mobile preview</title>
+<!-- True edge-to-edge (nothing drawn by Safari on top of the page at all)
+     only happens when this is added to the Home Screen and launched from
+     there — a normal Safari tab always keeps its own status bar and URL
+     bar, which a page can't render behind. These make the standalone
+     launch full-screen and let content extend under the notch/home
+     indicator, with safe-area-inset-* (already used below) keeping the
+     actual UI clear of those cutouts. -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#101418"/>
 
-            <style>html, body {
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
-            </style>
-
-            <style>#map {
-                position:absolute;
-                top:0;
-                bottom:0;
-                right:0;
-                left:0;
-                }
-            </style>
-
-            <script>
-                L_NO_TOUCH = false;
-                L_DISABLE_3D = false;
-            </script>
-
-        
-</head>
-<body>
-    
-    
-<!-- self cache-bust so the same QR/URL always fetches the latest build -->
+<!-- Leaflet: bundled locally (vendor/), CDN only as fallback -->
+<link rel="stylesheet" href="vendor/leaflet.css"/>
+<script src="vendor/leaflet.js"></script>
 <script>
-(function () {
-  if (!/([?&])v=/.test(location.search)) {
-    var sep = location.search ? '&' : '?';
-    var bust = 'v=' + Date.now();
-    location.replace(location.pathname + location.search + sep + bust + location.hash);
+  if(!window.L){
+    document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>');
+    document.write('<scr'+'ipt src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"><\/scr'+'ipt>');
   }
-})();
 </script>
+<!-- Phosphor icons = same icon font as albina-admin-gui. Online only; every
+     control also carries a text label, so the UI stays usable without it. -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
 
 <style>
-  /* -------- LOADER (fake) -------- */
-  #ava-loader{
-    position:fixed; inset:0; z-index:20000;
-    background:rgba(255,255,255,0.6);
-    display:flex; align-items:center; justify-content:center;
-    transition:opacity .35s ease;
-  }
-  #ava-loader.hide{opacity:0}
-  .loader-box{
-    text-align:center; pointer-events:none;
-  }
-  .loader-box img{width:200px; height:auto; display:block; margin:0 auto 6px}
-  .loader-title{font:700 18px/1.2 Arial, sans-serif; color:#ff00ff; margin:0 0 4px}
-  .loader-sub{font:12px Arial, sans-serif; color:#333}
+/* ============================================================================
+   DESIGN TOKENS
+   Palette taken from albina-admin-gui  src/scss/settings/_colors.scss
+   Danger colours = EAWS danger scale 1..5
+   ========================================================================== */
+:root{
+  --albina-blue:#19abff;
+  --albina-blue-dark:#1e83ba;
+  --albina-blue-subtle:#bdddf1;
+  --albina-blue-pale:#eaf4fb;
 
-  /* Top banner (...% width, centered) */
-  #ava-banner{position:fixed;top:0;left:0;width:100%;z-index:10000;pointer-events:none;display:flex;justify-content:center}
-  #ava-banner img {
-    width: 100%;
-    max-width: 800px;  
-    height: auto;
-    opacity: 0.9;
-    display: block;
-  }
+  --eaws-1:#ccff66;
+  --eaws-2:#ffff00;
+  --eaws-3:#ff9900;
+  --eaws-4:#ff0000;
+  --eaws-5:#000000;
 
-  /* Settings panel (bottom-left, collapsible) */
-  .ava-style{background:rgba(255,255,255,.9);padding:6px 8px;border:1px solid #ccc;border-radius:4px;
-    font-family:Arial,sans-serif;font-size:12px;line-height:1.25em;box-shadow:0 1px 3px rgba(0,0,0,.15);
-    min-width:220px;max-width:240px}
-  .ava-style .hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;
-    font-weight:700;margin:0 0 4px;cursor:pointer;user-select:none}
-  /* make only the "SETTINGS" text bold */
-  .ava-style .hdr span:first-child{
-    font-weight: 800;
-  }
-  .ava-style .hdr .caret{font-weight:500;font-size:16px;line-height:1;transform:translateY(-1px)}
-  .ava-style .body{transition:max-height .2s ease, opacity .2s ease}
-  .ava-style.collapsed .body{max-height:0;opacity:.0;overflow:hidden}
-  .ava-style .row{margin:3px 0}
-  .ava-style .cb{display:flex;align-items:center;gap:6px}
-  .ava-style .radio-row label{display:block;margin:2px 0}
-  .swatch{display:inline-block;width:40px;height:10px;border-radius:2px;vertical-align:middle}
-  
-  /* Transparency buttons (apply to all layers) — thinner */
-  .alpha-row{display:flex;gap:6px;margin:4px 0 6px}
-  .alpha-btn{flex:1;border:1px solid #bbb;border-radius:6px;padding:2px 4px;line-height:1.1;background:#fff;
-    cursor:pointer;text-align:center;font-size:11px;user-select:none}
-  .alpha-btn.active{border-color:#666;font-weight:700}
+  /* Avalanche Scenario Mapper feature colours (kept from current build) */
+  --rel:#ff00ff;
+  --res:#1e00ff;
 
-  /* Size legend (continuous bar + 3 labels) — NO border */
-  .legend-size{margin-top:6px}
-  .size-grad{width:100%;height:12px;border-radius:3px}
-  /* Size legend labels alignment */
-  .size-labels{
-    display:flex;
-    gap:0;
-    font-size:11px;
-    margin-top:2px;
-  }
-  .size-labels span{
-    flex:1 1 33%;
-  }
-  .size-labels span:first-child{ text-align:left; }
-  .size-labels span:nth-child(2){ text-align:center; transform:none; } /* remove prior translate */
-  .size-labels span:last-child{ text-align:right; }
+  --ink:#101418;
+  --ink-2:#5b6670;
+  --ink-3:#8d979f;
+  --line:#e3e7ea;
+  --line-2:#f1f4f6;
+  --surface:#ffffff;
+  --surface-2:#f7f9fa;
 
+  --r-sm:8px; --r-md:12px; --r-lg:18px; --r-pill:999px;
+  --sheet-shadow:0 -8px 32px rgba(16,20,24,.18);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
 
-  /* Hide default Leaflet layer control (we recreated it inside Settings) */
-  .leaflet-control-layers{display:none !important;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* 100dvh (not 100% / 100vh) so the page actually fills whatever space
+   Safari's auto-hiding URL bar currently isn't using, instead of being
+   sized once for whichever state it was in on load. */
+html,body{margin:0;padding:0;height:100%;height:100dvh;overscroll-behavior:none}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink);background:#dfe4e7;
+  font-size:14px;line-height:1.35;
+}
+#map{position:fixed;inset:0;height:100dvh;z-index:0}
+.leaflet-control-zoom{display:none!important}
+.leaflet-control-attribution{font-size:9px;opacity:.65;margin-bottom:2px}
+.leaflet-control-scale{margin-bottom:6px}
 
-  .leaflet-bottom.leaflet-left .leaflet-control{margin-left:10px;margin-bottom:10px}
-  /* Hide Leaflet +/- (Python also sets zoom_control=False) */
-  .leaflet-control-zoom{display:none !important;}
+/* ---------------------------------------------------------------- loader */
+#loader{
+  position:fixed;inset:0;z-index:900;display:grid;place-items:center;
+  background:rgba(255,255,255,.82);backdrop-filter:blur(3px);
+  transition:opacity .35s ease;
+}
+#loader.hide{opacity:0;pointer-events:none}
+.loader-box{text-align:center}
+.loader-title{font-weight:700;font-size:16px;letter-spacing:.01em}
+.loader-tagline{font-size:12px;color:var(--albina-blue-dark);font-weight:600;margin-top:2px}
+.loader-icons{display:flex;justify-content:center;gap:10px;margin-top:20px}
+.loader-icons img{width:36px;height:36px}
+.loader-bar{
+  width:220px;height:6px;border-radius:3px;margin:10px auto 0;
+  background:linear-gradient(to right,#0096ff,#00ff00,#ffd500,#ff0000,#aa00ff)
+}
+.loader-sub{font-size:12px;color:var(--ink-2);margin-top:14px}
+.loader-status{font-size:11px;color:var(--ink-3);margin-top:8px}
+.loader-note{
+  display:inline-block;margin-top:16px;padding:8px 16px;
+  font-weight:700;font-size:13px;color:var(--albina-blue-dark);
+  background:var(--albina-blue-pale);border:1.5px solid var(--albina-blue-subtle);
+  border-radius:var(--r-md)
+}
+.loader-enter{
+  display:none;margin:18px auto 0;padding:12px 30px;border:0;border-radius:var(--r-pill);
+  background:var(--ink);color:#fff;font-size:14px;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 14px rgba(16,20,24,.25)
+}
+.loader-enter.show{display:block;animation:loader-enter-in .3s ease}
+.loader-enter:active{transform:scale(.96)}
+@keyframes loader-enter-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
-  /* Popup: 80% opaque background, crisp text */
-  .ava-popup .leaflet-popup-content-wrapper{
-    background: rgba(255,255,255,0.8);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-    border-radius: 8px;
-  }
-  .ava-popup .leaflet-popup-tip{
-    background: rgba(255,255,255,0.8);
-  }
+/* ---------------------------------------------------------------- top bar */
+#topbar{
+  position:fixed;z-index:500;top:calc(var(--safe-t) + 8px);left:8px;right:8px;
+  display:flex;gap:8px;align-items:flex-start;pointer-events:none;
+}
+.card{
+  background:var(--surface);border-radius:var(--r-md);
+  box-shadow:0 2px 10px rgba(16,20,24,.14);pointer-events:auto;
+}
+#status{padding:8px 12px;flex:1;min-width:0}
+#status .eyebrow{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--albina-blue-dark)
+}
+#status .sub{font-size:11px;color:var(--ink-2);margin-top:2px}
+#status .sub b{color:var(--ink);font-variant-numeric:tabular-nums}
+#st-legend{margin-top:7px}
+#st-legend .lrow{display:flex;align-items:center;gap:8px;margin-top:6px}
+#st-legend .lrow:first-child{margin-top:0}
+#st-legend .lbl{font-size:9px;font-weight:600;letter-spacing:.03em;color:var(--ink-3);white-space:nowrap;flex:0 0 auto}
+#st-legend .bar{flex:1;min-width:0;height:8px;border-radius:4px}
+#st-legend .bar.outline{background:none;border:1.5px solid #ff00e5;box-sizing:border-box;height:8px}
+#st-legend .bar.gradient{background:linear-gradient(to right,rgba(30,0,255,.12),rgba(30,0,255,.85))}
+#st-legend .lrow.oneline{gap:25px}
+#st-legend .oneline .pair{display:flex;align-items:center;gap:5px}
+#st-legend .bar.mini{flex:0 0 auto;width:36px}
+/* size row: a real grid so each label line aligns to its own row's actual
+   height (bar row / ticks row) instead of guessing matching line-heights */
+#st-legend .sizegrid{display:grid;grid-template-columns:auto 1fr;column-gap:8px;row-gap:2px;align-items:center}
+#st-legend .sizegrid .lbl{white-space:normal}
+#st-legend .sizegrid .bar.sizekey{background:linear-gradient(to right,#0096ff,#00ff00,#ffd500,#ff0000,#aa00ff)}
+#st-legend .sizegrid .ticks{
+  display:flex;justify-content:space-between;
+  font-size:9px;font-weight:600;letter-spacing:.03em;color:var(--ink-3)
+}
+.iconbtn{
+  width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;
+  border:0;background:var(--surface);color:var(--ink);font-size:20px;cursor:pointer;
+  border-radius:var(--r-md);box-shadow:0 2px 10px rgba(16,20,24,.14);pointer-events:auto;
+}
+.iconbtn.on{background:var(--ink);color:#fff}
+.iconbtn:active{transform:scale(.96)}
+.topstack{display:flex;flex-direction:column;gap:8px}
 
+/* ---------------------------------------------------------------- sheet */
+#sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:600;
+  height:92dvh;max-height:92dvh;
+  background:var(--surface);
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+  box-shadow:var(--sheet-shadow);
+  display:flex;flex-direction:column;
+  transform:translateY(70%);
+  transition:transform .28s cubic-bezier(.22,.61,.36,1);
+  touch-action:none;
+}
+#sheet.dragging{transition:none}
+.grab{padding:6px 14px 8px;flex:0 0 auto;cursor:grab;touch-action:none}
+.grab .bar{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 8px}
+.grab-row{display:flex;align-items:center;gap:10px}
+.grab-row h1{font-size:15px;font-weight:700;margin:0;flex:1}
+.grab-sub{font-size:11px;color:var(--ink-3);margin-top:3px}
+.badge{
+  font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;
+  background:var(--albina-blue-pale);color:var(--albina-blue-dark);
+  padding:3px 8px;border-radius:var(--r-pill)
+}
+.linkbtn{
+  border:0;background:transparent;color:var(--albina-blue-dark);
+  font-size:12px;font-weight:600;padding:4px 2px;cursor:pointer
+}
+.sheet-pinned{
+  flex:0 0 auto;padding:2px 14px 0;border-bottom:1px solid var(--line-2)
+}
+.sheet-body{
+  flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+  padding:2px 14px calc(24px + var(--safe-b));
+}
 
-  @media (max-width:480px){
-    .ava-style{min-width:200px}
-  }
+/* ---------------------------------------------------------------- blocks */
+.block{padding:9px 0;border-top:1px solid var(--line-2)}
+.block:first-child{border-top:0;padding-top:4px}
+.label{
+  font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-2);margin-bottom:5px;display:flex;align-items:center;gap:6px
+}
+.label .val{
+  margin-left:auto;text-transform:none;letter-spacing:0;font-size:12px;
+  color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums
+}
+.hint{font-size:11px;color:var(--ink-3);margin-top:6px}
+.hint a{color:inherit;text-decoration:underline}
+#size-hint{display:none}
+#size-hint.show{display:block}
+.info-btn{
+  width:15px;height:15px;flex:0 0 auto;border-radius:50%;border:1px solid var(--ink-3);
+  background:none;color:var(--ink-3);font-size:10px;font-weight:700;
+  line-height:1;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center
+}
+.info-btn:active,.info-btn.on{background:var(--albina-blue-pale);border-color:var(--albina-blue);color:var(--albina-blue-dark)}
+.hint.ref-heading{
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--ink-2);margin-top:14px;margin-bottom:0
+}
+.hint + .hint.ref-heading{margin-top:14px}
+.ref-heading + .hint{margin-top:2px}
+.label.section{color:var(--albina-blue-dark);font-size:11px;font-weight:700}
+.label-btn{
+  border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r-md);
+  padding:9px 12px;width:100%;font-family:inherit;text-align:left;cursor:pointer;
+  transition:background .12s ease,border-color .12s ease,color .12s ease
+}
+.label-btn:active{background:var(--surface)}
+.label-btn.on{background:var(--albina-blue-pale);border-color:var(--albina-blue);color:var(--albina-blue-dark)}
+.label-btn.on .val{color:var(--albina-blue-dark)}
+
+/* segmented control */
+.seg{display:flex;background:var(--surface-2);border-radius:var(--r-md);padding:3px;gap:3px}
+.seg button{
+  flex:1;border:0;background:transparent;border-radius:9px;
+  padding:9px 6px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px
+}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(16,20,24,.16)}
+.seg.compact{padding:2px}
+.seg.compact button{padding:4px 6px;font-size:11px}
+.seg button.disabled{opacity:.4;pointer-events:none}
+.seg button.hidden{display:none}
+
+/* mode panels — only one of "Explore" / "Size Analysis" shown at a time */
+.mode-panel{display:none}
+.mode-panel.on{display:block}
+
+/* aspect rose + elevation side by side */
+.release{display:grid;grid-template-columns:92px 1fr;gap:10px;align-items:start}
+.rose{width:92px;height:92px;display:block;touch-action:manipulation}
+.rose polygon{cursor:pointer;transition:fill .12s ease}
+.rose text{pointer-events:none;font-family:inherit;font-weight:600}
+#btn-base{display:none}
+
+/* dual range */
+.range{position:relative;height:28px;margin-top:2px}
+.range .track{
+  position:absolute;top:12px;left:0;right:0;height:4px;border-radius:2px;background:var(--line)
+}
+.range .fill{position:absolute;top:12px;height:4px;border-radius:2px;background:var(--ink)}
+/* rainbow variant: the track itself carries the size-class colour scale, so a
+   separate legend gradient bar isn't needed — only the thumb position matters */
+.range.rainbow .track{top:9px;height:10px;border-radius:5px;background:linear-gradient(to right,#0096ff,#00ff00,#ffd500,#ff0000,#aa00ff)}
+.range.rainbow .fill{display:none}
+.range input[type=range]{
+  position:absolute;top:0;left:0;width:100%;height:28px;margin:0;
+  -webkit-appearance:none;appearance:none;background:transparent;pointer-events:none
+}
+.range input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;pointer-events:auto;width:18px;height:18px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:grab
+}
+.range input[type=range]::-moz-range-thumb{
+  pointer-events:auto;width:16px;height:16px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:grab
+}
+.single input[type=range]{pointer-events:auto}
+.ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-3);margin-top:-2px}
+
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.row + .row{margin-top:8px}
+.chip{
+  border:1px solid var(--line);background:var(--surface);border-radius:var(--r-pill);
+  padding:6px 11px;font-size:11px;font-weight:600;color:var(--ink-2);cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px
+}
+.chip.on{background:var(--albina-blue-pale);border-color:var(--albina-blue);color:var(--albina-blue-dark)}
+.dim-submenu{display:none}
+.dim-submenu.on{display:flex;margin-top:8px}
+
+/* size scale */
+.size-pictograms{display:none;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:8px}
+.size-pictograms.on{display:grid}
+.size-pictograms span{height:38px;display:grid;place-items:center}
+.size-pictograms img{width:34px;height:34px}
+/* value row under a 5-icon grid — same column grid as .size-pictograms so
+   each value lines up under its icon, unlike .ticks' flex space-between */
+.picto-ticks{display:none;grid-template-columns:repeat(5,1fr);margin-top:2px;
+  font-size:9px;color:var(--ink-3);text-align:center;font-variant-numeric:tabular-nums}
+.picto-ticks.on{display:grid}
+/* colour key linking each pictogram to its size-class colour, always shown */
+.picto-ticks.size-key{display:grid;gap:3px;margin-top:0;margin-bottom:4px}
+.picto-ticks.size-key span{border-radius:6px;padding:3px 0;font-weight:700;font-size:9px}
+.runout-arrow{display:none;margin-top:8px;justify-content:center}
+.runout-arrow.on{display:flex}
+.runout-arrow img{width:85%;height:auto;display:block}
+
+/* popup */
+.leaflet-popup-content-wrapper{border-radius:var(--r-md);box-shadow:0 6px 24px rgba(16,20,24,.22)}
+.leaflet-popup-content{margin:10px 12px;font-size:12px}
+.pop h4{margin:0 0 6px;font-size:13px}
+.pop table{border-collapse:collapse;width:100%}
+.pop td{padding:2px 0;vertical-align:top}
+.pop td:first-child{color:var(--ink-3);padding-right:10px;white-space:nowrap}
+.pop td:last-child{font-variant-numeric:tabular-nums}
+
+@media (min-width:820px){
+  #sheet{left:auto;right:14px;bottom:14px;width:400px;height:min(760px,88dvh);border-radius:var(--r-lg)}
+  #topbar{left:14px;right:auto;width:min(420px,50vw)}
+}
+@media (prefers-reduced-motion:reduce){
+  #sheet{transition:none}
+}
 </style>
+</head>
+<body>
 
-<!-- Fake loader -->
-<div id="ava-loader">
+<div id="map"></div>
+
+<!-- ------------------------------------------------------------- loader -->
+<div id="loader">
   <div class="loader-box">
-    <img src="https://media.giphy.com/media/3Xzlefv57zcrVIPPRN/giphy.gif" alt="">
     <div class="loader-title">Avalanche Scenario Mapper</div>
-    <div class="loader-sub">Please wait …</div>
+    <div class="loader-tagline">Mapping Avalanche Size</div>
+    <div class="loader-icons">
+      <img src="assets/size/size1.svg" alt="Size 1"/>
+      <img src="assets/size/size2.svg" alt="Size 2"/>
+      <img src="assets/size/size3.svg" alt="Size 3"/>
+      <img src="assets/size/size4.svg" alt="Size 4"/>
+      <img src="assets/size/size5.svg" alt="Size 5"/>
+    </div>
+    <div class="loader-bar"></div>
+    <div class="loader-sub" id="loader-sub">Loading scenarios …</div>
+    <div class="loader-status">Preview · Work in Progress — Current Build October 2026</div>
+    <div class="loader-note">See References for more info</div>
+    <button class="loader-enter" id="btn-enter">Enter Mapper</button>
   </div>
 </div>
 
-<!-- Banner -->
-<div id="ava-banner"><img id="ava-banner-img" src="" alt=""></div>
+<!-- ------------------------------------------------------------- top bar -->
+<div id="topbar">
+  <div class="card" id="status">
+    <div class="eyebrow" id="st-eyebrow">Scenario</div>
+    <div class="seg compact" id="seg-preset" style="margin-top:4px">
+      <button data-preset="dry" class="on"><i class="ph ph-snowflake"></i>Dry Winter</button>
+      <button data-preset="wet"><i class="ph ph-drop"></i>Wet Spring</button>
+      <button data-preset="custom"><i class="ph ph-sliders-horizontal"></i>Custom</button>
+    </div>
+    <div class="sub" id="st-sub">— paths shown</div>
+    <div id="st-legend"></div>
+  </div>
+  <div class="topstack">
+    <button class="iconbtn" id="btn-base" title="Switch base map" aria-label="Switch base map"><i class="ph ph-stack"></i></button>
+    <button class="iconbtn" id="btn-locate" title="My position" aria-label="My position"><i class="ph ph-crosshair-simple"></i></button>
+  </div>
+</div>
 
+<!-- --------------------------------------------------------------- sheet -->
+<section id="sheet" aria-label="Scenario settings">
+  <div class="grab" id="grab">
+    <div class="bar"></div>
+    <div class="grab-row">
+      <h1 id="sheet-title">Avalanche Scenario Mapper</h1>
+      <span class="badge" id="count">0</span>
+      <button class="linkbtn" id="btn-reset">Reset</button>
+    </div>
+    <div class="grab-sub">Preview · Work in Progress — Current Build October 2026</div>
+  </div>
+
+  <!-- pinned — always visible, doesn't scroll away with the body below -->
+  <div class="sheet-pinned">
+    <div class="block">
+      <div class="seg compact" id="seg-mode">
+        <button data-mode="explore" class="on"><i class="ph ph-map-trifold"></i>Explore Scenario</button>
+        <button data-mode="size" id="seg-mode-size"><i class="ph ph-chart-bar"></i>Explore Size</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-body">
+
+    <div class="mode-panel on" id="mode-explore">
+
+    <!-- 2 — spatial constraints ----------------------------------------- -->
+    <div class="block">
+      <div class="label section">Spatial Constraints</div>
+      <div class="label" style="margin-bottom:6px">Release Area · Aspect &amp; Mean Elevation <span class="val" id="v-elev">800–3500 m</span></div>
+      <div class="release">
+        <svg class="rose" id="rose" viewBox="0 0 600 600" aria-label="Aspects"></svg>
+        <div>
+          <div class="range" id="elev-range">
+            <div class="track"></div><div class="fill" id="elev-fill"></div>
+            <input type="range" id="elev-lo" min="800" max="3500" step="100" value="800"/>
+            <input type="range" id="elev-hi" min="800" max="3500" step="100" value="3500"/>
+          </div>
+          <div class="ticks"><span>800</span><span>2000</span><span>3500 m</span></div>
+          <div class="row" style="margin-top:6px">
+            <button class="chip" id="chip-treeline"><i class="ph ph-tree-evergreen"></i>Above treeline</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 — avalanche constraints --------------------------------------- -->
+    <div class="block">
+      <div class="label section">Avalanche Constraints</div>
+      <div class="label">Expected Size | Event Size <button class="info-btn" id="btn-size-info" aria-label="About event size" type="button">i</button> <span class="val" id="v-size">4 — very large</span></div>
+      <div class="range single rainbow" id="size-range">
+        <div class="track"></div><div class="fill" id="size-fill"></div>
+        <input type="range" id="size" min="1" max="5" step="1" value="5"/>
+      </div>
+      <div class="ticks" id="size-ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      <div class="hint" id="size-hint">Size 1 shows release areas only. Sizes 2–5 use the mapper's very-high-potential size matrix.</div>
+      <div class="label" style="margin-top:10px">Flow regime <span class="val" id="v-flow">Dry</span></div>
+      <div class="seg compact" id="seg-flow">
+        <button data-flow="dry" class="on">Cold</button>
+        <button data-flow="wet">Warm</button>
+      </div>
+    </div>
+
+    <!-- 4 — display ------------------------------------------------------ -->
+    <div class="block">
+      <div class="label">Display</div>
+      <div class="row">
+        <button class="chip on" id="chip-rel">Release</button>
+        <button class="chip on" id="chip-res">Runout</button>
+      </div>
+      <div class="label" style="margin:10px 0 2px">Set avalanche transparency <span class="val" id="v-alpha">20 %</span></div>
+      <div class="range single" id="alpha-range">
+        <div class="track"></div><div class="fill" id="alpha-fill"></div>
+        <input type="range" id="alpha" min="5" max="85" step="5" value="20"/>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="chip on" id="chip-hill"><i class="ph ph-mountains"></i>Hillshade</button>
+      </div>
+      <div class="label" style="margin:10px 0 2px">Set basemap transparency <span class="val" id="v-base-alpha">50 %</span></div>
+      <div class="range single" id="base-alpha-range">
+        <div class="track"></div><div class="fill" id="base-alpha-fill"></div>
+        <input type="range" id="base-alpha" min="10" max="100" step="5" value="50"/>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="label section">References</div>
+      <div class="hint" id="src-note" style="margin-top:0">The size interface builds on the established EAWS, CAA and AAA classifications. Continuous size relationships retain compatibility with these five-class operational schemes while allowing model inputs and outputs to be expressed on the same scale. Simulation results can therefore be translated back into spatially mapped dimension, runout and destructive size.</div>
+
+      <div class="hint ref-heading">Mapping Concept · Avalanche Scenario Maps</div>
+      <div class="hint">Hesselbach, C., Schwarz, J., Spannring, P., Wirbel, A., Huber, A., Winkler, M., Mitterer, C., Riedl, H., &amp; Fischer, J.-T. (2026). Avalanche scenario maps: from terrain identification to decision support tool. Proceedings of the International Snow Science Workshop. Whistler, Canada. <a href="https://doi.org/10.15788/1790098413" target="_blank" rel="noopener">doi.org/10.15788/1790098413</a></div>
+
+      <div class="hint ref-heading">Size Interface · Avalanche Size Classification</div>
+      <div class="hint">Fischer, J.-T., Spannring, P., Hesselbach, C., Huber, A., Wirbel, A., Koehler, A., Sovilla, B., Gauer, P., &amp; Thumlert, S. (2026). Towards a Technical and Communication Scheme for Avalanche Size Classification. Proceedings of the International Snow Science Workshop. Whistler, Canada. <a href="https://doi.org/10.15788/1790098722" target="_blank" rel="noopener">doi.org/10.15788/1790098722</a></div>
+
+      <div class="hint ref-heading">Software · Avalanche Scenario Mapper</div>
+      <div class="hint">Hesselbach, C., Spannring, P., Huber, A., Schwarz, J., &amp; Fischer, J.-T. (2025). OpenNHM/AvaScenarioMapper: Avalanche Scenario Mapper v1.0 [Computer software]. Zenodo. <a href="https://doi.org/10.5281/zenodo.17662779" target="_blank" rel="noopener">doi.org/10.5281/zenodo.17662779</a></div>
+
+      <div class="hint ref-heading">Software · Avalanche Terrain Identification</div>
+      <div class="hint">Hesselbach, C., Spannring, P., Huber, A., &amp; Fischer, J.-T. (2026). OpenNHM/AvalancheTerrainIdentification: Avalanche Terrain Identification v1.1 [Computer software]. Zenodo. <a href="https://doi.org/10.5281/zenodo.22049056" target="_blank" rel="noopener">doi.org/10.5281/zenodo.22049056</a></div>
+
+      <div class="hint">Cockpit UI (colours, aspect rose, icons) adapted from <a href="https://github.com/albina-euregio/albina-admin-gui" target="_blank" rel="noopener">albina-admin-gui</a> (AGPL-3.0).</div>
+    </div>
+
+    </div><!-- /mode-explore -->
+
+    <div class="mode-panel" id="mode-size">
+
+    <!-- 5 — legend --------------------------------------------------------- -->
+    <div class="block">
+      <div class="label section">Avalanche Size</div>
+      <div class="label" style="margin-top:2px">Classification</div>
+      <div class="picto-ticks size-key" aria-hidden="true">
+        <span style="background:#09a2ff;color:#fff">Size 1</span>
+        <span style="background:#66ff31;color:#101418">Size 2</span>
+        <span style="background:#fff300;color:#101418">Size 3</span>
+        <span style="background:#ff0000;color:#fff">Size 4</span>
+        <span style="background:#5b0069;color:#fff">Size 5</span>
+      </div>
+
+      <div class="hint" style="margin:2px 0 0">Tap a criterion below to show it spatially on the map — only available for the Dry Winter and Wet Spring presets, within the pilot-region extent.</div>
+
+      <div class="label" style="margin-top:12px">Criterion <span class="val" style="text-transform:uppercase;letter-spacing:.08em;font-size:10px;font-weight:600;color:var(--ink-2)">Characteristic</span></div>
+
+      <button class="label label-btn" id="btn-dimension-size">Dimension Size <span class="val">Release &amp; Deposition Volume [m³]</span></button>
+      <div class="row dim-submenu" id="dimension-submenu">
+        <button class="chip" id="chip-dim-release">Release</button>
+        <button class="chip" id="chip-dim-deposition">Deposition</button>
+      </div>
+      <div class="size-pictograms" id="depsize-pictograms" aria-label="Relative deposition volume by size class">
+        <span><img src="assets/size/truck-badge.svg" alt="&gt;0"/></span>
+        <span><img src="assets/size/truck-badge.svg" alt="1×"/></span>
+        <span><img src="assets/size/truck-badge.svg" alt="10×"/></span>
+        <span><img src="assets/size/truck-badge.svg" alt="100×"/></span>
+        <span><img src="assets/size/truck-badge.svg" alt="1,000×"/></span>
+      </div>
+      <div class="picto-ticks" id="depsize-ticks">
+        <span>&gt;0</span><span>1×</span><span>10×</span><span>100×</span><span>1,000×</span>
+      </div>
+
+      <button class="label label-btn" id="btn-runout-size" style="margin-top:12px">Runout Size <span class="val">Runout Length [m]</span></button>
+      <div class="runout-arrow" id="runout-arrow"><img src="assets/size/travelLengthArrows.svg" alt="short to long runout, five increasing size classes"/></div>
+      <div class="picto-ticks" id="runout-ticks">
+        <span>&gt;0 m</span><span>50 m</span><span>250 m</span><span>900 m</span><span>2000 m</span>
+      </div>
+
+      <button class="label label-btn" id="btn-destructive-size" style="margin-top:12px">Destructive Size <span class="val">Impact Pressure [kPa]</span></button>
+      <div class="size-pictograms" id="destructive-pictograms" aria-label="Destructive size consequences">
+        <span title="Size 1 · small slide"><img src="assets/size/size1.svg" alt="Size 1"/></span>
+        <span title="Size 2 · person"><img src="assets/size/size2.svg" alt="Size 2"/></span>
+        <span title="Size 3 · vehicle"><img src="assets/size/size3.svg" alt="Size 3"/></span>
+        <span title="Size 4 · railway"><img src="assets/size/size4.svg" alt="Size 4"/></span>
+        <span title="Size 5 · buildings and forest"><img src="assets/size/size5.svg" alt="Size 5"/></span>
+      </div>
+      <div class="picto-ticks" id="destructive-ticks">
+        <span>&gt;0 kPa</span><span>20 kPa</span><span>50 kPa</span><span>200 kPa</span><span>500 kPa</span>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="label section">References</div>
+      <div class="hint" id="src-note-size" style="margin-top:0">The size interface builds on the established EAWS, CAA and AAA classifications. Continuous size relationships retain compatibility with these five-class operational schemes while allowing model inputs and outputs to be expressed on the same scale. Simulation results can therefore be translated back into spatially mapped dimension, runout and destructive size.</div>
+
+      <div class="hint ref-heading">Mapping Concept · Avalanche Scenario Maps</div>
+      <div class="hint">Hesselbach, C., Schwarz, J., Spannring, P., Wirbel, A., Huber, A., Winkler, M., Mitterer, C., Riedl, H., &amp; Fischer, J.-T. (2026). Avalanche scenario maps: from terrain identification to decision support tool. Proceedings of the International Snow Science Workshop. Whistler, Canada. <a href="https://doi.org/10.15788/1790098413" target="_blank" rel="noopener">doi.org/10.15788/1790098413</a></div>
+
+      <div class="hint ref-heading">Size Interface · Avalanche Size Classification</div>
+      <div class="hint">Fischer, J.-T., Spannring, P., Hesselbach, C., Huber, A., Wirbel, A., Koehler, A., Sovilla, B., Gauer, P., &amp; Thumlert, S. (2026). Towards a Technical and Communication Scheme for Avalanche Size Classification. Proceedings of the International Snow Science Workshop. Whistler, Canada. <a href="https://doi.org/10.15788/1790098722" target="_blank" rel="noopener">doi.org/10.15788/1790098722</a></div>
+
+      <div class="hint ref-heading">Software · Avalanche Scenario Mapper</div>
+      <div class="hint">Hesselbach, C., Spannring, P., Huber, A., Schwarz, J., &amp; Fischer, J.-T. (2025). OpenNHM/AvaScenarioMapper: Avalanche Scenario Mapper v1.0 [Computer software]. Zenodo. <a href="https://doi.org/10.5281/zenodo.17662779" target="_blank" rel="noopener">doi.org/10.5281/zenodo.17662779</a></div>
+
+      <div class="hint ref-heading">Software · Avalanche Terrain Identification</div>
+      <div class="hint">Hesselbach, C., Spannring, P., Huber, A., &amp; Fischer, J.-T. (2026). OpenNHM/AvalancheTerrainIdentification: Avalanche Terrain Identification v1.1 [Computer software]. Zenodo. <a href="https://doi.org/10.5281/zenodo.22049056" target="_blank" rel="noopener">doi.org/10.5281/zenodo.22049056</a></div>
+
+      <div class="hint">Cockpit UI (colours, aspect rose, icons) adapted from <a href="https://github.com/albina-euregio/albina-admin-gui" target="_blank" rel="noopener">albina-admin-gui</a> (AGPL-3.0).</div>
+    </div>
+
+    </div><!-- /mode-size -->
+
+  </div>
+</section>
 
 <script>
+/* ============================================================================
+   AVALANCHE SCENARIO MAPPER — mobile draft
+   Data model: AvaDirectoryResults subset (Step 16 output)
+     modType rel|res · sector N/E/S/W · flow dry|wet · PPM · PEM · rSize
+     praElevMin/Max/Mean · avaPotential · hex_relRes · hex_size
+   ========================================================================== */
 (function(){
-  /* ============== IMPORTANT STYLE VARS ============== */
-  let FILL_OPACITY = 0.30;        // transparency for all visible features
-  const CONFIG = {
-    STROKE_WEIGHT: 0,
-    REL_COLOR: "#ff00ff",
-    RES_COLOR: "#1e00ff",
-    SIZE_CLASSES: [
-      { color:"#09a2ff", label:"Size 1<br>1 LKW" },
-      { color:"#66ff31", label:""                  },
-      { color:"#fff300", label:"Size 3<br>100 LKW"},
-      { color:"#ff0000", label:""                  },
-      { color:"#5b0069", label:"Size 5<br>10.000 LKW"},
-    ],
-    HIGHLIGHT_BORDER: "red",
-    HIGHLIGHT_WEIGHT: 3.5,
-    HIGHLIGHT_STROKE_OPACITY: 0.5,
-    HIGHLIGHT_EXTRA_FILL: 0.15,
-    HIGHLIGHT_MAX_FILL: 0.55
-  };
-  const LOADER_MS = 4000;  //  fake loader
+"use strict";
 
-  const winterUrl = "data/avaScen_Winter_mobile_hex.geojson";
-  const springUrl = "data/avaScen_Spring_mobile_hex.geojson";
-  const microUrl  = "data/avaScenMaster_avaReportMicroRegionsPilotBrenner_wgs84.geojson";
-  const bannerWinter = "data/avaScenWinter.png";
-  const bannerSpring = "data/avaScenSpring.png";
-  
-  // Reuse page's ?v=... to bust image cache (falls back to now)
-  const BUST  = new URLSearchParams(location.search).get('v') || Date.now();
-  const CACHE = '?v=' + BUST;
-  
-  const START_ZOOM = 14, MIN_ZOOM = 12, MAX_ZOOM = 15;
-  const FIT_TO_DATA = false;
-  const TITLE_OFF = 4500;
-  const STYLE_POS = "bottomleft";
-  const ATTRS = ['LWDGebietID', 'LKGebiet', 'LKRegion', 'praID', 'resultID', 'modType', 'sector', 'flow', 'praAreaM', 'rSize', 'PPM', 'PEM', 'avaPotential'];
-
-  /* --- Hillshade base (PNG + bounds) --- */
-  const HILL_PNG = "data/HS10m_pilotBrenner_wgs84.png";
-  let base_hill = null;
-  try {
-    const info = JSON.parse('{"bounds": [[46.91571776781058, 11.239491625878523], [47.080879561592, 11.593290591056762]]}');   // expects {"bounds":[[S,W],[N,E]]}
-    if (HILL_PNG && info && Array.isArray(info.bounds)) {
-      const hillBounds = L.latLngBounds(info.bounds);
-      base_hill = L.imageOverlay(HILL_PNG + CACHE, hillBounds, {
-        opacity: 0.50,                  // 30% transparency
-        interactive: false
-      });
-    }
-  } catch (e) {
-    console.error("Hillshade bounds JSON parse failed:", e);
+/* --------------------------------------------------------- error surfacing
+   A silent JS exception used to leave the splash screen up forever. Anything
+   that throws now shows up on screen instead of only in the console. */
+function showError(msg){
+  hideLoader();
+  let box=document.getElementById("errbox");
+  if(!box){
+    box=document.createElement("div");
+    box.id="errbox";
+    box.style.cssText="position:fixed;z-index:960;left:8px;right:8px;bottom:8px;background:#2b1416;"+
+      "color:#ffd9dc;border-radius:12px;padding:12px 14px;font:12px/1.45 ui-monospace,Consolas,monospace;"+
+      "box-shadow:0 6px 24px rgba(0,0,0,.4);max-height:40vh;overflow:auto";
+    box.addEventListener("click",()=>box.remove());
+    document.body.appendChild(box);
   }
-
-
-  function waitForVars(maxTries){
-    let tries=0, iv=setInterval(()=>{
-      const mapObj=window["map_e81022b33cd5faee81b57c37b37a3542"],
-            G_W=window["feature_group_a75f5b038da99f06acd409fec537b77e"], G_S=window["feature_group_3cbf51da6bb8c7846f0c4d33e2af41ee"], G_M=window["feature_group_0abc2f791d10a74b826f45f2414e98ec"],
-            BASE_LIGHT=window["tile_layer_f870ae09d355441331cecc149b6ebc49"], BASE_BERGFEX=window["tile_layer_ad0a7670a587c6145d0d96d359c9621e"];
-      if(mapObj && G_W && G_S && G_M && BASE_LIGHT && BASE_BERGFEX && mapObj.addControl){
-        clearInterval(iv); boot(mapObj,G_W,G_S,G_M,BASE_LIGHT,BASE_BERGFEX);
-      } else if(++tries>maxTries){ clearInterval(iv); console.error("❌ Leaflet objects not ready."); }
-    },120);
+  box.innerHTML += "<div><b>"+String(msg).replace(/</g,"&lt;")+"</b></div>";
+  box.innerHTML += '<div style="opacity:.6;margin-top:4px">tap to dismiss</div>';
+}
+window.addEventListener("error",e=>{
+  showError("JS error: "+e.message+"  ("+String(e.filename||"").split("/").pop()+":"+e.lineno+")");
+});
+window.addEventListener("unhandledrejection",e=>{
+  showError("Unhandled: "+((e.reason&&e.reason.message)||e.reason));
+});
+/* The full local preview is large; surface a timeout without hiding progress forever.
+   Skipped once loading has actually finished and is just waiting on the
+   "Enter" tap — that's not a stall, it's the user taking their time. */
+let loaderReady=false;
+setTimeout(()=>{
+  const l=document.getElementById("loader");
+  if(l && !l.classList.contains("hide") && !loaderReady){
+    hideLoader();
+    showError("Loading did not finish within 3 minutes — last step was: "+
+      (document.getElementById("loader-sub")||{textContent:"?"}).textContent);
   }
+},180000);
 
-  function boot(mapObj, G_W, G_S, G_M, BASE_LIGHT, BASE_BERGFEX){
-    let showRel=true, showRes=false, sizeOn=false;  
-    let L_W=null, L_S=null, highlighted=null, didFit=false;
-    let scenario='winter';                            
+/* ------------------------------------------------------------------ config */
+const CFG = {
+  center:[46.9914, 11.416055], zoom:13, minZoom:9, maxZoom:13,
+  data:{
+    shard:"data/avaPreview_issw_{type}_{flow}_{sector}_{tile}.geojson",
+    depSizeShard:"data/avaPreview_issw_depsize_{preset}_{tile}.geojson",
+    manifest:"data/avaPreview_issw_manifest.json",
+    extent:  "data/pilotBrennerExtentMerge.geojson",
+    hill:    "data/10HS_isswAll.png",
+    sizeManifest:"data/avaSize_rasters.json"
+  },
+  hillBounds:[[46.79292940616387,11.08313943136693],[47.183221440588866,11.757729610455556]],
+  REL:"#ff00ff", RES:"#1e00ff"
+};
 
-    // snap & clamp zoom; (+/- controls hidden via CSS and zoom_control=False)
-    mapObj.options.zoomSnap=1; mapObj.options.zoomDelta=1;
-    mapObj.setZoom(Math.min(Math.max(START_ZOOM, MIN_ZOOM), MAX_ZOOM));
+const SIZE_LABEL = {1:"small",2:"medium",3:"large",4:"very large",5:"extremely large"};
+const SIZE_HEX = {1:"#09a2ff",2:"#66ff31",3:"#fff300",4:"#ff0000",5:"#5b0069"};
 
-    // Add Leaflet scale bar
-    if (L && L.control && L.control.scale) {
-      L.control.scale({metric:true, imperial:false}).addTo(mapObj);
-    }
+/* Aspect rose geometry copied 1:1 from albina-admin-gui aspects.component.html
+   so the control is visually identical to the bulletin GUI. */
+const ROSE = {
+  N :"300,300 200,100 300,0 400,100",
+  NE:"300,300 400,100 500,100 500,200",
+  E :"300,300 500,200 600,300 500,400",
+  SE:"300,300 500,400 500,500 400,500",
+  S :"300,300 200,500 300,600 400,500",
+  SW:"300,300 200,500 100,500 100,400",
+  W :"300,300 100,200 0,300 100,400",
+  NW:"300,300 100,200 100,100 200,100"
+};
+/* The pilot dataset only carries 4 real release-aspect sectors (N/E/S/W) —
+   there's no actual NE/SE/SW/NW data. So only the 4 cardinal wedges are
+   clickable and drive S.aspects (which therefore only ever holds N/E/S/W);
+   the 4 diagonal wedges are display-only, shaded from their two cardinal
+   neighbours' state so the rose still reads as an 8-way compass. */
+const CARDINALS = ["N","E","S","W"];
+const ADJACENT_CARDINALS = {NE:["N","E"], SE:["S","E"], SW:["S","W"], NW:["N","W"]};
 
-    // banner helpers
-    function updateBanner(){
-      const img = document.getElementById('ava-banner-img');
-      if (!img) return;
-      img.src = ((scenario === 'winter') ? bannerWinter : bannerSpring) + CACHE;
-    }
+const PRESETS = {
+  dry:{label:"Dry Winter", flows:["dry"], aspects:["SW","W","NW","N","NE"], elev:[2000,3500], size:4},
+  wet:{label:"Wet Spring", flows:["wet"], aspects:["NE","E","SE","S","SW"], elev:[1400,2500], size:2}
+};
 
-    // visibility + styling
-    function isVisibleByType(p){
-      const t=((p&&p.modType)||"").toLowerCase();
-      return (t==="rel" && showRel) || (t==="res" && showRes);
-    }
-    function pickHex(p){
-      if(!p) return null;
-      if(sizeOn) return p.hex_size||p.hexSize||p.hexsize||p.size_hex||p.__size_hex||null;
-      return p.hex_relRes||p.hex_relres||p.hexRelRes||p.hexrelres||p.hex_rel||null;
-    }
-    function styleFromProps(p){
-      const visible=isVisibleByType(p);
-      const hex=pickHex(p)||"#808080";
-      return { color:hex, fillColor:hex, weight:CONFIG.STROKE_WEIGHT,
-               opacity:visible?1:0, fillOpacity:visible?FILL_OPACITY:0 };
-    }
-    function styleHighlight(p){
-      const base=styleFromProps(p);
-      return { color:CONFIG.HIGHLIGHT_BORDER, weight:CONFIG.HIGHLIGHT_WEIGHT, opacity:CONFIG.HIGHLIGHT_STROKE_OPACITY,
-               fillColor:base.fillColor,
-               fillOpacity:Math.min(CONFIG.HIGHLIGHT_MAX_FILL,(base.fillOpacity||0)+CONFIG.HIGHLIGHT_EXTRA_FILL) };
-    }
-    function bindPopupsAndHighlight(layer){
-      if(!layer||!layer.eachLayer) return;
-      layer.eachLayer(function(ch){
-        const p=ch&&ch.feature?ch.feature.properties:null; if(!p) return;
-        let rows="";
-        for(let k of ATTRS){
-          if(Object.prototype.hasOwnProperty.call(p,k)){
-            rows+=`<tr><td><b>${k}</b></td><td>${p[k]}</td></tr>`;
-          }
-        }
-        if(rows && ch.bindPopup){
-          ch.bindPopup(
-            `<table style="font-size:11px">${rows}</table>`,
-            { maxWidth:270, className:'ava-popup' }
-          );
-        }
-        ch.on('click', ()=>{
-          if(highlighted&&highlighted.setStyle){
-            const pp=highlighted.feature?highlighted.feature.properties:null;
-            highlighted.setStyle(styleFromProps(pp));
-          }
-          highlighted=ch;
-          ch.setStyle(styleHighlight(p));
-          if(ch.bringToFront) ch.bringToFront();
-          if(ch.openPopup) ch.openPopup();
-        });
-      });
-    }
-    function applyStyleToGeoJSON(layer){
-      if(!layer||!layer.eachLayer) return;
-      layer.eachLayer(function(ch){
-        const p=ch&&ch.feature?ch.feature.properties:null;
-        const s=(highlighted===ch)?styleHighlight(p):styleFromProps(p);
-        if(ch&&ch.setStyle) ch.setStyle(s);
-      });
-    }
-    function loadGeo(url, intoGroup){
-      return fetch(url,{cache:"no-store"}).then(r=>r.json()).then(geo=>{
-        const layer=L.geoJSON(geo,{style:f=>styleFromProps(f&&f.properties?f.properties:null)});
-        bindPopupsAndHighlight(layer); if(intoGroup) layer.addTo(intoGroup); return layer;
-      });
-    }
+/* ------------------------------------------------------------------- state */
+const S = {
+  preset:"dry",
+  mode:"explore",
+  flows:new Set(["dry"]),
+  aspects:new Set(["W","N"]),
+  elev:[2000,3500],
+  size:4,
+  showRel:true, showRes:true, sizeColour:false,
+  sizeRaster:null,
+  alpha:0.20,
+  baseAlpha:0.50,
+  base:"osm", hillshade:true,
+  demo:false
+};
 
-    /* Combined Settings panel (bottom-left) */
-    const StyleControl=L.Control.extend({
-      options:{position:STYLE_POS},
-      onAdd:function(map){
-        const div=L.DomUtil.create('div','ava-style leaflet-control');
-        div.innerHTML=`
-          <div class="hdr" id="ava-hdr">
-            <span>SETTINGS     </span>
-            <span class="caret" id="ava-caret">▾</span>
-          </div>
-          <div class="body" id="ava-body">
+const $ = s=>document.querySelector(s);
+const $$ = s=>Array.from(document.querySelectorAll(s));
 
-            <!-- Base Layer -->
-            <div class="row" style="margin-top:2px;font-weight:700">Base Layer:</div>
-            <div class="row radio-row">
-              <label><input type="radio" name="base" id="base-light"> Hillshade</label>
-              <label><input type="radio" name="base" id="base-berg" checked> Bergfex Topo</label> 
-            </div>
+/* --------------------------------------------------------------------- map */
+const map = L.map("map",{center:CFG.center,zoom:CFG.zoom,minZoom:CFG.minZoom,
+  maxZoom:CFG.maxZoom,zoomControl:false,preferCanvas:true,attributionControl:true});
+L.control.scale({metric:true,imperial:false,position:"bottomleft"}).addTo(map);
 
-            <!-- Scenario -->
-            <div class="row" style="margin-top:6px;font-weight:700">Scenario:</div>
-            <div class="row radio-row">
-              <label><input type="radio" name="scn" id="scn-winter" checked> Winter (New Snow)</label>
-              <label><input type="radio" name="scn" id="scn-spring"> Spring (Wet Snow)</label>
-            </div>
+/* #map growing via 100dvh (e.g. Safari's URL bar auto-collapsing on
+   scroll) resizes the CSS box, but Leaflet still needs telling — otherwise
+   the newly revealed strip stays blank until the next pan/zoom. */
+if(window.visualViewport) visualViewport.addEventListener("resize",()=>map.invalidateSize());
+window.addEventListener("orientationchange",()=>setTimeout(()=>map.invalidateSize(),300));
 
-            <hr style="margin:6px 0;border:none;border-top:1px solid #ddd">
+const baseOSM = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
+  maxZoom:19,maxNativeZoom:19,opacity:.5,
+  attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+});
+baseOSM.addTo(map);
 
-            <!-- Show Avalanche -->
-            <div class="row" style="font-weight:700">Potential Avalanche Paths:</div>
+const hill = L.imageOverlay(CFG.data.hill, L.latLngBounds(CFG.hillBounds),
+  {opacity:.5, interactive:false, errorOverlayUrl:""});
+if(S.hillshade) hill.addTo(map);
+map.createPane("sizeRasterPane");
+map.getPane("sizeRasterPane").style.zIndex=405;   /* raster > hillshade (overlayPane, 400) > basemap (tilePane, 200) */
+map.getPane("sizeRasterPane").style.pointerEvents="none";
+let sizeRasterManifest=null;
+let presetTotals={};    // {preset:{rel,res}} — pilot-region totals already filtered by
+                        // that preset's own aspects+elevation range (see PRESETS), used
+                        // when a size raster is active and nothing is rendered as vectors
+const sizeRasterLayers=new Map();
 
-            <!-- Transparency (applies to all visible features) -->
-            <div class="alpha-row">
-              <div class="alpha-btn" data-alpha="0.10">10%</div>
-              <div class="alpha-btn active" data-alpha="0.30">30%</div>
-              <div class="alpha-btn" data-alpha="0.50">50%</div>
-            </div>
+let microLayer=null;
+const featLayers=[];              // {layer, p}  every rel/res polygon
+const gAva = L.layerGroup().addTo(map);
+/* Separate Canvas renderers per layer: Leaflet's Canvas renderer redraws
+   every registered path (visible or not) whenever ANY of them changes, so
+   sharing one canvas across rel+res+depSize meant switching a single size
+   criterion repainted the whole loaded dataset. Splitting them means
+   toggling one only ever repaints its own (much smaller) canvas. */
+const relRenderer = L.canvas();
+const resRenderer = L.canvas();
+const depSizeRenderer = L.canvas();
 
-            <div class="row cb">
-              <label><input id="chk-rel" type="checkbox" checked> Release area</label>
-              <span class="swatch" style="background:${CONFIG.REL_COLOR}"></span>
-            </div>
-            <div class="row cb">
-              <label><input id="chk-res" type="checkbox"> Runout area</label> 
-              <span class="swatch" style="background:${CONFIG.RES_COLOR}"></span>
-            </div>
+/* "Deposition Size" — a fixed single-scenario snapshot (unlike rel/res it
+   doesn't respond to aspect/elevation/size filters), so features are styled
+   once at load time and just shown/hidden as a whole group. */
+const depSizeGroups = new Map();  // preset -> L.layerGroup(), only the active preset's group is ever on the map
+const loadedDepSizeShards=new Map();
+const knownDepSizeTiles=new Set();  // "preset/tileCol_tileRow"
 
-            <div class="row cb">
-              <label><input id="chk-size" type="checkbox"> Release Vol. Size </label>
-            </div>
+/* Boot happens at the very bottom of this file: loadAll() touches const
+   bindings declared further down, and const is not hoisted. */
 
-            <!-- Size legend -->
-            <div id="legend-size" class="legend-size" style="display:none;">
-              <div id="size-grad" class="size-grad"></div>
-              <div class="size-labels">
-                <span>${CONFIG.SIZE_CLASSES[0].label||"Size 1"}</span>
-                <span>${CONFIG.SIZE_CLASSES[2].label||"Size 3"}</span>
-                <span>${CONFIG.SIZE_CLASSES[4].label||"Size 5"}</span>
-              </div>
-            </div>
-          </div>
-        `;
-        L.DomEvent.disableClickPropagation(div);
-        return div;
-      }
+/* ---------------------------------------------------------------- UI build */
+function buildRose(){
+  const svg=$("#rose"); let h="";
+  for(const k in ROSE) h+=`<polygon data-aspect="${k}" points="${ROSE[k]}" fill="#e8edef" stroke="#3c5d73" stroke-width="5"/>`;
+  h+=`<text x="300" y="128" text-anchor="middle" fill="#3c5d73" font-size="62">N</text>
+      <text x="300" y="525" text-anchor="middle" fill="#3c5d73" font-size="62">S</text>`;
+  svg.innerHTML=h;
+  svg.querySelectorAll("polygon").forEach(el=>{
+    const a=el.dataset.aspect;
+    if(!CARDINALS.includes(a)){ el.style.cursor="default"; return; }
+    el.addEventListener("click",()=>{
+      if(S.aspects.has(a)) S.aspects.delete(a); else S.aspects.add(a);
+      applyAlphaStaffel();
+      markCustom(); syncRose(); refresh();
     });
-    mapObj.addControl(new StyleControl());
+  });
+}
 
-    // Collapsible behavior
-    function initCollapse(){
-      const wrap=document.querySelector('.ava-style');
-      const hdr=document.getElementById('ava-hdr');
-      const caret=document.getElementById('ava-caret');
-      if(!wrap||!hdr||!caret) return;
-
-      // collapsed by default on small screens
-      const shouldCollapse = window.matchMedia && window.matchMedia('(max-width: 480px)').matches;
-      if (shouldCollapse){ wrap.classList.add('collapsed'); caret.textContent='▸'; }
-
-      hdr.addEventListener('click', ()=>{
-        const isCollapsed = wrap.classList.toggle('collapsed');
-        caret.textContent = isCollapsed ? '▸' : '▾';
-      });
+/* More active sectors ≈ more overlapping polygons on screen, which is what
+   makes the fill look oversaturated — so step the fill opacity down as
+   more aspects are selected. Only 3 tiers (not one per aspect count): 3 and
+   4 aspects look the same amount of "busy" on screen, so they share the
+   lowest value. Only runs when the aspect selection itself changes, so a
+   manual slider tweak afterward still sticks until the next aspect change. */
+function applyAlphaStaffel(){
+  S.alpha = (S.showRel && !S.showRes) ? 0.50 : 0.20;   // rel-only has far less overlap than with res shown too
+  $("#alpha").value=Math.round(S.alpha*100);
+  syncAlpha();
+}
+function syncRose(){
+  $("#rose").querySelectorAll("polygon").forEach(el=>{
+    const a=el.dataset.aspect;
+    if(CARDINALS.includes(a)){
+      el.setAttribute("fill", S.aspects.has(a)?"#09a2ff":"#e8edef");
+      return;
     }
+    const on=ADJACENT_CARDINALS[a].filter(c=>S.aspects.has(c)).length;
+    el.setAttribute("fill", on===2?"#09a2ff":on===1?"#bdddf1":"#e8edef");
+  });
+}
 
-    /* Build continuous gradient bar from the 5 class colors */
-    function paintSizeGradient(){
-      const el=document.getElementById("size-grad"); if(!el) return;
-      const colors=CONFIG.SIZE_CLASSES.map(c=>c.color);
-      const stops=colors.map((c,i)=>`${c} ${(i*100)/(colors.length-1)}%`).join(', ');
-      el.style.background=`linear-gradient(to right, ${stops})`;
-    }
+/* --------------------------------------------------------------- sheet UX */
+function snapPoints(){
+  const h=window.innerHeight, sh=document.getElementById("sheet").offsetHeight;
+  // "half" reveals exactly through the Event Size ticks, measured from the
+  // element's real rendered position (not a guessed viewport fraction) —
+  // #sheet is the nearest positioned ancestor, so offsetTop already gives
+  // its distance from the sheet's own top regardless of screen size/zoom
+  const anchor=document.getElementById("seg-flow");
+  const halfReveal = anchor ? (anchor.offsetTop+anchor.offsetHeight+4) : Math.round(h*0.685);
+  return {full:0, half:Math.max(0,sh-halfReveal), peek:Math.max(0,sh-118)};
+}
+let sheetY=null, snapName="peek";
+function setSnap(name){
+  snapName=name; const p=snapPoints(); sheetY=p[name];
+  $("#sheet").style.transform=`translateY(${sheetY}px)`;
+}
+function bindSheet(){
+  const sheet=$("#sheet"), grab=$("#grab");
+  requestAnimationFrame(()=>setSnap("peek"));
+  window.addEventListener("resize",()=>setSnap(snapName));
 
-    function refreshLegend(){
-      const ls=document.getElementById("legend-size");
-      if(ls) ls.style.display = sizeOn ? "block" : "none";
-      if(sizeOn) paintSizeGradient();
-    }
-    function reStyleAll(){
-      applyStyleToGeoJSON(L_W); applyStyleToGeoJSON(L_S);
-      refreshLegend();
-    }
+  let startY=0,startT=0,drag=false,moved=false;
+  const down=e=>{
+    // let taps on real controls in the grab row (Reset) behave as normal
+    // clicks instead of being captured as part of the sheet-drag gesture
+    if(e.target.closest("button,a")) return;
+    drag=true;moved=false;startY=e.clientY;startT=sheetY;sheet.classList.add("dragging");grab.setPointerCapture(e.pointerId);
+  };
+  const move=e=>{
+    if(!drag)return;
+    const p=snapPoints(), d=e.clientY-startY;
+    if(Math.abs(d)>4) moved=true;
+    sheetY=Math.min(p.peek+40, Math.max(-10, startT+d));
+    sheet.style.transform=`translateY(${sheetY}px)`;
+  };
+  const up=()=>{
+    if(!drag)return; drag=false; sheet.classList.remove("dragging");
+    if(!moved){ setSnap(snapName==="peek" ? "half" : (snapName==="half" ? "full":"peek")); return; }
+    const p=snapPoints();
+    let best="peek",bd=1e9;
+    for(const k in p){const d=Math.abs(p[k]-sheetY); if(d<bd){bd=d;best=k;}}
+    setSnap(best);
+  };
+  grab.addEventListener("pointerdown",down);
+  grab.addEventListener("pointermove",move);
+  grab.addEventListener("pointerup",up);
+  grab.addEventListener("pointercancel",up);
+}
 
-    function bindBasics(){
-      const rLight = document.getElementById('base-light');
-      const rBerg  = document.getElementById('base-berg');
-      const sWin   = document.getElementById('scn-winter');
-      const sSpr   = document.getElementById('scn-spring');
-    
-      // helper: toggle hillshade based on active base
-      function syncHillshade(){
-        if (!base_hill) return;
-        const isLight = rLight && rLight.checked;
-        if (isLight) {
-          if (!mapObj.hasLayer(base_hill)) mapObj.addLayer(base_hill);       // show with Light Gray
-        } else {
-          if (mapObj.hasLayer(base_hill)) mapObj.removeLayer(base_hill);      // hide with Bergfex
+/* ------------------------------------------------------------- controls */
+function bindControls(){
+  $$("#seg-preset button").forEach(b=>b.addEventListener("click",()=>applyPreset(b.dataset.preset)));
+  $$("#seg-mode button").forEach(b=>b.addEventListener("click",()=>{
+    // coming back from Avalanche Size to Explore doubles as a reset to
+    // Dry Winter, so you're never stuck on a stale size-mode selection
+    if(b.dataset.mode==="explore" && S.mode==="size"){
+      resetToDefaults();
+      return;
+    }
+    // rasters only exist for the two named presets — the tab itself is
+    // greyed out (disabled) for Custom, so a click there is simply a no-op
+    if(b.dataset.mode==="size" && S.preset==="custom") return;
+    S.mode=b.dataset.mode;
+    syncMode();
+    syncSizeModeDisplay();
+    // default to showing Runout (travel length) the first time you open
+    // Avalanche Size, rather than just the plain rel+res view
+    if(S.mode==="size" && !S.sizeRaster && !S.sizeColour){
+      selectSizeRaster("runout");
+    } else {
+      refresh();
+    }
+  }));
+  $$("#seg-flow button").forEach(b=>b.addEventListener("click",()=>{
+    S.flows=new Set([b.dataset.flow]);
+    markCustom(); syncFlow(); refresh();
+  }));
+  $("#btn-reset").addEventListener("click",resetToDefaults);
+
+  /* elevation dual range */
+  const lo=$("#elev-lo"), hi=$("#elev-hi");
+  const onElev=()=>{
+    let a=+lo.value,b=+hi.value;
+    if(a>b-100){ if(document.activeElement===lo) a=b-100; else b=a+100; lo.value=a; hi.value=b; }
+    S.elev=[a,b]; markCustom(); syncElev(); refresh();
+  };
+  lo.addEventListener("input",onElev); hi.addEventListener("input",onElev);
+
+  $("#chip-treeline").addEventListener("click",()=>{
+    const isTreeline=+lo.value===2000 && +hi.value>=3500;
+    if(!isTreeline){ lo.value=2000; hi.value=3500; }   // treeline ≈ 2000 m in the pilot area
+    else{ lo.value=800; hi.value=3500; }
+    onElev();
+  });
+
+  $("#btn-size-info").addEventListener("click",e=>{
+    const on=!e.currentTarget.classList.contains("on");
+    e.currentTarget.classList.toggle("on",on);
+    $("#size-hint").classList.toggle("show",on);
+  });
+  $("#size").addEventListener("input",e=>{S.size=+e.target.value;markCustom();syncSize();refresh();});
+  $("#alpha").addEventListener("input",e=>{S.alpha=(+e.target.value)/100;syncAlpha();restyle();});
+  $("#base-alpha").addEventListener("input",e=>{
+    S.baseAlpha=(+e.target.value)/100; syncBaseAlpha(); baseOSM.setOpacity(S.baseAlpha);
+  });
+
+  const tog=(sel,key,fn)=>$(sel).addEventListener("click",e=>{
+    S[key]=!S[key]; e.currentTarget.classList.toggle("on",S[key]); (fn||restyle)();
+  });
+  tog("#chip-rel","showRel",()=>{ applyAlphaStaffel(); refresh(); });
+  $("#chip-res").addEventListener("click",e=>{
+    S.showRes=!S.showRes; e.currentTarget.classList.toggle("on",S.showRes);
+    if(S.showRes){
+      S.sizeColour=false;
+      syncSizeRaster();
+    }
+    applyAlphaStaffel();
+    refresh();
+  });
+  tog("#chip-hill","hillshade",()=>{ S.hillshade?hill.addTo(map):map.removeLayer(hill); });
+  // "Dimension Size" is a disclosure — tapping it reveals the Release/
+  // Deposition choice underneath, defaulting to Deposition on first open
+  $("#btn-dimension-size").addEventListener("click",()=>{
+    const wasOpen = $("#dimension-submenu").classList.contains("on");
+    $("#dimension-submenu").classList.toggle("on");
+    // opening it fresh with nothing picked yet defaults to Deposition,
+    // so the first tap shows something instead of just an empty picker
+    if(!wasOpen && !S.sizeColour && S.sizeRaster!=="depsize"){
+      selectSizeRaster("depsize");
+    }
+  });
+  $("#chip-dim-release").addEventListener("click",()=>{
+    S.sizeColour=!S.sizeColour;
+    if(S.sizeColour){
+      S.showRel=true; S.showRes=false;
+      $("#chip-rel").classList.add("on"); $("#chip-res").classList.remove("on");
+      // mutually exclusive with "Deposition" — they share the legend row below
+      S.sizeRaster=null; updateSizeRasters(); updateDepSizeLayer();
+    } else {
+      syncSizeModeDisplay();
+    }
+    syncSizeRaster();
+    applyAlphaStaffel();
+    refresh();
+  });
+  const selectSizeRaster=kind=>{
+    if(S.preset==="custom"){
+      showError("Detailed size rasters are available only for the Dry Winter and Wet Spring presets.");
+      return;
+    }
+    S.sizeRaster=S.sizeRaster===kind?null:kind;
+    if(S.sizeRaster){
+      // the raster is the whole point once it's on — hide the vector layers
+      // so they don't clutter/compete with it
+      S.showRel=false; S.showRes=false;
+      $("#chip-rel").classList.remove("on"); $("#chip-res").classList.remove("on");
+      // mutually exclusive with "Release" — they share the legend row below
+      S.sizeColour=false;
+    } else {
+      syncSizeModeDisplay();
+    }
+    syncSizeRaster(); updateSizeRasters(); updateDepSizeLayer();
+    refresh();
+  };
+  $("#btn-destructive-size").addEventListener("click",()=>selectSizeRaster("destructive"));
+  $("#chip-dim-deposition").addEventListener("click",()=>selectSizeRaster("depsize"));
+  $("#btn-runout-size").addEventListener("click",()=>selectSizeRaster("runout"));
+
+  $("#btn-locate").addEventListener("click",()=>{
+    map.locate({setView:true,maxZoom:CFG.maxZoom});
+  });
+  map.on("locationfound",e=>{
+    L.circleMarker(e.latlng,{radius:7,color:"#fff",weight:3,fillColor:"#19abff",fillOpacity:1})
+      .addTo(map);
+  });
+}
+
+function resetToDefaults(){
+  // full reset to the app's starting state, not just "reapply current preset"
+  S.mode="explore";
+  S.showRel=true; S.showRes=true;
+  $("#chip-rel").classList.add("on"); $("#chip-res").classList.add("on");
+  S.sizeColour=false; S.sizeRaster=null;
+  $("#dimension-submenu").classList.remove("on");
+  S.hillshade=true; $("#chip-hill").classList.add("on"); if(!map.hasLayer(hill)) hill.addTo(map);
+  S.baseAlpha=0.50; $("#base-alpha").value=50; baseOSM.setOpacity(S.baseAlpha);
+  applyPreset("dry");
+}
+function applyPreset(name,opt){
+  opt=opt||{};
+  S.preset=name;
+  if(name==="custom") S.sizeRaster=null;
+  if(name!=="custom"){
+    const p=PRESETS[name];
+    S.flows=new Set(p.flows);
+    S.aspects=new Set(p.aspects.filter(a=>CARDINALS.includes(a)));
+    applyAlphaStaffel();
+    S.elev=p.elev.slice();
+    S.size=p.size;
+    $("#elev-lo").value=p.elev[0]; $("#elev-hi").value=p.elev[1];
+    $("#size").value=p.size;
+  }
+  // "Above treeline" state is derived from the elevation values themselves
+  // inside syncElev() (called via syncAll() below), not set here directly
+  syncAll();
+  if(!opt.silent) refresh();
+}
+function markCustom(){
+  if(S.preset==="custom") return;
+  S.preset="custom";
+  S.sizeRaster=null; syncSizeRaster(); updateSizeRasters(); updateDepSizeLayer();
+  syncPreset(); syncMode();
+}
+function syncMode(){
+  const sizeDisabled = S.preset==="custom";
+  if(sizeDisabled && S.mode==="size") S.mode="explore";
+  $("#seg-mode-size").classList.toggle("disabled",sizeDisabled);
+  $$("#seg-mode button").forEach(b=>b.classList.toggle("on",b.dataset.mode===S.mode));
+  $("#mode-explore").classList.toggle("on",S.mode==="explore");
+  $("#mode-size").classList.toggle("on",S.mode==="size");
+  // Custom has no meaning in Size Analysis (rasters/depSize only exist for
+  // the two named presets), so don't offer it as a choice while in that mode
+  $('#seg-preset button[data-preset="custom"]').classList.toggle("hidden",S.mode==="size");
+  syncTopLegend();
+}
+function syncTopLegend(){
+  const el=$("#st-legend");
+  if(S.mode==="size"){
+    // matches whichever criterion is actually active, not a generic label
+    const word = S.sizeRaster==="runout" ? "Runout"
+               : S.sizeRaster==="destructive" ? "Destructive"
+               : (S.sizeRaster==="depsize" || S.sizeColour) ? "Dimension"
+               : "Avalanche";
+    el.innerHTML = `
+      <div class="lrow sizegrid">
+        <div class="lbl">${word}</div><div class="bar sizekey"></div>
+        <div class="lbl">Size</div><div class="ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div class="lrow oneline">
+        <div class="pair"><div class="bar outline mini"></div><div class="lbl">Release Areas</div></div>
+        <div class="pair"><div class="bar gradient mini"></div><div class="lbl">Overlapping Avalanches</div></div>
+      </div>`;
+  }
+}
+function syncSizeModeDisplay(){
+  // with no criterion picked, default to showing rel+res exactly like Explore
+  if(S.mode!=="size" || S.sizeRaster || S.sizeColour) return;
+  S.showRel=true; S.showRes=true;
+  $("#chip-rel").classList.add("on"); $("#chip-res").classList.add("on");
+  applyAlphaStaffel();
+}
+function syncDimensionButtons(){
+  const on = S.sizeColour || S.sizeRaster==="depsize";
+  $("#btn-dimension-size").classList.toggle("on",on);
+  $("#chip-dim-release").classList.toggle("on",S.sizeColour);
+  $("#chip-dim-deposition").classList.toggle("on",S.sizeRaster==="depsize");
+}
+function syncSizeRaster(){
+  $("#btn-destructive-size").classList.toggle("on",S.sizeRaster==="destructive");
+  $("#btn-runout-size").classList.toggle("on",S.sizeRaster==="runout");
+  $("#destructive-pictograms").classList.toggle("on",S.sizeRaster==="destructive");
+  $("#destructive-ticks").classList.toggle("on",S.sizeRaster==="destructive");
+  $("#runout-arrow").classList.toggle("on",S.sizeRaster==="runout");
+  $("#runout-ticks").classList.toggle("on",S.sizeRaster==="runout");
+  syncDimensionButtons();
+  syncVolumePictograms();
+  syncTopLegend();
+}
+function syncVolumePictograms(){
+  const on = S.sizeColour || S.sizeRaster==="depsize";
+  $("#depsize-pictograms").classList.toggle("on",on);
+  $("#depsize-ticks").classList.toggle("on",on);
+}
+function syncPreset(){
+  $$("#seg-preset button").forEach(b=>b.classList.toggle("on",b.dataset.preset===S.preset));
+}
+function syncFlow(){
+  const key=[...S.flows][0];
+  $$("#seg-flow button").forEach(b=>b.classList.toggle("on",b.dataset.flow===key));
+  $("#v-flow").textContent=key==="dry"?"Cold":"Warm";
+}
+
+function syncElev(){
+  const lo=+$("#elev-lo").value, hi=+$("#elev-hi").value, min=800, max=3500;
+  const f=$("#elev-fill");
+  f.style.left=((lo-min)/(max-min)*100)+"%";
+  f.style.width=((hi-lo)/(max-min)*100)+"%";
+  $("#v-elev")
+    .textContent = (hi>=3500 ? lo+"–3500 m" : lo+"–"+hi+" m");
+  syncTreeline();
+}
+// "Above treeline" reflects the elevation range itself — only on when the
+// range is exactly the treeline preset (2000–3500 m), never a manual toggle
+function syncTreeline(){
+  const lo=+$("#elev-lo").value, hi=+$("#elev-hi").value;
+  $("#chip-treeline").classList.toggle("on", lo===2000 && hi>=3500);
+}
+function syncSize(){
+  const f=$("#size-fill"); f.style.left="0"; f.style.width=((S.size-1)/4*100)+"%";
+  $("#v-size").textContent = S.size+" — "+SIZE_LABEL[S.size];
+}
+function syncAlpha(){
+  const v=+$("#alpha").value, f=$("#alpha-fill");
+  f.style.left="0"; f.style.width=((v-5)/80*100)+"%";
+  $("#v-alpha").textContent = v+" %";
+}
+function syncBaseAlpha(){
+  const v=+$("#base-alpha").value, f=$("#base-alpha-fill");
+  f.style.left="0"; f.style.width=((v-10)/90*100)+"%";
+  $("#v-base-alpha").textContent=v+" %";
+}
+function syncAll(){ syncPreset(); syncMode(); syncSizeModeDisplay(); syncFlow(); syncRose(); syncElev(); syncSize(); syncAlpha(); syncBaseAlpha(); syncSizeRaster(); updateSizeRasters(); updateDepSizeLayer(); }
+
+/* --------------------------------------------------------------- filtering */
+function activeSectors(){
+  return new Set(S.aspects);
+}
+function matches(p,sectors){
+  if(!S.flows.has(p.flow)) return false;
+  if(!sectors.has(p.sector)) return false;
+  const e = (p.praElevMean!=null) ? p.praElevMean : (p.praElevMin+p.praElevMax)/2;
+  const hi = S.elev[1]>=3500 ? 9999 : S.elev[1];
+  if(e < S.elev[0] || e > hi) return false;
+  if(p.modType==="res" && !(Number(p.sizeMask||0) & (1 << (S.size-1)))) return false;
+  return true;
+}
+const REL_OUTLINE="#ff00e5";   // matches the QGIS project's rel symbol (255,0,229)
+function styleFor(p,visible){
+  if(!visible) return {opacity:0,fillOpacity:0,weight:0};
+  if(p.modType==="rel"){
+    if(S.showRes){
+      // res is also on screen — rel steps back to an outline only, like the QGIS style
+      return {color:REL_OUTLINE,weight:1,opacity:1,fillOpacity:0};
+    }
+    const hex = S.sizeColour ? (p.hex_size||SIZE_HEX[p.PPM]||SIZE_HEX[p.PEM]||"#808080") : REL_OUTLINE;
+    return {color:hex,fillColor:hex,weight:0,opacity:1,fillOpacity:S.alpha};
+  }
+  const hex = p.hex_relRes || CFG.RES;
+  return {color:hex,fillColor:hex,weight:0,opacity:1,fillOpacity:S.alpha};
+}
+
+let raf=null, refreshVersion=0;
+function refresh(){
+  const version=++refreshVersion;
+  if(raf) cancelAnimationFrame(raf);
+  raf=requestAnimationFrame(async()=>{
+    raf=null;
+    try{
+      await ensureActiveShards();
+      updateDepSizeLayer();   // no-op unless "Deposition Size" is active; loads tiles as the viewport moves
+      if(version===refreshVersion) doRefresh();
+    }catch(err){ showError(err && err.message ? err.message : String(err)); }
+  });
+}
+function doRefresh(){
+  const sectors=activeSectors();
+  /* per-feature colour only depends on sizeColour, so one key covers all
+     visible features — lets us skip setStyle for anything that did not change */
+  const shownKey = S.alpha.toFixed(2) + (S.sizeColour ? "|release-size" : "|type");
+  let n=0;
+  for(let i=0;i<featLayers.length;i++){
+    const it=featLayers[i], p=it.p;
+    const typeOn = (p.modType==="rel"&&S.showRel)||(p.modType==="res"&&S.showRes);
+    const ok = typeOn && matches(p,sectors);
+    if(ok && p.modType==="rel") n++;
+    const key = ok ? shownKey : "hidden";
+    if(it.key!==key){
+      it.key=key; it.visible=ok; it.layer.setStyle(styleFor(p,ok));
+      // hidden features are still fully transparent canvas paths — without
+      // this they keep absorbing clicks meant for whatever visible feature
+      // is underneath, so some avalanches silently never open a popup
+      it.layer.options.interactive=ok;
+    }
+  }
+  // Destructive/Runout are TIF-derived image overlays — no vectors get
+  // rendered while they're active, so the live loop above always counts 0.
+  // Show the precomputed pilot-region res total for the current preset instead.
+  const rasterActive = S.sizeRaster==="destructive" || S.sizeRaster==="runout";
+  const shownN = rasterActive ? ((presetTotals[S.preset] && presetTotals[S.preset].res) || 0) : n;
+  const countLabel = rasterActive ? "avalanche paths" : "release areas";
+  $("#count").textContent = shownN.toLocaleString();
+  $("#st-eyebrow").textContent = S.demo ? "Scenario · demo data" : "Scenario";
+  const flow=S.flows.size===2?"dry + wet":[...S.flows][0];
+  const sectorsText=CARDINALS.filter(c=>S.aspects.has(c)).join(", ")||"—";
+  $("#st-sub").innerHTML = `<b>${shownN.toLocaleString()}</b> ${countLabel} · ${S.elev[0]}–${S.elev[1]>=3500?"3500":S.elev[1]} m · ${sectorsText} · event size ${S.size} · ${flow}`;
+}
+function restyle(){ refresh(); }
+
+/* Size rasters are a single full-region image, not thousands of overlapping
+   vector polygons, so the aspect-count opacity staffel (tuned for fill
+   density) doesn't apply — they always show at a fixed, more opaque level. */
+const RASTER_ALPHA=0.7;
+function updateSizeRasters(){
+  sizeRasterLayers.forEach(layer=>{ if(map.hasLayer(layer)) map.removeLayer(layer); });
+  if(!S.sizeRaster || !sizeRasterManifest || S.preset==="custom") return;
+  const key=S.preset+"/"+S.sizeRaster;
+  const item=sizeRasterManifest.rasters && sizeRasterManifest.rasters[key];
+  if(!item) return;
+  let layer=sizeRasterLayers.get(key);
+  if(!layer){
+    layer=L.imageOverlay("data/"+item.file,L.latLngBounds(item.bounds),{
+      opacity:RASTER_ALPHA,interactive:false,pane:"sizeRasterPane",errorOverlayUrl:""
+    });
+    layer.on("error",()=>showError("Could not load detailed size raster: "+item.file));
+    sizeRasterLayers.set(key,layer);
+  }
+  layer.addTo(map);
+}
+
+/* "Deposition Size" — one fixed vector snapshot per preset (the same
+   North2000/South2500 scenario runs the size rasters above come from),
+   coloured by each feature's own precomputed depSize rather than the
+   rel/res filter system. Loaded tile-by-tile like rel/res, but features are
+   styled once and never restyled by doRefresh(). */
+function depSizeShardUrl(preset,tileCol,tileRow){
+  return CFG.data.depSizeShard.replace("{preset}",preset).replace("{tile}",tileCol+"_"+tileRow)+".gz";
+}
+const DEPSIZE_ALPHA=0.5;   // Dimension Size stays a bit more transparent than the image rasters
+function depSizeStyle(p){
+  const hex=SIZE_HEX[Math.min(5,Math.max(1,Math.floor(p.depSize)))]||"#808080";
+  return {color:hex,fillColor:hex,weight:0,opacity:DEPSIZE_ALPHA,fillOpacity:DEPSIZE_ALPHA};
+}
+function depSizeGroupFor(preset){
+  let group=depSizeGroups.get(preset);
+  if(!group){ group=L.layerGroup(); depSizeGroups.set(preset,group); }
+  return group;
+}
+async function loadDepSizeShard(preset,tileCol,tileRow){
+  const key=preset+"/"+tileCol+"_"+tileRow;
+  if(loadedDepSizeShards.has(key)) return loadedDepSizeShards.get(key);
+  const group=depSizeGroupFor(preset);
+  const task=(async()=>{
+    const geo=await getShardJSON(depSizeShardUrl(preset,tileCol,tileRow));
+    const feats=(geo&&geo.features)||[];
+    const CHUNK=1200;
+    for(let i=0;i<feats.length;i+=CHUNK){
+      const slice=feats.slice(i,i+CHUNK);
+      L.geoJSON({type:"FeatureCollection",features:slice},{
+        renderer:depSizeRenderer,
+        style:f=>depSizeStyle(f.properties||{}),
+        onEachFeature:(f,l)=>{
+          const p=f.properties||{};
+          const item={layer:l,p,visible:true,baseStyle:depSizeStyle(p)};
+          l.on("click",()=>{ highlightFeature(item); openPopup(l,p); });
+        }
+      }).addTo(group);
+      await nextFrame();
+    }
+    loadedDepSizeShards.set(key,true);
+  })().catch(err=>{ loadedDepSizeShards.delete(key); throw err; });
+  loadedDepSizeShards.set(key,task);
+  return task;
+}
+async function updateDepSizeLayer(){
+  // exactly mirrors updateSizeRasters(): hide every preset's group first,
+  // then only show/populate the one matching the currently active preset.
+  depSizeGroups.forEach((group,preset)=>{
+    if(map.hasLayer(group) && !(S.sizeRaster==="depsize" && S.preset===preset)) map.removeLayer(group);
+  });
+  if(S.sizeRaster!=="depsize" || S.preset==="custom") return;
+  const preset=S.preset;
+  const group=depSizeGroupFor(preset);
+  if(!map.hasLayer(group)) group.addTo(map);
+  const tiles=tilesForBounds(map.getBounds());
+  const jobs=[];
+  for(const [tileCol,tileRow] of tiles){
+    if(!knownDepSizeTiles.has(preset+"/"+tileCol+"_"+tileRow)) continue;
+    jobs.push(loadDepSizeShard(preset,tileCol,tileRow));
+  }
+  await Promise.all(jobs);
+}
+
+/* ------------------------------------------------------------------- data */
+const loadedShards=new Map();         // key -> in-flight promise or true
+
+const nextFrame = ()=>new Promise(r=>requestAnimationFrame(()=>r()));
+
+/* Build in chunks and yield between them: the browser keeps painting, so a
+   slow machine shows progress instead of a frozen splash screen. */
+async function addFeatures(geo, want, onProgress, renderer){
+  const src = (geo && geo.features) || [];
+  const feats = want ? src.filter(f=>f.properties && f.properties.modType===want) : src;
+  const CHUNK = 1200;
+  for(let i=0;i<feats.length;i+=CHUNK){
+    const slice = feats.slice(i, i+CHUNK);
+    L.geoJSON({type:"FeatureCollection", features:slice},{
+      renderer,
+      style:()=>({weight:0,opacity:0,fillOpacity:0}),
+      onEachFeature:(f,l)=>{
+        const item={layer:l, p:f.properties||{}, visible:false, key:"hidden"};
+        featLayers.push(item);
+        l.on("click",()=>{ if(item.visible){ highlightFeature(item); openPopup(l,item.p); } });
+        l.on("popupclose",()=>{ if(highlighted===item){ restoreHighlight(item); highlighted=null; } });
+      }
+    }).addTo(gAva);
+    if(onProgress) onProgress(Math.min(i+CHUNK, feats.length), feats.length);
+    await nextFrame();
+  }
+  return feats.length;
+}
+
+function shardUrl(flow,type,sector,tileCol,tileRow){
+  return CFG.data.shard.replace("{flow}",flow).replace("{type}",type).replace("{sector}",sector)
+    .replace("{tile}",tileCol+"_"+tileRow)+".gz";
+}
+
+/* Spatial tiling: each shard is additionally split into a fixed-origin
+   lon/lat grid (helper/prepareWebPreviewScenarios.py), so only the tiles
+   near the current viewport need to be fetched/rendered. Grid params +
+   which tile keys actually exist come from the manifest. */
+let grid=null;                    // {originLat, originLon, cellSizeDeg}
+const knownTiles=new Set();       // "modType/flow/sector/tileCol_tileRow"
+function tilesForBounds(bounds){
+  const b=bounds.pad(0.3);
+  const c0=Math.floor((b.getWest() -grid.originLon)/grid.cellSizeDeg);
+  const c1=Math.floor((b.getEast() -grid.originLon)/grid.cellSizeDeg);
+  const r0=Math.floor((b.getSouth()-grid.originLat)/grid.cellSizeDeg);
+  const r1=Math.floor((b.getNorth()-grid.originLat)/grid.cellSizeDeg);
+  const tiles=[];
+  for(let c=c0;c<=c1;c++) for(let r=r0;r<=r1;r++) tiles.push([c,r]);
+  return tiles;
+}
+
+/* Shard fetch + JSON.parse happen in a worker so a 30-40 MB response never
+   blocks the UI thread. One shared worker, requests correlated by id. */
+let dataWorker=null, dataWorkerReqID=0;
+const dataWorkerPending=new Map();
+function getShardJSON(url){
+  if(!dataWorker){
+    dataWorker=new Worker("data-worker.js");
+    dataWorker.onmessage=ev=>{
+      const {id,data,error}=ev.data;
+      const p=dataWorkerPending.get(id);
+      if(!p) return;
+      dataWorkerPending.delete(id);
+      error ? p.reject(new Error(error)) : p.resolve(data);
+    };
+    dataWorker.onerror=e=>{
+      for(const p of dataWorkerPending.values()) p.reject(new Error("Worker error: "+e.message));
+      dataWorkerPending.clear();
+    };
+  }
+  const id=++dataWorkerReqID;
+  return new Promise((resolve,reject)=>{
+    dataWorkerPending.set(id,{resolve,reject});
+    dataWorker.postMessage({id,url});
+  });
+}
+async function loadShard(flow,type,sector,tileCol,tileRow){
+  const key=flow+"/"+type+"/"+sector+"/"+tileCol+"_"+tileRow;
+  if(loadedShards.has(key)) return loadedShards.get(key);
+  const task=(async()=>{
+    setBusy("Loading "+flow+" "+type+" "+sector+" …");
+    const geo=await getShardJSON(shardUrl(flow,type,sector,tileCol,tileRow));
+    await addFeatures(geo,null,undefined,type==="rel"?relRenderer:resRenderer);
+    loadedShards.set(key,true);
+    setBusy(null);
+    return true;
+  })().catch(err=>{ loadedShards.delete(key); setBusy(null); throw err; });
+  loadedShards.set(key,task);
+  return task;
+}
+async function ensureActiveShards(){
+  if(location.protocol==="file:" || S.demo) return;
+  const sectors=activeSectors();
+  const types=[];
+  if(S.showRel) types.push("rel");
+  if(S.showRes && S.size>1) types.push("res");
+  const tiles=tilesForBounds(map.getBounds());
+  /* Fire every needed tile request concurrently — sequentially awaiting
+     each one (as this used to) turns a viewport spanning ~100+ tiles into
+     that many serialized round trips instead of one overlapped batch. */
+  const jobs=[];
+  for(const flow of S.flows){
+    for(const type of types){
+      for(const sector of sectors){
+        for(const [tileCol,tileRow] of tiles){
+          if(!knownTiles.has(type+"/"+flow+"/"+sector+"/"+tileCol+"_"+tileRow)) continue;
+          jobs.push(loadShard(flow,type,sector,tileCol,tileRow));
         }
       }
-    
-      if (rLight && rBerg){
-        rLight.addEventListener('change', ()=> {
-          if (rLight.checked){
-            if (mapObj.hasLayer(BASE_BERGFEX)) mapObj.removeLayer(BASE_BERGFEX);
-            if (!mapObj.hasLayer(BASE_LIGHT))  mapObj.addLayer(BASE_LIGHT);
-            syncHillshade();   
-          }
-        });
-        rBerg.addEventListener('change', ()=> {
-          if (rBerg.checked){
-            if (mapObj.hasLayer(BASE_LIGHT))   mapObj.removeLayer(BASE_LIGHT);
-            if (!mapObj.hasLayer(BASE_BERGFEX)) mapObj.addLayer(BASE_BERGFEX);
-            syncHillshade();   
-          }
-        });
-      }
-    
-      if (sWin && sSpr){
-        sWin.addEventListener('change', ()=>{ 
-          if (sWin.checked){
-            scenario='winter';
-            if (mapObj.hasLayer(G_S)) mapObj.removeLayer(G_S);
-            if (!mapObj.hasLayer(G_W)) mapObj.addLayer(G_W);
-            updateBanner(); reStyleAll();
-          }
-        });
-        sSpr.addEventListener('change', ()=>{ 
-          if (sSpr.checked){
-            scenario='spring';
-            if (mapObj.hasLayer(G_W)) mapObj.removeLayer(G_W);
-            if (!mapObj.hasLayer(G_S)) mapObj.addLayer(G_S);
-            updateBanner(); reStyleAll();
-          }
-        });
-      }
-    
-      // make sure hillshade visibility matches the initially selected base
-      syncHillshade();
     }
-
-    function bindPanel(){
-      const cRel=document.getElementById("chk-rel");
-      const cRes=document.getElementById("chk-res");
-      const cSize=document.getElementById("chk-size");
-      if(!cRel||!cRes||!cSize) return false;
-      cRel.addEventListener('change', ()=>{ showRel=!!cRel.checked; reStyleAll(); });
-      cRes.addEventListener('change', ()=>{ showRes=!!cRes.checked; reStyleAll(); });
-      cSize.addEventListener('change', ()=>{ sizeOn=!!cSize.checked; reStyleAll(); });
-
-      // transparency buttons
-      const alphas=[...document.querySelectorAll('.alpha-btn')];
-      alphas.forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          alphas.forEach(b=>b.classList.remove('active'));
-          btn.classList.add('active');
-          const v=parseFloat(btn.getAttribute('data-alpha')) || 0.3;
-          FILL_OPACITY = v;         // live change for all layers/modes
-          reStyleAll();
-        });
-      });
-      return true;
-    }
-
-    // helper: hide loader
-    function hideLoaderSoon(){
-      const ld=document.getElementById('ava-loader');
-      if(!ld) return;
-      setTimeout(()=>{ ld.classList.add('hide'); setTimeout(()=>ld.remove(), 380); }, LOADER_MS);
-    }
-
-    /* Load layers */
-    Promise.all([
-      loadGeo(winterUrl, G_W).then(l=>{L_W=l}),
-      loadGeo(springUrl, G_S).then(l=>{L_S=l}),
-      fetch(microUrl,{cache:"no-store"}).then(r=>r.ok?r.json():null).then(geo=>{
-        if(!geo) return null;
-        return L.geoJSON(geo,{style:{color:"#666",weight:1,opacity:0.9,fillOpacity:0}}).addTo(G_M);
-      }).catch(()=>null)
-    ]).then(()=>{
-      // initial: Winter visible, base = Bergfex, Release only
-      if(mapObj.hasLayer(G_S)) mapObj.removeLayer(G_S);
-      if(!mapObj.hasLayer(G_W)) mapObj.addLayer(G_W);
-      // force bergfex as base at start
-      if(mapObj.hasLayer(BASE_LIGHT)) mapObj.removeLayer(BASE_LIGHT);
-      if(!mapObj.hasLayer(BASE_BERGFEX)) mapObj.addLayer(BASE_BERGFEX);
-      document.getElementById('base-berg')?.setAttribute('checked','checked');
-
-      updateBanner();
-      applyStyleToGeoJSON(L_W); applyStyleToGeoJSON(L_S);
-      paintSizeGradient(); refreshLegend();
-      bindBasics(); bindPanel(); initCollapse();
-      hideLoaderSoon();  
-
-      if(FIT_TO_DATA && !didFit){
-        const active=(mapObj.hasLayer(G_W) && L_W)?L_W:((mapObj.hasLayer(G_S) && L_S)?L_S:null);
-        try{ if(active){ const b=active.getBounds(); if(b && b.isValid && b.isValid()) mapObj.fitBounds(b,{padding:[10,10]}); } }catch(_){}
-        didFit=true;
-      }
-
-    
-    }).catch(err=>console.error("❌ load error", err));
   }
+  await Promise.all(jobs);
+}
 
-  waitForVars(80);
+/* Tapping a feature draws a visible outline on it (features otherwise have
+   weight:0 by design — see styleFor) so it's clear which avalanche the open
+   popup belongs to. Only the stroke props are touched; setStyle merges into
+   the existing options, so fillColor/fillOpacity are untouched. */
+let highlighted=null;
+function highlightFeature(item){
+  if(highlighted && highlighted!==item) restoreHighlight(highlighted);
+  highlighted=item;
+  item.layer.setStyle({weight:3,color:"#111418",opacity:1});
+  item.layer.bringToFront();
+}
+function restoreHighlight(item){
+  // depSize features carry their own frozen colour (baseStyle) since they
+  // don't participate in the rel/res filter system styleFor() computes from
+  item.layer.setStyle(item.baseStyle || styleFor(item.p,item.visible));
+}
+function openPopup(l,p){
+  const rows=[["Region",p.LKGebiet],["Warning region",p.LWDGebietID],["Aspect",p.sector],
+    ["Flow",p.flow],["Elevation",Math.round(p.praElevMin)+"–"+Math.round(p.praElevMax)+" m"],
+    ["Release area",p.praAreaM?Math.round(p.praAreaM).toLocaleString()+" m²":null],
+    ["PPM / PEM",(p.PPM??"–")+" / "+(p.PEM??"–")],["rSize",p.rSize],
+    ["Dimension size",p.depSize!=null?p.depSize.toFixed(2):null],
+    ["Potential",p.AvaDistributionPotential??p.avaPotential],["praID",p.praID],["resultID",p.resultID]]
+    .filter(r=>r[1]!=null&&r[1]!=="")
+    .map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");
+  l.bindPopup(`<div class="pop"><h4>${p.modType==="rel"?"Release area":"Avalanche outline"}</h4>
+    <table>${rows}</table></div>`,{maxWidth:280,autoPan:true}).openPopup();
+}
+
+/* Draws the pilot-region outline only. Deliberately does not fitBounds to
+   it: the extent is bigger than a screen's worth of tiles, so auto-fitting
+   here would force-load every tile in the region on startup. */
+function addMicro(geo){
+  map.createPane("extentPane");
+  map.getPane("extentPane").style.zIndex=460;
+  map.getPane("extentPane").style.pointerEvents="none";
+  microLayer=L.geoJSON(geo,{pane:"extentPane",style:{color:"#103b5c",weight:3.2,opacity:1,fillOpacity:0},interactive:false});
+  microLayer.addTo(map);
+}
+function loadScript(src){
+  return new Promise(res=>{
+    const el=document.createElement("script");
+    el.src=src; el.onload=()=>res(true); el.onerror=()=>res(false);
+    document.head.appendChild(el);
+  });
+}
+
+/* Let the browser parse the response directly. Building an extra byte buffer
+   would duplicate the 200+ MB scenario file in memory. */
+async function getJSON(url,label){
+  const r = await fetch(url,{cache:"no-store"});
+  if(!r.ok) throw new Error(url+" → HTTP "+r.status);
+  const total = +(r.headers.get("content-length")||0);
+  setLoaderText("Downloading "+label+(total?" — "+(total/1048576).toFixed(1)+" MB":"")+" …");
+  await nextFrame();
+  return r.json();
+}
+
+async function loadAll(){
+  const fileMode = (location.protocol === "file:");
+  try{
+    if(fileMode){
+      setLoaderText("Local web server required …");
+      S.demo=true;
+      await addFeatures(demoData(),null);
+      $("#src-note").innerHTML = "<b>Demo data.</b> Start the local web server and open <code>http://localhost:8000/index.html</code>.";
+      showFileWarning();
+    } else {
+      try{ addMicro(await getJSON(CFG.data.extent,"pilot extent")); }catch(e){ console.warn("pilot extent",e); }
+      try{ sizeRasterManifest=await getJSON(CFG.data.sizeManifest,"size raster manifest"); }
+      catch(e){ console.warn("size raster manifest",e); }
+      const manifest=await getJSON(CFG.data.manifest,"tile manifest");
+      grid=manifest.grid;
+      presetTotals=manifest.presetTotals||{};
+      for(const key in manifest.shards) knownTiles.add(key);
+      for(const key in manifest.depSizeShards||{}) knownDepSizeTiles.add(key);
+      setLoaderText("Loading Dry Winter Avalanches …");
+      await ensureActiveShards();
+      map.on("moveend zoomend",refresh);
+    }
+    doRefresh();
+  }catch(err){
+    showError(err && err.message ? err.message : String(err));
+  }finally{
+    readyToEnter();
+  }
+}
+/* once loading succeeds, wait for an explicit tap instead of auto-dismissing —
+   a no-op if showError() already hid the loader first */
+function readyToEnter(){
+  const l=$("#loader");
+  if(!l || l.classList.contains("hide")) return;
+  loaderReady=true;
+  setLoaderText("Ready");
+  const btn=$("#btn-enter");
+  if(!btn){ hideLoader(); return; }
+  btn.classList.add("show");
+  btn.addEventListener("click",hideLoader,{once:true});
+}
+function countMod(geo,want){
+  if(!geo||!geo.features) return 0;
+  let n=0; for(const f of geo.features) if(f.properties && f.properties.modType===want) n++;
+  return n;
+}
+function setLoaderText(t){ const e=$("#loader-sub"); if(e) e.textContent=t; }
+function hideLoader(){
+  const l=$("#loader"); if(!l) return;
+  l.classList.add("hide"); setTimeout(()=>l.remove(),400);
+}
+/* small transient note in the status card, used while runout is being built */
+function setBusy(t){
+  const e=$("#st-sub"); if(!e) return;
+  if(t){ e.dataset.prev=e.innerHTML; e.textContent=t; }
+  else if(e.dataset.prev!=null){ e.innerHTML=e.dataset.prev; delete e.dataset.prev; }
+}
+
+/* file:// cannot fetch local GeoJSON — say so instead of failing silently */
+function showFileWarning(){
+  const d=document.createElement("div");
+  d.style.cssText="position:fixed;z-index:950;left:12px;right:12px;top:50%;transform:translateY(-50%);"+
+    "background:#fff;border-radius:14px;padding:18px 18px 16px;box-shadow:0 10px 40px rgba(0,0,0,.3);max-width:430px;margin:0 auto";
+  d.innerHTML='<div style="font-weight:700;font-size:15px;margin-bottom:6px">One-time step needed</div>'+
+    '<div style="font-size:13px;color:#5b6670;line-height:1.45">Opened directly from disk, the browser is not allowed to read '+
+    '<code>data\\*.geojson</code>. Start a local web server from the project folder:<br><br>'+
+    '<code>pixi run python -m http.server 8000 --directory docs</code><br><br>'+
+    'Then open <code>http://localhost:8000/index.html</code>.<br><br>'+
+    'Until then you are looking at demo geometry.</div>'+
+    '<button style="margin-top:14px;width:100%;border:0;background:#101418;color:#fff;padding:11px;border-radius:10px;font-size:14px;font-weight:600">Continue with demo data</button>';
+  d.querySelector("button").onclick=()=>d.remove();
+  document.body.appendChild(d);
+}
+
+/* synthetic stand-in so the UI can be reviewed without the data folder */
+function demoData(){
+  const SIZEHEX={1:"#09a2ff",2:"#66ff31",3:"#fff300",4:"#ff0000",5:"#5b0069"};
+  const sect=["N","E","S","W"], feats=[];
+  let seed=42; const rnd=()=>{seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;};
+  for(let i=0;i<420;i++){
+    const lat=46.945+rnd()*0.10, lon=11.30+rnd()*0.24;
+    const flow = rnd()<0.55?"dry":"wet";
+    const sector=sect[Math.floor(rnd()*4)];
+    const elev=1600+Math.round(rnd()*14)*100;
+    const PEM=2+Math.floor(rnd()*3), PPM=PEM+Math.floor(rnd()*2);
+    const r=0.0035+rnd()*0.004;
+    const ring=[],rings=[];
+    for(let a=0;a<6;a++){const t=a/6*Math.PI*2;ring.push([lon+r*Math.cos(t)*1.4,lat+r*Math.sin(t)]);}
+    ring.push(ring[0]);
+    const base={LKGebiet:"Brenner (demo)",LWDGebietID:"AT-07-22",sector:sector,flow:flow,
+      praElevMin:elev,praElevMax:elev+180,praElevMean:elev+90,praAreaM:Math.round(3000+rnd()*40000),
+      PPM:PPM,PEM:PEM,rSize:5-(PPM-PEM),avaPotential:"very high",
+      hex_relRes:"#ff00ff",hex_size:SIZEHEX[Math.max(1,Math.min(5,PPM))],praID:900000+i,resultID:"demo"+i};
+    feats.push({type:"Feature",properties:Object.assign({},base,{modType:"rel"}),
+      geometry:{type:"Polygon",coordinates:[ring]}});
+    const run=ring.map(c=>[c[0],c[1]-r*2.2]);
+    feats.push({type:"Feature",properties:Object.assign({},base,{modType:"res",hex_relRes:"#1e00ff"}),
+      geometry:{type:"Polygon",coordinates:[run]}});
+  }
+  return {type:"FeatureCollection",features:feats};
+}
+
+/* ------------------------------------------------------------------- boot */
+buildRose(); bindSheet(); bindControls();
+applyPreset("dry",{silent:true});
+loadAll();
+
 })();
 </script>
-
-    
-            <div class="folium-map" id="map_e81022b33cd5faee81b57c37b37a3542" ></div>
-        
 </body>
-<script>
-    
-    
-            var map_e81022b33cd5faee81b57c37b37a3542 = L.map(
-                "map_e81022b33cd5faee81b57c37b37a3542",
-                {
-                    center: [46.9914, 11.416055],
-                    crs: L.CRS.EPSG3857,
-                    ...{
-  "zoom": 14,
-  "zoomControl": false,
-  "preferCanvas": true,
-}
-
-                }
-            );
-
-            
-
-        
-    
-            var tile_layer_f870ae09d355441331cecc149b6ebc49 = L.tileLayer(
-                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-                {
-  "minZoom": 0,
-  "maxZoom": 20,
-  "maxNativeZoom": 17,
-  "noWrap": false,
-  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
-  "subdomains": "abcd",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
-
-            );
-        
-    
-            tile_layer_f870ae09d355441331cecc149b6ebc49.addTo(map_e81022b33cd5faee81b57c37b37a3542);
-        
-    
-            var tile_layer_ad0a7670a587c6145d0d96d359c9621e = L.tileLayer(
-                "https://tiles.bergfex.at/styles/bergfex-osm/{z}/{x}/{y}.jpg",
-                {
-  "minZoom": 0,
-  "maxZoom": 18,
-  "maxNativeZoom": 17,
-  "noWrap": false,
-  "attribution": "\u00a9 Bergfex OSM",
-  "subdomains": "abc",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
-
-            );
-        
-    
-            tile_layer_ad0a7670a587c6145d0d96d359c9621e.addTo(map_e81022b33cd5faee81b57c37b37a3542);
-        
-    
-            var feature_group_a75f5b038da99f06acd409fec537b77e = L.featureGroup(
-                {
-}
-            );
-        
-    
-            feature_group_a75f5b038da99f06acd409fec537b77e.addTo(map_e81022b33cd5faee81b57c37b37a3542);
-        
-    
-            var feature_group_3cbf51da6bb8c7846f0c4d33e2af41ee = L.featureGroup(
-                {
-}
-            );
-        
-    
-            var feature_group_0abc2f791d10a74b826f45f2414e98ec = L.featureGroup(
-                {
-}
-            );
-        
-    
-            feature_group_0abc2f791d10a74b826f45f2414e98ec.addTo(map_e81022b33cd5faee81b57c37b37a3542);
-        
-    
-            var layer_control_54793b0e59770872df87f83903d26524_layers = {
-                base_layers : {
-                    "Light Gray" : tile_layer_f870ae09d355441331cecc149b6ebc49,
-                    "Bergfex Topo" : tile_layer_ad0a7670a587c6145d0d96d359c9621e,
-                },
-                overlays :  {
-                    "Winter" : feature_group_a75f5b038da99f06acd409fec537b77e,
-                    "Spring" : feature_group_3cbf51da6bb8c7846f0c4d33e2af41ee,
-                },
-            };
-            let layer_control_54793b0e59770872df87f83903d26524 = L.control.layers(
-                layer_control_54793b0e59770872df87f83903d26524_layers.base_layers,
-                layer_control_54793b0e59770872df87f83903d26524_layers.overlays,
-                {
-  "position": "topright",
-  "collapsed": false,
-  "autoZIndex": true,
-}
-            ).addTo(map_e81022b33cd5faee81b57c37b37a3542);
-
-        
-</script>
 </html>

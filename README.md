@@ -15,8 +15,8 @@
 ---
 ### Overview
 
-- The Avalanche Scenario Mapper is developed within the **project CAIROS**.
-  - **The project CAIROS is funded by the European Regional Development Fund and Interreg VI-A Italy-Austria 2021-2027**.
+- Parts of the Avalanche Scenario Mapper were developed within the **project CAIROS**.
+  - **The project CAIROS was funded by the European Regional Development Fund and Interreg VI-A Italy-Austria 2021-2027**.
 - This repo represents **Step 16** of the **Avalanche Scenario Model Chain**.  
 - The Avalanche Scenario Mapper post-processes avalanche simulation results from Step 15 (AvaDirectoryResults)  
   and generates **scenario-specific subsets** for visualization, mapping, and publication.  
