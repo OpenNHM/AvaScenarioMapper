@@ -88,9 +88,30 @@ body{
 }
 #loader.hide{opacity:0;pointer-events:none}
 .loader-box{text-align:center}
-.loader-box img{width:190px;max-width:60vw;display:block;margin:0 auto 10px;border-radius:var(--r-md)}
 .loader-title{font-weight:700;font-size:16px;letter-spacing:.01em}
-.loader-sub{font-size:12px;color:var(--ink-2);margin-top:2px}
+.loader-tagline{font-size:12px;color:var(--albina-blue-dark);font-weight:600;margin-top:2px}
+.loader-icons{display:flex;justify-content:center;gap:10px;margin-top:20px}
+.loader-icons img{width:36px;height:36px}
+.loader-bar{
+  width:220px;height:6px;border-radius:3px;margin:10px auto 0;
+  background:linear-gradient(to right,#0096ff,#00ff00,#ffd500,#ff0000,#aa00ff)
+}
+.loader-sub{font-size:12px;color:var(--ink-2);margin-top:14px}
+.loader-status{font-size:11px;color:var(--ink-3);margin-top:8px}
+.loader-note{
+  display:inline-block;margin-top:16px;padding:8px 16px;
+  font-weight:700;font-size:13px;color:var(--albina-blue-dark);
+  background:var(--albina-blue-pale);border:1.5px solid var(--albina-blue-subtle);
+  border-radius:var(--r-md)
+}
+.loader-enter{
+  display:none;margin:18px auto 0;padding:12px 30px;border:0;border-radius:var(--r-pill);
+  background:var(--ink);color:#fff;font-size:14px;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 14px rgba(16,20,24,.25)
+}
+.loader-enter.show{display:block;animation:loader-enter-in .3s ease}
+.loader-enter:active{transform:scale(.96)}
+@keyframes loader-enter-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* ---------------------------------------------------------------- top bar */
 #topbar{
@@ -152,6 +173,7 @@ body{
 .grab .bar{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 8px}
 .grab-row{display:flex;align-items:center;gap:10px}
 .grab-row h1{font-size:15px;font-weight:700;margin:0;flex:1}
+.grab-sub{font-size:11px;color:var(--ink-3);margin-top:3px}
 .badge{
   font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;
   background:var(--albina-blue-pale);color:var(--albina-blue-dark);
@@ -171,11 +193,11 @@ body{
 }
 
 /* ---------------------------------------------------------------- blocks */
-.block{padding:10px 0;border-top:1px solid var(--line-2)}
+.block{padding:9px 0;border-top:1px solid var(--line-2)}
 .block:first-child{border-top:0;padding-top:4px}
 .label{
   font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--ink-2);margin-bottom:6px;display:flex;align-items:center;gap:6px
+  color:var(--ink-2);margin-bottom:5px;display:flex;align-items:center;gap:6px
 }
 .label .val{
   margin-left:auto;text-transform:none;letter-spacing:0;font-size:12px;
@@ -183,6 +205,14 @@ body{
 }
 .hint{font-size:11px;color:var(--ink-3);margin-top:6px}
 .hint a{color:inherit;text-decoration:underline}
+#size-hint{display:none}
+#size-hint.show{display:block}
+.info-btn{
+  width:15px;height:15px;flex:0 0 auto;border-radius:50%;border:1px solid var(--ink-3);
+  background:none;color:var(--ink-3);font-size:10px;font-weight:700;
+  line-height:1;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center
+}
+.info-btn:active,.info-btn.on{background:var(--albina-blue-pale);border-color:var(--albina-blue);color:var(--albina-blue-dark)}
 .hint.ref-heading{
   font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
   color:var(--ink-2);margin-top:14px;margin-bottom:0
@@ -208,7 +238,7 @@ body{
 }
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(16,20,24,.16)}
 .seg.compact{padding:2px}
-.seg.compact button{padding:5px 6px;font-size:12px}
+.seg.compact button{padding:4px 6px;font-size:11px}
 .seg button.disabled{opacity:.4;pointer-events:none}
 .seg button.hidden{display:none}
 
@@ -216,45 +246,33 @@ body{
 .mode-panel{display:none}
 .mode-panel.on{display:block}
 
-/* EAWS avalanche problem icons */
-.problems{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.problems.optional{grid-template-columns:repeat(2,1fr);margin-top:6px}
-.prob{
-  border:1px solid var(--line);background:var(--surface);border-radius:var(--r-md);
-  padding:6px 3px 5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px
-}
-.prob.on{border-color:var(--ink);background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--ink)}
-.prob img{width:100%;max-width:46px;aspect-ratio:1;object-fit:contain;display:block}
-.prob span{font-size:9px;line-height:1.15;text-align:center;color:var(--ink-2);hyphens:auto}
-.prob.on span{color:var(--ink);font-weight:600}
-
 /* aspect rose + elevation side by side */
-.release{display:grid;grid-template-columns:104px 1fr;gap:10px;align-items:start}
-.rose{width:104px;height:104px;display:block;touch-action:manipulation}
+.release{display:grid;grid-template-columns:92px 1fr;gap:10px;align-items:start}
+.rose{width:92px;height:92px;display:block;touch-action:manipulation}
 .rose polygon{cursor:pointer;transition:fill .12s ease}
 .rose text{pointer-events:none;font-family:inherit;font-weight:600}
 #btn-base{display:none}
 
 /* dual range */
-.range{position:relative;height:34px;margin-top:2px}
+.range{position:relative;height:28px;margin-top:2px}
 .range .track{
-  position:absolute;top:15px;left:0;right:0;height:4px;border-radius:2px;background:var(--line)
+  position:absolute;top:12px;left:0;right:0;height:4px;border-radius:2px;background:var(--line)
 }
-.range .fill{position:absolute;top:15px;height:4px;border-radius:2px;background:var(--ink)}
+.range .fill{position:absolute;top:12px;height:4px;border-radius:2px;background:var(--ink)}
 /* rainbow variant: the track itself carries the size-class colour scale, so a
    separate legend gradient bar isn't needed — only the thumb position matters */
-.range.rainbow .track{top:12px;height:10px;border-radius:5px;background:linear-gradient(to right,#0096ff,#00ff00,#ffd500,#ff0000,#aa00ff)}
+.range.rainbow .track{top:9px;height:10px;border-radius:5px;background:linear-gradient(to right,#0096ff,#00ff00,#ffd500,#ff0000,#aa00ff)}
 .range.rainbow .fill{display:none}
 .range input[type=range]{
-  position:absolute;top:0;left:0;width:100%;height:34px;margin:0;
+  position:absolute;top:0;left:0;width:100%;height:28px;margin:0;
   -webkit-appearance:none;appearance:none;background:transparent;pointer-events:none
 }
 .range input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;pointer-events:auto;width:24px;height:24px;border-radius:50%;
+  -webkit-appearance:none;pointer-events:auto;width:18px;height:18px;border-radius:50%;
   background:var(--surface);border:2px solid var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:grab
 }
 .range input[type=range]::-moz-range-thumb{
-  pointer-events:auto;width:22px;height:22px;border-radius:50%;
+  pointer-events:auto;width:16px;height:16px;border-radius:50%;
   background:var(--surface);border:2px solid var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:grab
 }
 .single input[type=range]{pointer-events:auto}
@@ -264,7 +282,7 @@ body{
 .row + .row{margin-top:8px}
 .chip{
   border:1px solid var(--line);background:var(--surface);border-radius:var(--r-pill);
-  padding:7px 12px;font-size:12px;font-weight:600;color:var(--ink-2);cursor:pointer;
+  padding:6px 11px;font-size:11px;font-weight:600;color:var(--ink-2);cursor:pointer;
   display:inline-flex;align-items:center;gap:6px
 }
 .chip.on{background:var(--albina-blue-pale);border-color:var(--albina-blue);color:var(--albina-blue-dark)}
@@ -313,9 +331,20 @@ body{
 <!-- ------------------------------------------------------------- loader -->
 <div id="loader">
   <div class="loader-box">
-    <img src="https://media.giphy.com/media/3Xzlefv57zcrVIPPRN/giphy.gif" alt="" onerror="this.hidden=true"/>
     <div class="loader-title">Avalanche Scenario Mapper</div>
+    <div class="loader-tagline">Mapping Avalanche Size</div>
+    <div class="loader-icons">
+      <img src="assets/size/size1.svg" alt="Size 1"/>
+      <img src="assets/size/size2.svg" alt="Size 2"/>
+      <img src="assets/size/size3.svg" alt="Size 3"/>
+      <img src="assets/size/size4.svg" alt="Size 4"/>
+      <img src="assets/size/size5.svg" alt="Size 5"/>
+    </div>
+    <div class="loader-bar"></div>
     <div class="loader-sub" id="loader-sub">Loading scenarios …</div>
+    <div class="loader-status">Preview · Work in Progress — Current Build October 2026</div>
+    <div class="loader-note">See References for more info</div>
+    <button class="loader-enter" id="btn-enter">Enter Mapper</button>
   </div>
 </div>
 
@@ -346,6 +375,7 @@ body{
       <span class="badge" id="count">0</span>
       <button class="linkbtn" id="btn-reset">Reset</button>
     </div>
+    <div class="grab-sub">Preview · Work in Progress — Current Build October 2026</div>
   </div>
 
   <!-- pinned — always visible, doesn't scroll away with the body below -->
@@ -365,17 +395,16 @@ body{
     <!-- 2 — spatial constraints ----------------------------------------- -->
     <div class="block">
       <div class="label section">Spatial Constraints</div>
-      <div class="label" style="margin-bottom:6px">Release area</div>
+      <div class="label" style="margin-bottom:6px">Release Area · Aspect &amp; Mean Elevation <span class="val" id="v-elev">800–3500 m</span></div>
       <div class="release">
         <svg class="rose" id="rose" viewBox="0 0 600 600" aria-label="Aspects"></svg>
         <div>
-          <div class="label" style="margin-bottom:2px">Mean elevation <span class="val" id="v-elev">800–8848 m</span></div>
           <div class="range" id="elev-range">
             <div class="track"></div><div class="fill" id="elev-fill"></div>
             <input type="range" id="elev-lo" min="800" max="3500" step="100" value="800"/>
             <input type="range" id="elev-hi" min="800" max="3500" step="100" value="3500"/>
           </div>
-          <div class="ticks"><span>800</span><span>2200</span><span>3500 m</span></div>
+          <div class="ticks"><span>800</span><span>2000</span><span>3500 m</span></div>
           <div class="row" style="margin-top:6px">
             <button class="chip" id="chip-treeline"><i class="ph ph-tree-evergreen"></i>Above treeline</button>
           </div>
@@ -386,13 +415,13 @@ body{
     <!-- 3 — avalanche constraints --------------------------------------- -->
     <div class="block">
       <div class="label section">Avalanche Constraints</div>
-      <div class="label">Expected Size | Event Size <span class="val" id="v-size">4 — very large</span></div>
+      <div class="label">Expected Size | Event Size <button class="info-btn" id="btn-size-info" aria-label="About event size" type="button">i</button> <span class="val" id="v-size">4 — very large</span></div>
       <div class="range single rainbow" id="size-range">
         <div class="track"></div><div class="fill" id="size-fill"></div>
         <input type="range" id="size" min="1" max="5" step="1" value="5"/>
       </div>
-      <div class="ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
-      <div class="hint">Size 1 shows release areas only. Sizes 2–5 use the mapper's very-high-potential size matrix.</div>
+      <div class="ticks" id="size-ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      <div class="hint" id="size-hint">Size 1 shows release areas only. Sizes 2–5 use the mapper's very-high-potential size matrix.</div>
       <div class="label" style="margin-top:10px">Flow regime <span class="val" id="v-flow">Dry</span></div>
       <div class="seg compact" id="seg-flow">
         <button data-flow="dry" class="on">Cold</button>
@@ -427,10 +456,10 @@ body{
       <div class="hint" id="src-note" style="margin-top:0">The size interface builds on the established EAWS, CAA and AAA classifications. Continuous size relationships retain compatibility with these five-class operational schemes while allowing model inputs and outputs to be expressed on the same scale. Simulation results can therefore be translated back into spatially mapped dimension, runout and destructive size.</div>
 
       <div class="hint ref-heading">Mapping Concept · Avalanche Scenario Maps</div>
-      <div class="hint">Hesselbach, C., Schwarz, J., Spannring, P., Wirbel, A., Huber, A., Winkler, M., Mitterer, C., Riedl, H., &amp; Fischer, J.-T. (2026). Avalanche scenario maps: from terrain identification to decision support tool. Proceedings of the International Snow Science Workshop. Whistler, Canada.</div>
+      <div class="hint">Hesselbach, C., Schwarz, J., Spannring, P., Wirbel, A., Huber, A., Winkler, M., Mitterer, C., Riedl, H., &amp; Fischer, J.-T. (2026). Avalanche scenario maps: from terrain identification to decision support tool. Proceedings of the International Snow Science Workshop. Whistler, Canada. <a href="https://doi.org/10.15788/1790098413" target="_blank" rel="noopener">doi.org/10.15788/1790098413</a></div>
 
-      <div class="hint ref-heading">Size Interface · Avalanche Size Classification</div> 
-      <div class="hint">Fischer, J.-T., Spannring, P., Hesselbach, C., Huber, A., Wirbel, A., Koehler, A., Sovilla, B., Gauer, P., &amp; Thumlert, S. (2026). Towards a Technical Scheme for Classification. Proceedings of the International Snow Science Workshop. Whistler, Canada.</div>
+      <div class="hint ref-heading">Size Interface · Avalanche Size Classification</div>
+      <div class="hint">Fischer, J.-T., Spannring, P., Hesselbach, C., Huber, A., Wirbel, A., Koehler, A., Sovilla, B., Gauer, P., &amp; Thumlert, S. (2026). Towards a Technical and Communication Scheme for Avalanche Size Classification. Proceedings of the International Snow Science Workshop. Whistler, Canada. <a href="https://doi.org/10.15788/1790098722" target="_blank" rel="noopener">doi.org/10.15788/1790098722</a></div>
 
       <div class="hint ref-heading">Software · Avalanche Scenario Mapper</div>
       <div class="hint">Hesselbach, C., Spannring, P., Huber, A., Schwarz, J., &amp; Fischer, J.-T. (2025). OpenNHM/AvaScenarioMapper: Avalanche Scenario Mapper v1.0 [Computer software]. Zenodo. <a href="https://doi.org/10.5281/zenodo.17662779" target="_blank" rel="noopener">doi.org/10.5281/zenodo.17662779</a></div>
@@ -501,10 +530,10 @@ body{
       <div class="hint" id="src-note-size" style="margin-top:0">The size interface builds on the established EAWS, CAA and AAA classifications. Continuous size relationships retain compatibility with these five-class operational schemes while allowing model inputs and outputs to be expressed on the same scale. Simulation results can therefore be translated back into spatially mapped dimension, runout and destructive size.</div>
 
       <div class="hint ref-heading">Mapping Concept · Avalanche Scenario Maps</div>
-      <div class="hint">Hesselbach, C., Schwarz, J., Spannring, P., Wirbel, A., Huber, A., Winkler, M., Mitterer, C., Riedl, H., &amp; Fischer, J.-T. (2026). Avalanche scenario maps: from terrain identification to decision support tool. Proceedings of the International Snow Science Workshop. Whistler, Canada.</div>
+      <div class="hint">Hesselbach, C., Schwarz, J., Spannring, P., Wirbel, A., Huber, A., Winkler, M., Mitterer, C., Riedl, H., &amp; Fischer, J.-T. (2026). Avalanche scenario maps: from terrain identification to decision support tool. Proceedings of the International Snow Science Workshop. Whistler, Canada. <a href="https://doi.org/10.15788/1790098413" target="_blank" rel="noopener">doi.org/10.15788/1790098413</a></div>
 
       <div class="hint ref-heading">Size Interface · Avalanche Size Classification</div>
-      <div class="hint">Fischer, J.-T., Spannring, P., Hesselbach, C., Huber, A., Wirbel, A., Koehler, A., Sovilla, B., Gauer, P., &amp; Thumlert, S. (2026). Towards a Technical Scheme for Avalanche Size Classification. Proceedings of the International Snow Science Workshop. Whistler, Canada.</div>
+      <div class="hint">Fischer, J.-T., Spannring, P., Hesselbach, C., Huber, A., Wirbel, A., Koehler, A., Sovilla, B., Gauer, P., &amp; Thumlert, S. (2026). Towards a Technical and Communication Scheme for Avalanche Size Classification. Proceedings of the International Snow Science Workshop. Whistler, Canada. <a href="https://doi.org/10.15788/1790098722" target="_blank" rel="noopener">doi.org/10.15788/1790098722</a></div>
 
       <div class="hint ref-heading">Software · Avalanche Scenario Mapper</div>
       <div class="hint">Hesselbach, C., Spannring, P., Huber, A., Schwarz, J., &amp; Fischer, J.-T. (2025). OpenNHM/AvaScenarioMapper: Avalanche Scenario Mapper v1.0 [Computer software]. Zenodo. <a href="https://doi.org/10.5281/zenodo.17662779" target="_blank" rel="noopener">doi.org/10.5281/zenodo.17662779</a></div>
@@ -554,12 +583,15 @@ window.addEventListener("error",e=>{
 window.addEventListener("unhandledrejection",e=>{
   showError("Unhandled: "+((e.reason&&e.reason.message)||e.reason));
 });
-/* The full local preview is large; surface a timeout without hiding progress forever. */
+/* The full local preview is large; surface a timeout without hiding progress forever.
+   Skipped once loading has actually finished and is just waiting on the
+   "Enter" tap — that's not a stall, it's the user taking their time. */
+let loaderReady=false;
 setTimeout(()=>{
   const l=document.getElementById("loader");
-  if(l && !l.classList.contains("hide")){
+  if(l && !l.classList.contains("hide") && !loaderReady){
     hideLoader();
-    showError("Loading did not finish within 60 s — last step was: "+
+    showError("Loading did not finish within 3 minutes — last step was: "+
       (document.getElementById("loader-sub")||{textContent:"?"}).textContent);
   }
 },180000);
@@ -721,7 +753,13 @@ function syncRose(){
 /* --------------------------------------------------------------- sheet UX */
 function snapPoints(){
   const h=window.innerHeight, sh=document.getElementById("sheet").offsetHeight;
-  return {full:0, half:Math.max(0,sh-Math.round(h*0.685)), peek:Math.max(0,sh-118)};
+  // "half" reveals exactly through the Event Size ticks, measured from the
+  // element's real rendered position (not a guessed viewport fraction) —
+  // #sheet is the nearest positioned ancestor, so offsetTop already gives
+  // its distance from the sheet's own top regardless of screen size/zoom
+  const anchor=document.getElementById("seg-flow");
+  const halfReveal = anchor ? (anchor.offsetTop+anchor.offsetHeight+4) : Math.round(h*0.685);
+  return {full:0, half:Math.max(0,sh-halfReveal), peek:Math.max(0,sh-118)};
 }
 let sheetY=null, snapName="peek";
 function setSnap(name){
@@ -800,14 +838,18 @@ function bindControls(){
   };
   lo.addEventListener("input",onElev); hi.addEventListener("input",onElev);
 
-  $("#chip-treeline").addEventListener("click",e=>{
-    const on=!e.currentTarget.classList.contains("on");
-    e.currentTarget.classList.toggle("on",on);
-    if(on){ lo.value=2000; hi.value=3500; }            // treeline ≈ 2000 m in the pilot area
-    else  { lo.value=800; hi.value=3500; }
+  $("#chip-treeline").addEventListener("click",()=>{
+    const isTreeline=+lo.value===2000 && +hi.value>=3500;
+    if(!isTreeline){ lo.value=2000; hi.value=3500; }   // treeline ≈ 2000 m in the pilot area
+    else{ lo.value=800; hi.value=3500; }
     onElev();
   });
 
+  $("#btn-size-info").addEventListener("click",e=>{
+    const on=!e.currentTarget.classList.contains("on");
+    e.currentTarget.classList.toggle("on",on);
+    $("#size-hint").classList.toggle("show",on);
+  });
   $("#size").addEventListener("input",e=>{S.size=+e.target.value;markCustom();syncSize();refresh();});
   $("#alpha").addEventListener("input",e=>{S.alpha=(+e.target.value)/100;syncAlpha();restyle();});
   $("#base-alpha").addEventListener("input",e=>{
@@ -910,9 +952,8 @@ function applyPreset(name,opt){
     $("#elev-lo").value=p.elev[0]; $("#elev-hi").value=p.elev[1];
     $("#size").value=p.size;
   }
-  // Dry Winter's own elevation floor (2000 m) is exactly what "Above
-  // treeline" sets, so show it as already active rather than off
-  $("#chip-treeline").classList.toggle("on", name==="dry");
+  // "Above treeline" state is derived from the elevation values themselves
+  // inside syncElev() (called via syncAll() below), not set here directly
   syncAll();
   if(!opt.silent) refresh();
 }
@@ -999,7 +1040,14 @@ function syncElev(){
   f.style.left=((lo-min)/(max-min)*100)+"%";
   f.style.width=((hi-lo)/(max-min)*100)+"%";
   $("#v-elev")
-    .textContent = (hi>=3500 ? lo+"–8848 m" : lo+"–"+hi+" m");
+    .textContent = (hi>=3500 ? lo+"–3500 m" : lo+"–"+hi+" m");
+  syncTreeline();
+}
+// "Above treeline" reflects the elevation range itself — only on when the
+// range is exactly the treeline preset (2000–3500 m), never a manual toggle
+function syncTreeline(){
+  const lo=+$("#elev-lo").value, hi=+$("#elev-hi").value;
+  $("#chip-treeline").classList.toggle("on", lo===2000 && hi>=3500);
 }
 function syncSize(){
   const f=$("#size-fill"); f.style.left="0"; f.style.width=((S.size-1)/4*100)+"%";
@@ -1070,7 +1118,13 @@ function doRefresh(){
     const ok = typeOn && matches(p,sectors);
     if(ok && p.modType==="rel") n++;
     const key = ok ? shownKey : "hidden";
-    if(it.key!==key){ it.key=key; it.visible=ok; it.layer.setStyle(styleFor(p,ok)); }
+    if(it.key!==key){
+      it.key=key; it.visible=ok; it.layer.setStyle(styleFor(p,ok));
+      // hidden features are still fully transparent canvas paths — without
+      // this they keep absorbing clicks meant for whatever visible feature
+      // is underneath, so some avalanches silently never open a popup
+      it.layer.options.interactive=ok;
+    }
   }
   // Destructive/Runout are TIF-derived image overlays — no vectors get
   // rendered while they're active, so the live loop above always counts 0.
@@ -1081,7 +1135,8 @@ function doRefresh(){
   $("#count").textContent = shownN.toLocaleString();
   $("#st-eyebrow").textContent = S.demo ? "Scenario · demo data" : "Scenario";
   const flow=S.flows.size===2?"dry + wet":[...S.flows][0];
-  $("#st-sub").innerHTML = `<b>${shownN.toLocaleString()}</b> ${countLabel} · ${flow} · ${S.elev[0]}–${S.elev[1]>=3500?"8848":S.elev[1]} m · event size ${S.size}`;
+  const sectorsText=CARDINALS.filter(c=>S.aspects.has(c)).join(", ")||"—";
+  $("#st-sub").innerHTML = `<b>${shownN.toLocaleString()}</b> ${countLabel} · ${S.elev[0]}–${S.elev[1]>=3500?"3500":S.elev[1]} m · ${sectorsText} · event size ${S.size} · ${flow}`;
 }
 function restyle(){ refresh(); }
 
@@ -1367,8 +1422,20 @@ async function loadAll(){
   }catch(err){
     showError(err && err.message ? err.message : String(err));
   }finally{
-    hideLoader();
+    readyToEnter();
   }
+}
+/* once loading succeeds, wait for an explicit tap instead of auto-dismissing —
+   a no-op if showError() already hid the loader first */
+function readyToEnter(){
+  const l=$("#loader");
+  if(!l || l.classList.contains("hide")) return;
+  loaderReady=true;
+  setLoaderText("Ready");
+  const btn=$("#btn-enter");
+  if(!btn){ hideLoader(); return; }
+  btn.classList.add("show");
+  btn.addEventListener("click",hideLoader,{once:true});
 }
 function countMod(geo,want){
   if(!geo||!geo.features) return 0;
