@@ -158,8 +158,11 @@ body{
 
 /* ---------------------------------------------------------------- sheet */
 #sheet{
-  position:fixed;left:0;right:0;bottom:0;z-index:600;
-  height:92dvh;max-height:92dvh;
+  /* top+bottom (not height+bottom) so both edges are pinned to whatever the
+     current viewport actually is — height:92dvh plus bottom:0 could briefly
+     disagree whenever the browser's own toolbar shows/hides, leaving a
+     sliver of the page's own background exposed below the sheet */
+  position:fixed;left:0;right:0;bottom:0;top:8dvh;z-index:600;
   background:var(--surface);
   border-radius:var(--r-lg) var(--r-lg) 0 0;
   box-shadow:var(--sheet-shadow);
@@ -316,7 +319,7 @@ body{
 .pop td:last-child{font-variant-numeric:tabular-nums}
 
 @media (min-width:820px){
-  #sheet{left:auto;right:14px;bottom:14px;width:400px;height:min(760px,88dvh);border-radius:var(--r-lg)}
+  #sheet{left:auto;right:14px;bottom:14px;top:auto;width:400px;height:min(760px,88dvh);border-radius:var(--r-lg)}
   #topbar{left:14px;right:auto;width:min(420px,50vw)}
 }
 @media (prefers-reduced-motion:reduce){
