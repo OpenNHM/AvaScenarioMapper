@@ -16,6 +16,22 @@
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="theme-color" content="#101418"/>
 
+<!-- dvh support/behaviour is inconsistent in iOS standalone ("Add to Home
+     Screen") mode, which has left a stray strip of the body's own background
+     showing below #sheet even after switching it to top+bottom. Drive the
+     real pixel height from JS instead and let CSS read that via --vh; set
+     eagerly here (before body layout) so there's no flash of the 1vh
+     fallback, and keep it live on resize/orientation change below. -->
+<script>
+(function(){
+  function setVh(){ document.documentElement.style.setProperty("--vh",(window.visualViewport?window.visualViewport.height:window.innerHeight)*0.01+"px"); }
+  setVh();
+  window.addEventListener("resize",setVh);
+  window.addEventListener("orientationchange",()=>setTimeout(setVh,300));
+  if(window.visualViewport) visualViewport.addEventListener("resize",setVh);
+})();
+</script>
+
 <!-- Leaflet: bundled locally (vendor/), CDN only as fallback -->
 <link rel="stylesheet" href="vendor/leaflet.css"/>
 <script src="vendor/leaflet.js"></script>
@@ -69,13 +85,13 @@
 /* 100dvh (not 100% / 100vh) so the page actually fills whatever space
    Safari's auto-hiding URL bar currently isn't using, instead of being
    sized once for whichever state it was in on load. */
-html,body{margin:0;padding:0;height:100%;height:100dvh;overscroll-behavior:none}
+html,body{margin:0;padding:0;height:100%;height:100dvh;height:calc(var(--vh,1vh)*100);overscroll-behavior:none}
 body{
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   color:var(--ink);background:#dfe4e7;
   font-size:14px;line-height:1.35;
 }
-#map{position:fixed;inset:0;height:100dvh;z-index:0}
+#map{position:fixed;inset:0;height:100dvh;height:calc(var(--vh,1vh)*100);z-index:0}
 .leaflet-control-zoom{display:none!important}
 .leaflet-control-attribution{font-size:9px;opacity:.65;margin-bottom:2px}
 .leaflet-control-scale{margin-bottom:6px}
@@ -105,13 +121,17 @@ body{
   border-radius:var(--r-md)
 }
 .loader-enter{
-  display:none;margin:18px auto 0;padding:12px 30px;border:0;border-radius:var(--r-pill);
+  display:block;margin:18px auto 0;padding:12px 30px;border:0;border-radius:var(--r-pill);
   background:var(--ink);color:#fff;font-size:14px;font-weight:700;cursor:pointer;
-  box-shadow:0 4px 14px rgba(16,20,24,.25)
+  box-shadow:0 4px 14px rgba(16,20,24,.25);
+  opacity:0;visibility:hidden;pointer-events:none;transform:translateY(4px);
+  transition:opacity .3s ease,transform .3s ease,visibility 0s linear .3s;
 }
-.loader-enter.show{display:block;animation:loader-enter-in .3s ease}
+.loader-enter.show{
+  opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);
+  transition:opacity .3s ease,transform .3s ease;
+}
 .loader-enter:active{transform:scale(.96)}
-@keyframes loader-enter-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* ---------------------------------------------------------------- top bar */
 #topbar{
@@ -162,7 +182,7 @@ body{
      current viewport actually is — height:92dvh plus bottom:0 could briefly
      disagree whenever the browser's own toolbar shows/hides, leaving a
      sliver of the page's own background exposed below the sheet */
-  position:fixed;left:0;right:0;bottom:0;top:8dvh;z-index:600;
+  position:fixed;left:0;right:0;bottom:0;top:8dvh;top:calc(var(--vh,1vh)*8);z-index:600;
   background:var(--surface);
   border-radius:var(--r-lg) var(--r-lg) 0 0;
   box-shadow:var(--sheet-shadow);
